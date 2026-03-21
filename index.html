@@ -568,6 +568,49 @@
   .hw-btn:hover { transform: scale(1.2); background: rgba(255,255,255,0.35); }
   .hw-btn.gekozen { background: rgba(255,255,255,0.5); transform: scale(1.15); }
 
+  /* ─── DONKERE MODUS ─── */
+  body.donker {
+    --bg:    #1a1a2e;
+    --card:  #16213e;
+    --text:  #e8e0f0;
+    --muted: #8a8aaa;
+    --pink2: #3a2040;
+  }
+  body.donker nav {
+    background: rgba(26,26,46,0.95);
+    border-bottom-color: #3a2040;
+  }
+  body.donker .home-hero {
+    background: linear-gradient(135deg,#2d1b4e,#1a1a3e,#0d2137);
+  }
+
+  /* ─── STICKER BUTTONS ─── */
+  .sticker-btn {
+    background: none; border: 2px solid var(--pink2);
+    border-radius: 10px; font-size: 1.3rem; cursor: pointer;
+    padding: 4px 8px; transition: transform .15s;
+  }
+  .sticker-btn:hover { transform: scale(1.2); }
+
+  /* ─── QUIZ ─── */
+  .quiz-antwoord-btn {
+    width: 100%; background: var(--bg); border: 2px solid var(--lavender);
+    border-radius: 14px; padding: 13px 16px; text-align: left;
+    font-family: 'Nunito', sans-serif; font-size: 0.92rem; font-weight: 700;
+    cursor: pointer; color: var(--text); transition: all .15s;
+  }
+  .quiz-antwoord-btn:hover { background: var(--pink2); border-color: var(--pink); }
+  .quiz-antwoord-btn.goed  { background: #d1fae5; border-color: #10b981; color: #065f46; }
+  .quiz-antwoord-btn.fout  { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+
+  /* ─── DAGBOEK ─── */
+  .dagboek-entry {
+    background: var(--bg); border-radius: 14px; padding: 14px 16px;
+    border-left: 4px solid var(--lavender);
+  }
+  .dagboek-entry .de-datum { font-size: 0.75rem; color: var(--muted); font-weight: 700; margin-bottom: 4px; }
+  .dagboek-entry .de-tekst { font-size: 0.88rem; color: var(--text); line-height: 1.6; }
+
   @media (max-width: 400px) {
     .bp-members-big { grid-template-columns: 1fr 1fr; }
     .yt-grid { grid-template-columns: 1fr 1fr; }
@@ -585,6 +628,11 @@
   <button onclick="toon('creatief', this)">🎨 Creatief</button>
   <button onclick="toon('rust', this)">💚 Rust</button>
   <button onclick="toon('roblox', this)">🎮 Roblox</button>
+  <button onclick="toon('tekenen', this)">✏️ Teken</button>
+  <button onclick="toon('dagboek', this)">📓 Dagboek</button>
+  <button onclick="toon('quiz', this)">🎵 Quiz</button>
+  <button onclick="toon('ouder', this)" style="opacity:0.4;font-size:0.7rem">🔒 Ouder</button>
+  <button onclick="wisselDonker()" id="donker-btn" style="margin-left:auto;flex-shrink:0">🌙</button>
 </nav>
 
 <main>
@@ -644,6 +692,47 @@
       <div class="tile-emoji">🎮</div>
       <div class="tile-label">Roblox</div>
       <div class="tile-sub">Games & tips</div>
+    </button>
+    <button class="home-tile" onclick="toon('tekenen', navBtn('tekenen'))" style="position:relative">
+      <div class="tile-emoji">✏️</div>
+      <div class="tile-label">Tekenbord</div>
+      <div class="tile-sub">Teken met je vinger</div>
+      <span style="position:absolute;top:8px;right:8px;background:var(--pink);color:white;font-size:0.6rem;font-weight:900;padding:2px 6px;border-radius:10px">NIEUW</span>
+    </button>
+    <button class="home-tile" onclick="toon('dagboek', navBtn('dagboek'))" style="position:relative">
+      <div class="tile-emoji">📓</div>
+      <div class="tile-label">Mijn Dagboek</div>
+      <div class="tile-sub">Privé voor jou alleen</div>
+      <span style="position:absolute;top:8px;right:8px;background:var(--pink);color:white;font-size:0.6rem;font-weight:900;padding:2px 6px;border-radius:10px">NIEUW</span>
+    </button>
+    <button class="home-tile" onclick="toon('quiz', navBtn('quiz'))" style="position:relative">
+      <div class="tile-emoji">🎵</div>
+      <div class="tile-label">BLACKPINK Quiz</div>
+      <div class="tile-sub">Test je kennis!</div>
+      <span style="position:absolute;top:8px;right:8px;background:var(--pink);color:white;font-size:0.6rem;font-weight:900;padding:2px 6px;border-radius:10px">NIEUW</span>
+    </button>
+    <!-- Weerbericht widget -->
+    <div class="home-tile" id="weer-tile" style="cursor:default">
+      <div id="weer-emoji" style="font-size:2.4rem;margin-bottom:4px">🌤️</div>
+      <div class="tile-label" id="weer-temp">Leiden</div>
+      <div class="tile-sub" id="weer-omschrijving">weerbericht laden...</div>
+    </div>
+  </div>
+
+  <!-- Sterren beloningsbalk -->
+  <div class="card accent-yellow" style="margin-top:18px">
+    <h2>⭐ Jouw sterren deze week</h2>
+    <div id="sterren-balk" style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0"></div>
+    <p style="font-size:0.78rem;color:var(--muted)">Je verdient een ster voor elke dag dat je de app gebruikt en je stemming invult! 🌟</p>
+  </div>
+
+  <!-- Geheim berichtje van papa/mama -->
+  <div id="geheim-berichtje-card" style="display:none" class="card accent-pink">
+    <h2>💌 Verrassing voor jou!</h2>
+    <div id="geheim-tekst" style="font-size:1rem;font-weight:700;line-height:1.6;color:var(--text);margin-bottom:8px"></div>
+    <div id="geheim-van" style="font-size:0.8rem;color:var(--muted)"></div>
+    <button onclick="verwijderGeheimBerichtje()" style="margin-top:10px;background:var(--pink);border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:8px 20px;border-radius:50px;color:white;font-size:0.85rem">
+      💕 Gelezen!
     </button>
   </div>
 </section>
@@ -1469,6 +1558,167 @@
       <li><span class="ci-emoji">💰</span><div><strong>Gratis is ook leuk</strong> — gebruik promo codes en gratis catalog items!</div></li>
       <li><span class="ci-emoji">⏰</span><div><strong>Speeltijd</strong> — zet een timer zodat je de tijd niet vergeet.</div></li>
     </ul>
+  </div>
+</section>
+
+<!-- ══════════ TEKENBORD ══════════ -->
+<section class="section" id="tekenen">
+  <div class="page-header">
+    <div class="emoji">✏️</div>
+    <h1>Tekenbord</h1>
+    <p>Teken met je vinger of muis!</p>
+  </div>
+  <div class="card accent-yellow">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center">
+      <div id="kleur-kiezer" style="display:flex;gap:6px;flex-wrap:wrap">
+        <button onclick="setTekenKleur('#e63946')" style="width:32px;height:32px;border-radius:50%;background:#e63946;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
+        <button onclick="setTekenKleur('#f7a8c4')" style="width:32px;height:32px;border-radius:50%;background:#f7a8c4;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
+        <button onclick="setTekenKleur('#ff9f1c')" style="width:32px;height:32px;border-radius:50%;background:#ff9f1c;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
+        <button onclick="setTekenKleur('#2ec4b6')" style="width:32px;height:32px;border-radius:50%;background:#2ec4b6;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
+        <button onclick="setTekenKleur('#a8e6cf')" style="width:32px;height:32px;border-radius:50%;background:#a8e6cf;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
+        <button onclick="setTekenKleur('#c9b8f0')" style="width:32px;height:32px;border-radius:50%;background:#c9b8f0;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
+        <button onclick="setTekenKleur('#1a1a2e')" style="width:32px;height:32px;border-radius:50%;background:#1a1a2e;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
+        <button onclick="setTekenKleur('#ffffff')" style="width:32px;height:32px;border-radius:50%;background:#ffffff;border:3px solid #ddd;cursor:pointer" class="teken-kleur-btn" title="Gum"></button>
+      </div>
+      <input type="range" min="2" max="30" value="6" oninput="tekenGrootte=this.value" style="width:80px" title="Penseelgrootte">
+      <button onclick="wisTekenBord()" style="background:#fee2e2;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:7px 14px;border-radius:50px;color:#e63946;font-size:0.82rem">🗑️ Wis alles</button>
+      <button onclick="slaTekeningOp()" style="background:var(--mint);border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:7px 14px;border-radius:50px;color:#2a7a5a;font-size:0.82rem">💾 Opslaan</button>
+    </div>
+    <canvas id="tekenCanvas" style="width:100%;border-radius:14px;background:white;touch-action:none;display:block;cursor:crosshair" height="400"></canvas>
+    <p style="font-size:0.75rem;color:var(--muted);margin-top:8px;text-align:center">Teken met je vinger (telefoon) of muis 🎨 Wit = gum</p>
+  </div>
+  <div class="card accent-pink" id="opgeslagen-tekeningen-card" style="display:none">
+    <h2>🖼️ Opgeslagen tekeningen</h2>
+    <div id="opgeslagen-tekeningen" style="display:flex;gap:10px;flex-wrap:wrap"></div>
+  </div>
+</section>
+
+<!-- ══════════ DAGBOEK ══════════ -->
+<section class="section" id="dagboek">
+  <div class="page-header">
+    <div class="emoji">📓</div>
+    <h1>Mijn Dagboek</h1>
+    <p>Privé — alleen voor jou 🔒</p>
+  </div>
+  <div class="card accent-lav">
+    <h2>✍️ Schrijf vandaag</h2>
+    <div style="font-size:0.82rem;color:var(--muted);margin-bottom:10px" id="dagboek-datum"></div>
+    <textarea id="dagboek-input" placeholder="Hoe was jouw dag? Wat vond je leuk, wat was moeilijk, waar ben je trots op?..."
+      style="width:100%;min-height:160px;border:2px solid var(--lavender);border-radius:14px;
+      padding:14px;font-family:'Nunito',sans-serif;font-size:0.92rem;resize:vertical;
+      background:var(--bg);color:var(--text);outline:none;line-height:1.6"></textarea>
+    <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+      <div style="display:flex;gap:6px" id="dagboek-stickers">
+        <button onclick="voegStickerToe('🌸')" class="sticker-btn">🌸</button>
+        <button onclick="voegStickerToe('⭐')" class="sticker-btn">⭐</button>
+        <button onclick="voegStickerToe('💕')" class="sticker-btn">💕</button>
+        <button onclick="voegStickerToe('😊')" class="sticker-btn">😊</button>
+        <button onclick="voegStickerToe('🎵')" class="sticker-btn">🎵</button>
+        <button onclick="voegStickerToe('🎮')" class="sticker-btn">🎮</button>
+      </div>
+      <button onclick="slaanDagboekOp()" style="margin-left:auto;background:var(--lavender);border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:10px 20px;border-radius:50px;color:#5a4a9a;font-size:0.88rem">
+        💾 Opslaan
+      </button>
+    </div>
+    <div id="dagboek-feedback" style="font-size:0.8rem;color:var(--mint);margin-top:6px;min-height:18px;font-weight:700"></div>
+  </div>
+  <div class="card accent-mint" id="dagboek-entries-card">
+    <h2>📖 Eerdere dagboekpagina's</h2>
+    <div id="dagboek-entries" style="display:flex;flex-direction:column;gap:10px;margin-top:6px"></div>
+  </div>
+</section>
+
+<!-- ══════════ BLACKPINK QUIZ ══════════ -->
+<section class="section" id="quiz">
+  <div class="page-header">
+    <div class="emoji">🎵</div>
+    <h1>BLACKPINK Quiz</h1>
+    <p>Test je kennis! 🖤💗</p>
+  </div>
+  <div class="card accent-pink">
+    <div id="quiz-score-balk" style="display:flex;justify-content:space-between;margin-bottom:16px">
+      <span style="font-weight:800;font-size:0.9rem">❓ Vraag <span id="quiz-nr">1</span> van 10</span>
+      <span style="font-weight:800;font-size:0.9rem">⭐ Score: <span id="quiz-score">0</span></span>
+    </div>
+    <div id="quiz-vraag" style="font-size:1.05rem;font-weight:800;line-height:1.5;margin-bottom:18px;color:var(--text)"></div>
+    <div id="quiz-antwoorden" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div id="quiz-feedback" style="margin-top:14px;font-size:0.9rem;font-weight:700;min-height:24px"></div>
+    <button id="quiz-volgende-btn" onclick="volgendeQuizVraag()" style="display:none;margin-top:12px;background:var(--pink);border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:11px 28px;border-radius:50px;color:white;font-size:0.9rem">
+      Volgende vraag →
+    </button>
+  </div>
+  <div id="quiz-einde" style="display:none" class="card accent-lav">
+    <div style="text-align:center;padding:10px 0">
+      <div style="font-size:3rem">🎉</div>
+      <h2 style="margin:10px 0">Quiz afgerond!</h2>
+      <div id="quiz-einde-score" style="font-family:'Pacifico',cursive;font-size:2rem;color:var(--pink);margin:8px 0"></div>
+      <div id="quiz-einde-tekst" style="font-size:0.9rem;color:var(--muted);margin-bottom:16px"></div>
+      <button onclick="herStartQuiz()" style="background:var(--pink);border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:12px 28px;border-radius:50px;color:white;font-size:0.9rem">
+        🔄 Opnieuw spelen
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ OUDER DASHBOARD ══════════ -->
+<section class="section" id="ouder">
+  <div id="ouder-login" class="card accent-lav" style="text-align:center;padding:32px 20px">
+    <div style="font-size:3rem;margin-bottom:12px">🔒</div>
+    <h2 style="margin-bottom:8px">Ouder pagina</h2>
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:18px">Deze pagina is alleen voor papa en mama</p>
+    <input type="password" id="ouder-pin" placeholder="Pincode" maxlength="4"
+      style="width:120px;text-align:center;font-size:1.5rem;font-weight:900;letter-spacing:8px;
+      padding:10px;border:2px solid var(--lavender);border-radius:14px;font-family:'Nunito',sans-serif;
+      background:var(--bg);color:var(--text)">
+    <br><br>
+    <button onclick="checkOuderPin()" style="background:var(--lavender);border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:11px 28px;border-radius:50px;color:#5a4a9a;font-size:0.9rem">
+      🔓 Inloggen
+    </button>
+    <div id="pin-fout" style="color:#e63946;font-size:0.82rem;margin-top:8px;min-height:18px;font-weight:700"></div>
+  </div>
+
+  <div id="ouder-dashboard" style="display:none">
+    <div class="page-header">
+      <div class="emoji">📊</div>
+      <h1>Ouder Dashboard</h1>
+      <p>Overzicht van Milou's week</p>
+    </div>
+
+    <!-- Stemming grafiek -->
+    <div class="card accent-lav">
+      <h2>📈 Stemmingen deze week</h2>
+      <canvas id="stemmingGrafiek" height="200" style="width:100%;margin-top:8px"></canvas>
+      <div id="stemming-samenvatting" style="margin-top:12px;font-size:0.85rem;color:var(--muted);line-height:1.8"></div>
+    </div>
+
+    <!-- Geheim berichtje sturen -->
+    <div class="card accent-pink">
+      <h2>💌 Stuur een geheim berichtje naar Milou</h2>
+      <p style="font-size:0.83rem;color:var(--muted);margin-bottom:12px">Milou ziet dit de volgende keer dat ze de app opent op de homepagina!</p>
+      <textarea id="geheim-input" placeholder="Schrijf hier je verrassing voor Milou..."
+        style="width:100%;min-height:100px;border:2px solid var(--pink2);border-radius:14px;
+        padding:12px;font-family:'Nunito',sans-serif;font-size:0.9rem;resize:vertical;
+        background:var(--bg);color:var(--text);outline:none"></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <input type="text" id="geheim-van" placeholder="Van: (bijv. Mama 💕)" value="Mama & Papa 💕"
+          style="flex:1;border:2px solid var(--pink2);border-radius:50px;padding:8px 14px;
+          font-family:'Nunito',sans-serif;font-size:0.85rem;background:var(--bg);color:var(--text)">
+        <button onclick="verstuurGeheimBerichtje()" style="background:var(--pink);border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:10px 20px;border-radius:50px;color:white;font-size:0.85rem">
+          💌 Sturen!
+        </button>
+      </div>
+      <div id="geheim-bevestiging" style="font-size:0.8rem;color:var(--mint);margin-top:8px;min-height:18px;font-weight:700"></div>
+    </div>
+
+    <!-- Dagboek inzien (optioneel) -->
+    <div class="card accent-mint">
+      <h2>📓 Dagboek statistieken</h2>
+      <div id="dagboek-stats" style="font-size:0.88rem;color:var(--muted);line-height:2"></div>
+    </div>
+
+    <button onclick="uitloggenOuder()" style="width:100%;background:#fee2e2;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:12px;border-radius:14px;color:#e63946;font-size:0.88rem;margin-top:8px">
+      🔒 Uitloggen
+    </button>
   </div>
 </section>
 
@@ -2374,9 +2624,365 @@ function volgendeVerjaardag() {
 }
 volgendeVerjaardag();
 
-// ════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════
+//  🌙 DONKERE MODUS
+// ════════════════════════════════════════════════════
+function wisselDonker() {
+  document.body.classList.toggle('donker');
+  const isDonker = document.body.classList.contains('donker');
+  document.getElementById('donker-btn').textContent = isDonker ? '☀️' : '🌙';
+  localStorage.setItem('milou_donker', isDonker ? '1' : '0');
+}
+if (localStorage.getItem('milou_donker') === '1') {
+  document.body.classList.add('donker');
+  const db = document.getElementById('donker-btn');
+  if (db) db.textContent = '☀️';
+}
+
+// ════════════════════════════════════════════════════
+//  ⭐ BELONINGSSYSTEEM
+// ════════════════════════════════════════════════════
+function updateSterren() {
+  const el = document.getElementById('sterren-balk');
+  if (!el) return;
+  let data = {};
+  try { data = JSON.parse(localStorage.getItem('milou_stemmingen') || '{}'); } catch(e) {}
+  const nu = new Date();
+  let sterren = 0;
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(nu); d.setDate(d.getDate() - i);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if (data[key] && data[key].length > 0) sterren++;
+  }
+  el.innerHTML = '';
+  for (let i = 0; i < 7; i++) {
+    const s = document.createElement('span');
+    s.style.cssText = `font-size:1.6rem;filter:${i < sterren ? 'none' : 'grayscale(1) opacity(0.3)'}`;
+    s.textContent = i < sterren ? '⭐' : '☆';
+    el.appendChild(s);
+  }
+}
+updateSterren();
+
+// ════════════════════════════════════════════════════
+//  🌤️ WEERBERICHT LEIDEN
+// ════════════════════════════════════════════════════
+async function laadWeer() {
+  try {
+    const url = 'https://api.open-meteo.com/v1/forecast?latitude=52.16&longitude=4.49&current=temperature_2m,weather_code&timezone=Europe/Amsterdam';
+    const r = await fetch(url);
+    const d = await r.json();
+    const temp = Math.round(d.current.temperature_2m);
+    const code = d.current.weather_code;
+    const WEER = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',95:'⛈️'};
+    const OMSCH = {0:'Zonnig',1:'Licht bewolkt',2:'Bewolkt',3:'Zwaar bewolkt',45:'Mist',51:'Motregen',61:'Lichte regen',63:'Regen',80:'Buien',95:'Onweer',71:'Sneeuw'};
+    const el1 = document.getElementById('weer-emoji');
+    const el2 = document.getElementById('weer-temp');
+    const el3 = document.getElementById('weer-omschrijving');
+    if (el1) el1.textContent = WEER[code] || '🌤️';
+    if (el2) el2.textContent = `${temp}°C`;
+    if (el3) el3.textContent = `Leiden • ${OMSCH[code] || 'Wisselend'}`;
+  } catch(e) {}
+}
+laadWeer();
+
+// ════════════════════════════════════════════════════
+//  ✏️ TEKENBORD
+// ════════════════════════════════════════════════════
+let tekenKleur = '#e63946', tekenGrootte = 6, isTekening = false;
+let tekenCanvas = null, tekenCtx = null;
+
+function initTekenbord() {
+  tekenCanvas = document.getElementById('tekenCanvas');
+  if (!tekenCanvas) return;
+  tekenCanvas.width = tekenCanvas.offsetWidth;
+  tekenCtx = tekenCanvas.getContext('2d');
+  tekenCtx.lineCap = 'round'; tekenCtx.lineJoin = 'round';
+  tekenCanvas.addEventListener('touchstart', e => { e.preventDefault(); startTekenen(tekenPos(e.touches[0])); }, { passive: false });
+  tekenCanvas.addEventListener('touchmove',  e => { e.preventDefault(); tekenStip(tekenPos(e.touches[0])); }, { passive: false });
+  tekenCanvas.addEventListener('touchend',   () => isTekening = false);
+  tekenCanvas.addEventListener('mousedown',  e => startTekenen(tekenPos(e)));
+  tekenCanvas.addEventListener('mousemove',  e => tekenStip(tekenPos(e)));
+  tekenCanvas.addEventListener('mouseup',    () => isTekening = false);
+  tekenCanvas.addEventListener('mouseleave', () => isTekening = false);
+  laadOpgeslagenTekeningen();
+}
+function tekenPos(e) {
+  const r = tekenCanvas.getBoundingClientRect();
+  return { x: (e.clientX - r.left) * (tekenCanvas.width / r.width), y: (e.clientY - r.top) * (tekenCanvas.height / r.height) };
+}
+function startTekenen(pos) { isTekening = true; tekenCtx.beginPath(); tekenCtx.moveTo(pos.x, pos.y); }
+function tekenStip(pos) {
+  if (!isTekening) return;
+  tekenCtx.lineWidth = tekenKleur === '#ffffff' ? tekenGrootte * 4 : tekenGrootte;
+  tekenCtx.strokeStyle = tekenKleur;
+  tekenCtx.lineTo(pos.x, pos.y); tekenCtx.stroke();
+  tekenCtx.beginPath(); tekenCtx.moveTo(pos.x, pos.y);
+}
+function setTekenKleur(kleur) {
+  tekenKleur = kleur;
+  document.querySelectorAll('.teken-kleur-btn').forEach(b => b.style.border = '3px solid transparent');
+  event.target.style.border = '3px solid #333';
+}
+function wisTekenBord() { if (tekenCtx) tekenCtx.clearRect(0, 0, tekenCanvas.width, tekenCanvas.height); }
+function slaTekeningOp() {
+  if (!tekenCanvas) return;
+  let t = []; try { t = JSON.parse(localStorage.getItem('milou_tekeningen') || '[]'); } catch(e) {}
+  t.unshift({ data: tekenCanvas.toDataURL(), datum: new Date().toLocaleDateString('nl-NL') });
+  if (t.length > 10) t = t.slice(0, 10);
+  localStorage.setItem('milou_tekeningen', JSON.stringify(t));
+  laadOpgeslagenTekeningen();
+  alert('Tekening opgeslagen! 🎨');
+}
+function laadOpgeslagenTekeningen() {
+  const c = document.getElementById('opgeslagen-tekeningen');
+  const card = document.getElementById('opgeslagen-tekeningen-card');
+  if (!c) return;
+  let t = []; try { t = JSON.parse(localStorage.getItem('milou_tekeningen') || '[]'); } catch(e) {}
+  if (!t.length) { if (card) card.style.display = 'none'; return; }
+  if (card) card.style.display = 'block';
+  c.innerHTML = t.map(i => `<div style="text-align:center"><img src="${i.data}" style="width:100px;height:80px;object-fit:cover;border-radius:10px;border:2px solid var(--pink2)"><div style="font-size:0.7rem;color:var(--muted);margin-top:3px">${i.datum}</div></div>`).join('');
+}
+
+// ════════════════════════════════════════════════════
+//  📓 DAGBOEK
+// ════════════════════════════════════════════════════
+(function() {
+  const el = document.getElementById('dagboek-datum');
+  if (el) el.textContent = new Date().toLocaleDateString('nl-NL', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+})();
+
+function voegStickerToe(sticker) {
+  const ta = document.getElementById('dagboek-input');
+  if (ta) ta.value += sticker;
+}
+function slaanDagboekOp() {
+  const tekst = document.getElementById('dagboek-input')?.value?.trim();
+  if (!tekst) return;
+  const nu = new Date();
+  const key = nu.toLocaleDateString('nl-NL', { weekday:'long', day:'numeric', month:'long' });
+  let e = []; try { e = JSON.parse(localStorage.getItem('milou_dagboek') || '[]'); } catch(ex) {}
+  e.unshift({ datum: key, tekst, timestamp: nu.toISOString() });
+  if (e.length > 50) e = e.slice(0, 50);
+  localStorage.setItem('milou_dagboek', JSON.stringify(e));
+  document.getElementById('dagboek-input').value = '';
+  const fb = document.getElementById('dagboek-feedback');
+  if (fb) { fb.textContent = '✅ Opgeslagen! 💕'; setTimeout(() => fb.textContent = '', 2500); }
+  laadDagboekEntries();
+}
+function laadDagboekEntries() {
+  const c = document.getElementById('dagboek-entries');
+  if (!c) return;
+  let e = []; try { e = JSON.parse(localStorage.getItem('milou_dagboek') || '[]'); } catch(ex) {}
+  if (!e.length) { c.innerHTML = '<p style="font-size:0.85rem;color:var(--muted)">Nog niets geschreven. Begin vandaag! ✍️</p>'; return; }
+  c.innerHTML = e.slice(0,10).map(i => `<div class="dagboek-entry"><div class="de-datum">📅 ${i.datum}</div><div class="de-tekst">${i.tekst.replace(/</g,'&lt;')}</div></div>`).join('');
+}
+
+// ════════════════════════════════════════════════════
+//  🎵 BLACKPINK QUIZ
+// ════════════════════════════════════════════════════
+const QUIZ_VRAGEN = [
+  { vraag:'Welk BLACKPINK-lid komt uit Thailand?', antwoorden:['Jisoo','Jennie','Rosé','Lisa'], goed:3 },
+  { vraag:'Wanneer debuteerde BLACKPINK?', antwoorden:['2014','2016','2018','2015'], goed:1 },
+  { vraag:'Wat is de echte naam van Rosé?', antwoorden:['Park Sooyoung','Kim Jisoo','Roseanne Park','Lalisa Manoban'], goed:2 },
+  { vraag:'Welk nummer heeft "DDU-DU" in de titel?', antwoorden:['Pink Venom','How You Like That','DDU-DU DDU-DU','Shut Down'], goed:2 },
+  { vraag:'Bij welk label is BLACKPINK?', antwoorden:['SM Entertainment','HYBE','JYP','YG Entertainment'], goed:3 },
+  { vraag:'Welk lid was de EERSTE soliste?', antwoorden:['Lisa','Jisoo','Jennie','Rosé'], goed:2 },
+  { vraag:'Hoe heet Jisoo haar hondje?', antwoorden:['Kuma','Dalgom','Bori','Tobi'], goed:1 },
+  { vraag:'Op welk festival headlinede BLACKPINK als eerste K-pop groep?', antwoorden:['Glastonbury','Lollapalooza','Coachella','Tomorrowland'], goed:2 },
+  { vraag:'Wat speelt Rosé naast zingen?', antwoorden:['Drums','Viool','Piano & Gitaar','Fluit'], goed:2 },
+  { vraag:'Hoe oud was Lisa bij haar auditie bij YG?', antwoorden:['12','14','16','18'], goed:1 },
+];
+let quizIndex = 0, quizScore = 0, quizAntwoordGegeven = false;
+
+function initQuiz() {
+  quizIndex = 0; quizScore = 0;
+  const e = document.getElementById('quiz-einde');
+  const s = document.getElementById('quiz-score-balk');
+  if (e) e.style.display = 'none';
+  if (s) s.style.display = 'flex';
+  toonQuizVraag();
+}
+function toonQuizVraag() {
+  if (quizIndex >= QUIZ_VRAGEN.length) { eindQuiz(); return; }
+  const v = QUIZ_VRAGEN[quizIndex];
+  quizAntwoordGegeven = false;
+  document.getElementById('quiz-nr').textContent = quizIndex + 1;
+  document.getElementById('quiz-score').textContent = quizScore;
+  document.getElementById('quiz-vraag').textContent = v.vraag;
+  document.getElementById('quiz-feedback').textContent = '';
+  document.getElementById('quiz-volgende-btn').style.display = 'none';
+  document.getElementById('quiz-antwoorden').innerHTML = v.antwoorden.map((a,i) =>
+    `<button class="quiz-antwoord-btn" onclick="checkQuizAntwoord(${i})">${a}</button>`).join('');
+}
+function checkQuizAntwoord(index) {
+  if (quizAntwoordGegeven) return;
+  quizAntwoordGegeven = true;
+  const v = QUIZ_VRAGEN[quizIndex];
+  const btns = document.querySelectorAll('.quiz-antwoord-btn');
+  btns[v.goed].classList.add('goed');
+  const fb = document.getElementById('quiz-feedback');
+  if (index === v.goed) { quizScore++; btns[index].classList.add('goed'); fb.textContent = '✅ Goed! Super! 🌟'; fb.style.color = '#10b981'; }
+  else { btns[index].classList.add('fout'); fb.textContent = `❌ Het goede antwoord was: ${v.antwoorden[v.goed]}`; fb.style.color = '#ef4444'; }
+  document.getElementById('quiz-volgende-btn').style.display = 'block';
+  document.getElementById('quiz-score').textContent = quizScore;
+}
+function volgendeQuizVraag() { quizIndex++; toonQuizVraag(); }
+function eindQuiz() {
+  document.getElementById('quiz-score-balk').style.display = 'none';
+  document.getElementById('quiz-vraag').textContent = '';
+  document.getElementById('quiz-antwoorden').innerHTML = '';
+  document.getElementById('quiz-feedback').textContent = '';
+  document.getElementById('quiz-volgende-btn').style.display = 'none';
+  document.getElementById('quiz-einde').style.display = 'block';
+  document.getElementById('quiz-einde-score').textContent = `${quizScore} / ${QUIZ_VRAGEN.length}`;
+  const pct = quizScore / QUIZ_VRAGEN.length;
+  document.getElementById('quiz-einde-tekst').textContent =
+    pct === 1 ? '🏆 PERFECTE score! Jij bent een echte BLACKPINK expert!' :
+    pct >= 0.7 ? '🎉 Heel goed! Jij weet veel over BLACKPINK!' :
+    pct >= 0.5 ? '👍 Niet slecht! Nog een keer proberen?' : '🌸 Oefening baart kunst! Probeer het nog een keer!';
+}
+function herStartQuiz() {
+  QUIZ_VRAGEN.sort(() => Math.random() - 0.5);
+  document.getElementById('quiz-einde').style.display = 'none';
+  document.getElementById('quiz-score-balk').style.display = 'flex';
+  initQuiz();
+}
+
+// ════════════════════════════════════════════════════
+//  🔒 OUDER DASHBOARD
+// ════════════════════════════════════════════════════
+const OUDER_PIN = '1987'; // ✏️ Verander naar jouw eigen pincode!
+
+function checkOuderPin() {
+  const pin = document.getElementById('ouder-pin')?.value;
+  if (pin === OUDER_PIN) {
+    document.getElementById('ouder-login').style.display = 'none';
+    document.getElementById('ouder-dashboard').style.display = 'block';
+    laadOuderDashboard();
+  } else {
+    const fb = document.getElementById('pin-fout');
+    if (fb) { fb.textContent = '❌ Verkeerde pincode'; setTimeout(() => fb.textContent = '', 2000); }
+  }
+}
+function uitloggenOuder() {
+  document.getElementById('ouder-login').style.display = 'block';
+  document.getElementById('ouder-dashboard').style.display = 'none';
+  if (document.getElementById('ouder-pin')) document.getElementById('ouder-pin').value = '';
+}
+function laadOuderDashboard() {
+  tekenStemmingGrafiek();
+  laadDagboekStats();
+}
+function tekenStemmingGrafiek() {
+  const canvas = document.getElementById('stemmingGrafiek');
+  if (!canvas) return;
+  canvas.width = canvas.offsetWidth;
+  const ctx = canvas.getContext('2d');
+  let weekData = {}; try { weekData = JSON.parse(localStorage.getItem('milou_stemmingen') || '{}'); } catch(e) {}
+  const nu = new Date();
+  const SCORE = { '😊':5,'🥰':5,'😐':3,'😴':2,'😢':1 };
+  const DN = ['Zo','Ma','Di','Wo','Do','Vr','Za'];
+  const labels=[], scores=[], kleuren=[];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(nu); d.setDate(d.getDate()-i);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    labels.push(DN[d.getDay()]);
+    if (weekData[key]?.length > 0) {
+      const gem = weekData[key].reduce((s,e) => s+(SCORE[e.emoji]||3), 0) / weekData[key].length;
+      scores.push(gem); kleuren.push(gem>=4?'#a8e6cf':gem>=3?'#ffe49a':'#f9c9d8');
+    } else { scores.push(0); kleuren.push('#e0e0e0'); }
+  }
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const bW = (canvas.width-40)/7-8, mH = canvas.height-40;
+  scores.forEach((s,i) => {
+    const x = 20 + i*((canvas.width-40)/7);
+    const h = s > 0 ? (s/5)*mH : 4;
+    ctx.fillStyle = kleuren[i];
+    ctx.beginPath(); ctx.roundRect(x, canvas.height-30-h, bW, h, 6); ctx.fill();
+    ctx.fillStyle='#3a2a3a'; ctx.font='bold 11px Nunito,sans-serif'; ctx.textAlign='center';
+    ctx.fillText(labels[i], x+bW/2, canvas.height-10);
+    if (s>0) { ctx.font='14px serif'; ctx.fillText(s>=4.5?'🥰':s>=3.5?'😊':s>=2.5?'😐':s>=1.5?'😴':'😢', x+bW/2, canvas.height-35-h); }
+  });
+  const sv = document.getElementById('stemming-samenvatting');
+  if (sv) {
+    const t = scores.filter(s=>s>0).length;
+    const g = t>0 ? scores.reduce((a,b)=>a+b,0)/t : 0;
+    sv.innerHTML = `📅 <strong>${t} van 7 dagen</strong> ingevuld<br>😊 Gemiddeld: <strong>${g.toFixed(1)}/5</strong><br>${g>=4?'💚 Milou heeft een goede week!':g>=3?'🌿 Gemiddelde week':'💛 Milou heeft wat extra aandacht nodig'}`;
+  }
+}
+function laadDagboekStats() {
+  const el = document.getElementById('dagboek-stats');
+  if (!el) return;
+  let e=[]; try{e=JSON.parse(localStorage.getItem('milou_dagboek')||'[]');}catch(ex){}
+  el.innerHTML = !e.length ? 'Milou heeft nog niets in haar dagboek geschreven.' :
+    `📝 <strong>${e.length}</strong> pagina's geschreven<br>📅 Laatste: <strong>${e[0]?.datum}</strong><br>✍️ Gem. lengte: <strong>${Math.round(e.reduce((s,i)=>s+i.tekst.length,0)/e.length)} tekens</strong>`;
+}
+
+// ════════════════════════════════════════════════════
+//  💌 GEHEIM BERICHTJE
+// ════════════════════════════════════════════════════
+function verstuurGeheimBerichtje() {
+  const tekst = document.getElementById('geheim-input')?.value?.trim();
+  const van   = document.getElementById('geheim-van')?.value?.trim() || 'Mama & Papa';
+  if (!tekst) return;
+  localStorage.setItem('milou_geheim', JSON.stringify({ tekst, van }));
+  const fb = document.getElementById('geheim-bevestiging');
+  if (fb) { fb.textContent = '✅ Klaar! Milou ziet het de volgende keer 💕'; setTimeout(() => fb.textContent='', 3000); }
+  document.getElementById('geheim-input').value = '';
+}
+function checkGeheimBerichtje() {
+  try {
+    const raw = localStorage.getItem('milou_geheim');
+    if (!raw) return;
+    const b = JSON.parse(raw);
+    const card = document.getElementById('geheim-berichtje-card');
+    if (card) { card.style.display='block'; }
+    const t = document.getElementById('geheim-tekst');
+    if (t) t.textContent = b.tekst;
+    const v = card?.querySelector('.geheim-van-tekst');
+    if (v) v.textContent = `💕 Van: ${b.van}`;
+  } catch(e) {}
+}
+function verwijderGeheimBerichtje() {
+  localStorage.removeItem('milou_geheim');
+  const c = document.getElementById('geheim-berichtje-card');
+  if (c) c.style.display='none';
+}
+checkGeheimBerichtje();
+
+// ════════════════════════════════════════════════════
+//  🔔 BEDTIJD HERINNERING
+// ════════════════════════════════════════════════════
+function checkBedtijdHerinnering() {
+  const nu = new Date();
+  const dag = nu.getDay(), uur = nu.getHours(), min = nu.getMinutes();
+  const bt = dag===6 ? {h:22,m:0} : {h:19,m:30};
+  const minNu = uur*60+min, minBt = bt.h*60+bt.m, diff = minBt-minNu;
+  if (diff===15 || diff===5) {
+    const el = document.createElement('div');
+    el.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#2d1b4e;color:white;padding:14px 24px;border-radius:20px;font-family:Nunito,sans-serif;font-weight:800;font-size:0.92rem;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.3);text-align:center;max-width:300px';
+    el.innerHTML=`🌙 Nog ${diff} minuten tot bedtijd (${bt.h}:${String(bt.m).padStart(2,'0')})<br><span style="font-size:0.78rem;opacity:0.8">Maak je klaar om lekker te slapen 😴</span>`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 8000);
+  }
+}
+setInterval(checkBedtijdHerinnering, 60000);
+checkBedtijdHerinnering();
+
+// Override toon() om nieuwe secties te initialiseren
+const _origToon = toon;
+function toon(id, btn) {
+  _origToon(id, btn);
+  if (id==='tekenen') setTimeout(initTekenbord, 50);
+  if (id==='dagboek') laadDagboekEntries();
+  if (id==='quiz')    initQuiz();
+  if (id==='ouder')   laadOuderDashboard();
+  if (id==='home')  { updateSterren(); checkGeheimBerichtje(); }
+}
+
+// ════════════════════════════════════════════════════
 //  🤖 AI — AUTOMATISCHE BERICHTJES & QUOTES VIA CLAUDE
-// ════════════════════════════════════════════════════════
 
 async function genereerNieuweBerichtjes() {
   const btn = document.getElementById('ai-bericht-btn');
