@@ -1576,22 +1576,39 @@
   </div>
   <div class="card accent-yellow">
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center">
+      <!-- Kleurknoppen -->
       <div id="kleur-kiezer" style="display:flex;gap:6px;flex-wrap:wrap">
-        <button onclick="setTekenKleur('#e63946',this)" style="width:32px;height:32px;border-radius:50%;background:#e63946;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
+        <button onclick="setTekenKleur('#e63946',this)" style="width:32px;height:32px;border-radius:50%;background:#e63946;border:3px solid #333;cursor:pointer" class="teken-kleur-btn actief-kleur"></button>
         <button onclick="setTekenKleur('#f7a8c4',this)" style="width:32px;height:32px;border-radius:50%;background:#f7a8c4;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
         <button onclick="setTekenKleur('#ff9f1c',this)" style="width:32px;height:32px;border-radius:50%;background:#ff9f1c;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
         <button onclick="setTekenKleur('#2ec4b6',this)" style="width:32px;height:32px;border-radius:50%;background:#2ec4b6;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
         <button onclick="setTekenKleur('#a8e6cf',this)" style="width:32px;height:32px;border-radius:50%;background:#a8e6cf;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
         <button onclick="setTekenKleur('#c9b8f0',this)" style="width:32px;height:32px;border-radius:50%;background:#c9b8f0;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
         <button onclick="setTekenKleur('#1a1a2e',this)" style="width:32px;height:32px;border-radius:50%;background:#1a1a2e;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
-        <button onclick="setTekenKleur('#ffffff',this)" style="width:32px;height:32px;border-radius:50%;background:#ffffff;border:3px solid #ddd;cursor:pointer" class="teken-kleur-btn" title="Gum"></button>
       </div>
-      <input type="range" min="2" max="30" value="6" oninput="tekenGrootte=this.value" style="width:80px" title="Penseelgrootte">
+      <!-- Gum als aparte knop -->
+      <button onclick="activeerGum(this)" id="gum-knop"
+        style="background:#fff3cd;border:2px solid #ffc107;border-radius:50px;padding:6px 12px;
+        cursor:pointer;font-size:0.85rem;font-weight:800;color:#856404;white-space:nowrap">
+        🧹 Gum
+      </button>
+    </div>
+    <!-- Tweede rij: grootte + wis alles + opslaan -->
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+      <span style="font-size:0.78rem;font-weight:700;color:var(--muted)">Dikte:</span>
+      <input type="range" min="2" max="30" value="6" id="teken-grootte-slider"
+        oninput="tekenGrootte=parseInt(this.value);updateCursorGrootte()"
+        style="width:80px">
+      <span id="teken-grootte-label" style="font-size:0.78rem;color:var(--muted);min-width:20px">6</span>
       <button onclick="wisTekenBord()" style="background:#fee2e2;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:7px 14px;border-radius:50px;color:#e63946;font-size:0.82rem">🗑️ Wis alles</button>
       <button onclick="slaTekeningOp()" style="background:var(--mint);border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:7px 14px;border-radius:50px;color:#2a7a5a;font-size:0.82rem">💾 Opslaan</button>
     </div>
-    <canvas id="tekenCanvas" style="width:100%;border-radius:14px;background:white;touch-action:none;display:block;cursor:crosshair" height="400"></canvas>
-    <p style="font-size:0.75rem;color:var(--muted);margin-top:8px;text-align:center">Teken met je vinger (telefoon) of muis 🎨 Wit = gum</p>
+    <!-- Potlood cursor die meebeweegt -->
+    <div style="position:relative">
+      <canvas id="tekenCanvas" style="width:100%;border-radius:14px;background:white;touch-action:none;display:block;cursor:none" height="400"></canvas>
+      <div id="potlood-cursor" style="position:absolute;pointer-events:none;font-size:1.5rem;transform:translate(-4px,-100%);display:none;z-index:10;transition:none">✏️</div>
+    </div>
+    <p style="font-size:0.75rem;color:var(--muted);margin-top:8px;text-align:center">Teken met je vinger (telefoon) of muis 🎨 · Gebruik de gum om stukjes weg te halen</p>
   </div>
   <div class="card accent-pink" id="opgeslagen-tekeningen-card" style="display:none">
     <h2>🖼️ Opgeslagen tekeningen</h2>
@@ -2703,40 +2720,169 @@ laadWeer();
 // ════════════════════════════════════════════════════
 let tekenKleur = '#e63946', tekenGrootte = 6, isTekening = false;
 let tekenCanvas = null, tekenCtx = null;
+let isGumModus = false;
+let vorigePos = null;
 
 function initTekenbord() {
   tekenCanvas = document.getElementById('tekenCanvas');
   if (!tekenCanvas) return;
+  // Voorkom dubbele event listeners
+  if (tekenCanvas._init) return;
+  tekenCanvas._init = true;
+
   tekenCanvas.width = tekenCanvas.offsetWidth;
   tekenCtx = tekenCanvas.getContext('2d');
-  tekenCtx.lineCap = 'round'; tekenCtx.lineJoin = 'round';
-  tekenCanvas.addEventListener('touchstart', e => { e.preventDefault(); startTekenen(tekenPos(e.touches[0])); }, { passive: false });
-  tekenCanvas.addEventListener('touchmove',  e => { e.preventDefault(); tekenStip(tekenPos(e.touches[0])); }, { passive: false });
-  tekenCanvas.addEventListener('touchend',   () => isTekening = false);
-  tekenCanvas.addEventListener('mousedown',  e => startTekenen(tekenPos(e)));
-  tekenCanvas.addEventListener('mousemove',  e => tekenStip(tekenPos(e)));
-  tekenCanvas.addEventListener('mouseup',    () => isTekening = false);
-  tekenCanvas.addEventListener('mouseleave', () => isTekening = false);
+  tekenCtx.lineCap = 'round';
+  tekenCtx.lineJoin = 'round';
+
+  const cursor = document.getElementById('potlood-cursor');
+
+  // ── Touch events (iPhone) ──
+  tekenCanvas.addEventListener('touchstart', e => {
+    e.preventDefault();
+    const pos = tekenPos(e.touches[0]);
+    startTekenen(pos);
+    toonCursor(pos, true);
+  }, { passive: false });
+
+  tekenCanvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const pos = tekenPos(e.touches[0]);
+    tekenStip(pos);
+    toonCursor(pos, true);
+  }, { passive: false });
+
+  tekenCanvas.addEventListener('touchend', () => {
+    isTekening = false;
+    vorigePos = null;
+    if (cursor) cursor.style.display = 'none';
+  });
+
+  // ── Mouse events (computer) ──
+  tekenCanvas.addEventListener('mouseenter', () => {
+    if (cursor) cursor.style.display = 'block';
+  });
+  tekenCanvas.addEventListener('mouseleave', () => {
+    isTekening = false;
+    vorigePos = null;
+    if (cursor) cursor.style.display = 'none';
+  });
+  tekenCanvas.addEventListener('mousedown', e => {
+    const pos = tekenPos(e);
+    startTekenen(pos);
+    toonCursor(pos, true);
+  });
+  tekenCanvas.addEventListener('mousemove', e => {
+    const pos = tekenPos(e);
+    tekenStip(pos);
+    toonCursor(pos, isTekening);
+  });
+  tekenCanvas.addEventListener('mouseup', () => {
+    isTekening = false;
+    vorigePos = null;
+  });
+
   laadOpgeslagenTekeningen();
 }
+
+function toonCursor(pos, actief) {
+  const cursor = document.getElementById('potlood-cursor');
+  if (!cursor || !tekenCanvas) return;
+  const rect = tekenCanvas.getBoundingClientRect();
+  const schaalX = rect.width / tekenCanvas.width;
+  const schaalY = rect.height / tekenCanvas.height;
+  const x = pos.x * schaalX;
+  const y = pos.y * schaalY;
+  cursor.style.left = (x - 4) + 'px';
+  cursor.style.top  = (y - 20) + 'px';
+  cursor.style.display = 'block';
+  cursor.textContent = isGumModus ? '🧹' : '✏️';
+  cursor.style.fontSize = isGumModus
+    ? Math.max(16, tekenGrootte * 1.8) + 'px'
+    : '1.5rem';
+}
+
 function tekenPos(e) {
   const r = tekenCanvas.getBoundingClientRect();
-  return { x: (e.clientX - r.left) * (tekenCanvas.width / r.width), y: (e.clientY - r.top) * (tekenCanvas.height / r.height) };
+  return {
+    x: (e.clientX - r.left) * (tekenCanvas.width  / r.width),
+    y: (e.clientY - r.top)  * (tekenCanvas.height / r.height),
+  };
 }
-function startTekenen(pos) { isTekening = true; tekenCtx.beginPath(); tekenCtx.moveTo(pos.x, pos.y); }
+
+function startTekenen(pos) {
+  isTekening = true;
+  vorigePos = pos;
+  tekenCtx.beginPath();
+  tekenCtx.moveTo(pos.x, pos.y);
+}
+
 function tekenStip(pos) {
-  if (!isTekening) return;
-  tekenCtx.lineWidth = tekenKleur === '#ffffff' ? tekenGrootte * 4 : tekenGrootte;
-  tekenCtx.strokeStyle = tekenKleur;
-  tekenCtx.lineTo(pos.x, pos.y); tekenCtx.stroke();
-  tekenCtx.beginPath(); tekenCtx.moveTo(pos.x, pos.y);
+  if (!isTekening || !vorigePos) return;
+
+  if (isGumModus) {
+    // Gum — wis alleen het gebied rondom de cursor
+    const groot = tekenGrootte * 3;
+    tekenCtx.clearRect(
+      pos.x - groot / 2,
+      pos.y - groot / 2,
+      groot, groot
+    );
+  } else {
+    // Normaal tekenen
+    tekenCtx.lineWidth   = tekenGrootte;
+    tekenCtx.strokeStyle = tekenKleur;
+    tekenCtx.globalCompositeOperation = 'source-over';
+    tekenCtx.lineTo(pos.x, pos.y);
+    tekenCtx.stroke();
+    tekenCtx.beginPath();
+    tekenCtx.moveTo(pos.x, pos.y);
+  }
+  vorigePos = pos;
 }
+
 function setTekenKleur(kleur, el) {
+  // Verlaat gummodus
+  isGumModus = false;
   tekenKleur = kleur;
+  // Reset alle borders
   document.querySelectorAll('.teken-kleur-btn').forEach(b => b.style.border = '3px solid transparent');
   if (el) el.style.border = '3px solid #333';
+  // Gum-knop resetten
+  const gk = document.getElementById('gum-knop');
+  if (gk) { gk.style.background = '#fff3cd'; gk.style.borderColor = '#ffc107'; gk.style.color = '#856404'; }
+  // Cursor updaten
+  const cursor = document.getElementById('potlood-cursor');
+  if (cursor) cursor.textContent = '✏️';
 }
-function wisTekenBord() { if (tekenCtx) tekenCtx.clearRect(0, 0, tekenCanvas.width, tekenCanvas.height); }
+
+function activeerGum(el) {
+  isGumModus = !isGumModus;
+  // Visuele feedback gum-knop
+  if (isGumModus) {
+    el.style.background = '#ffc107';
+    el.style.borderColor = '#856404';
+    el.style.color = 'white';
+    // Deselecteer kleurknopjes
+    document.querySelectorAll('.teken-kleur-btn').forEach(b => b.style.border = '3px solid transparent');
+  } else {
+    el.style.background = '#fff3cd';
+    el.style.borderColor = '#ffc107';
+    el.style.color = '#856404';
+  }
+}
+
+function updateCursorGrootte() {
+  const slider = document.getElementById('teken-grootte-slider');
+  const label  = document.getElementById('teken-grootte-label');
+  if (slider) tekenGrootte = parseInt(slider.value);
+  if (label)  label.textContent = tekenGrootte;
+}
+
+function wisTekenBord() {
+  if (tekenCtx) tekenCtx.clearRect(0, 0, tekenCanvas.width, tekenCanvas.height);
+}
+
 function slaTekeningOp() {
   if (!tekenCanvas) return;
   let t = []; try { t = JSON.parse(localStorage.getItem('milou_tekeningen') || '[]'); } catch(e) {}
@@ -2746,14 +2892,20 @@ function slaTekeningOp() {
   laadOpgeslagenTekeningen();
   alert('Tekening opgeslagen! 🎨');
 }
+
 function laadOpgeslagenTekeningen() {
-  const c = document.getElementById('opgeslagen-tekeningen');
+  const c    = document.getElementById('opgeslagen-tekeningen');
   const card = document.getElementById('opgeslagen-tekeningen-card');
   if (!c) return;
   let t = []; try { t = JSON.parse(localStorage.getItem('milou_tekeningen') || '[]'); } catch(e) {}
   if (!t.length) { if (card) card.style.display = 'none'; return; }
   if (card) card.style.display = 'block';
-  c.innerHTML = t.map(i => `<div style="text-align:center"><img src="${i.data}" style="width:100px;height:80px;object-fit:cover;border-radius:10px;border:2px solid var(--pink2)"><div style="font-size:0.7rem;color:var(--muted);margin-top:3px">${i.datum}</div></div>`).join('');
+  c.innerHTML = t.map(i =>
+    `<div style="text-align:center">
+      <img src="${i.data}" style="width:100px;height:80px;object-fit:cover;border-radius:10px;border:2px solid var(--pink2)">
+      <div style="font-size:0.7rem;color:var(--muted);margin-top:3px">${i.datum}</div>
+    </div>`
+  ).join('');
 }
 
 // ════════════════════════════════════════════════════
