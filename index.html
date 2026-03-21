@@ -163,22 +163,30 @@
 
   /* ─── RECEPTEN ─── */
   .recipe-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    display: grid; grid-template-columns: 1fr; gap: 8px;
   }
   .recipe-pill {
-    background: var(--bg); border-radius: 12px; padding: 10px 14px;
-    font-weight: 700; font-size: 0.9rem;
-    display: flex; align-items: center; gap: 8px;
+    background: var(--bg); border-radius: 14px; padding: 14px 16px;
+    font-weight: 700; font-size: 0.92rem;
+    display: flex; align-items: center; gap: 12px;
     border: 2px solid transparent;
     cursor: pointer; transition: all .15s;
+    width: 100%; text-align: left;
+    min-height: 52px;
   }
-  .recipe-pill:hover { border-color: var(--pink); background: #fff0f5; }
+  .recipe-pill:hover, .recipe-pill.actief { border-color: var(--pink); background: #fff0f5; }
+  .recipe-pill .rp-emoji { font-size: 1.5rem; flex-shrink: 0; }
+  .recipe-pill .rp-naam  { flex: 1; }
+  .recipe-pill .rp-pijl  { color: var(--muted); font-size: 1rem; transition: transform .2s; }
+  .recipe-pill.actief .rp-pijl { transform: rotate(90deg); color: var(--pink); }
   .recipe-detail {
     display: none;
     background: #fff8fb; border-radius: 14px; padding: 18px;
-    margin-top: 14px; border: 2px solid var(--pink2);
+    margin-top: 4px; margin-bottom: 4px;
+    border: 2px solid var(--pink2);
+    animation: fadeIn .25s ease;
   }
-  .recipe-detail.open { display: block; animation: fadeIn .25s ease; }
+  .recipe-detail.open { display: block; }
   .recipe-detail h3 { margin-bottom: 10px; font-size: 1rem; }
   .recipe-detail ul { padding-left: 18px; color: var(--muted); font-size: 0.9rem; line-height: 1.8; }
   .recipe-detail .stappen { margin-top: 12px; font-size: 0.9rem; line-height: 1.9; color: var(--text); }
@@ -303,7 +311,28 @@
     border-radius: 10px; margin-left: 8px; vertical-align: middle;
   }
 
-  /* ─── BLACKPINK BIG MEMBER CARDS ─── */
+  /* ─── GAME GRID ─── */
+  .game-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .game-card {
+    background: var(--gc, linear-gradient(160deg,#1a1a2e,#2a2a4e));
+    border-radius: 14px; padding: 14px 12px;
+    text-decoration: none; display: flex; flex-direction: column;
+    gap: 4px; transition: transform .2s, box-shadow .2s;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .game-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+  .game-emoji { font-size: 2rem; margin-bottom: 2px; }
+  .game-naam  { font-weight: 900; font-size: 0.82rem; color: white; line-height: 1.3; }
+  .game-sub   { font-size: 0.72rem; color: rgba(255,255,255,0.6); }
+  .game-tag   {
+    margin-top: 6px; display: inline-block;
+    background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85);
+    font-size: 0.68rem; font-weight: 800; padding: 2px 8px;
+    border-radius: 20px; align-self: flex-start;
+  }
   .bp-members-big { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .bp-big-card {
     position: relative; border-radius: 16px; overflow: hidden;
@@ -447,22 +476,34 @@
   }
   .roblox-link-btn:hover { background: rgba(255,255,255,0.2); }
 
-  /* ─── HOME HERO met BP leden ─── */
-  .home-bp-strip {
-    display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 6px; margin-top: 14px;
+  /* ─── HOME HERO WIDGETS ─── */
+  .hero-widgets {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-top: 16px;
   }
-  .home-bp-thumb {
-    border-radius: 12px; overflow: hidden;
-    aspect-ratio: 1; position: relative;
-    text-decoration: none; display: block;
+  .hero-widget {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px);
+    border-radius: 16px; padding: 14px;
+    border: 1px solid rgba(255,255,255,0.25);
   }
-  .home-bp-thumb img { width:100%; height:100%; object-fit:cover; }
-  .home-bp-thumb .hbt-label {
-    position: absolute; bottom: 0; left:0; right:0;
-    background: rgba(0,0,0,0.6); color: white;
-    font-size: 0.68rem; font-weight: 800; text-align: center; padding: 3px;
+  .hw-label {
+    font-size: 0.72rem; font-weight: 800;
+    color: rgba(255,255,255,0.75);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-bottom: 8px;
   }
+  .hw-stemmingen {
+    display: flex; gap: 6px; flex-wrap: wrap;
+  }
+  .hw-btn {
+    background: rgba(255,255,255,0.2); border: none;
+    border-radius: 50%; width: 36px; height: 36px;
+    font-size: 1.2rem; cursor: pointer;
+    transition: transform .15s, background .15s;
+  }
+  .hw-btn:hover { transform: scale(1.2); background: rgba(255,255,255,0.35); }
+  .hw-btn.gekozen { background: rgba(255,255,255,0.5); transform: scale(1.15); }
 
   @media (max-width: 400px) {
     .bp-members-big { grid-template-columns: 1fr 1fr; }
@@ -489,24 +530,25 @@
 <section class="section active" id="home">
   <div class="home-hero">
     <h1>Hoi Milou! 🌸</h1>
-    <p>Dit is jouw eigen plekje. Welkom!</p>
-    <div class="home-bp-strip">
-      <a href="#" onclick="toon('blackpink',navBtn('blackpink'));return false" class="home-bp-thumb" style="background:linear-gradient(160deg,#ffb6c1,#c9184a)">
-        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);font-size:1.6rem">🌸</div>
-        <div class="hbt-label">Jisoo</div>
-      </a>
-      <a href="#" onclick="toon('blackpink',navBtn('blackpink'));return false" class="home-bp-thumb" style="background:linear-gradient(160deg,#ffe066,#e76f51)">
-        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);font-size:1.6rem">👑</div>
-        <div class="hbt-label">Jennie</div>
-      </a>
-      <a href="#" onclick="toon('blackpink',navBtn('blackpink'));return false" class="home-bp-thumb" style="background:linear-gradient(160deg,#a8d8ea,#4dabf7)">
-        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);font-size:1.6rem">🌹</div>
-        <div class="hbt-label">Rosé</div>
-      </a>
-      <a href="#" onclick="toon('blackpink',navBtn('blackpink'));return false" class="home-bp-thumb" style="background:linear-gradient(160deg,#b7e4c7,#40916c)">
-        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);font-size:1.6rem">⚡</div>
-        <div class="hbt-label">Lisa</div>
-      </a>
+    <p id="hero-dag-tekst">Welkom op jouw eigen plekje</p>
+    <div class="hero-widgets">
+      <!-- Dagelijkse stemming -->
+      <div class="hero-widget" id="stemming-widget">
+        <div class="hw-label">Hoe voel jij je vandaag?</div>
+        <div class="hw-stemmingen">
+          <button onclick="kiesStemming('😊','Super!')" class="hw-btn">😊</button>
+          <button onclick="kiesStemming('🥰','Liefdevol!')" class="hw-btn">🥰</button>
+          <button onclick="kiesStemming('😐','Gewoon')" class="hw-btn">😐</button>
+          <button onclick="kiesStemming('😴','Moe')" class="hw-btn">😴</button>
+          <button onclick="kiesStemming('😢','Niet zo fijn')" class="hw-btn">😢</button>
+        </div>
+        <div id="stemming-reactie" style="min-height:20px;font-size:0.85rem;font-weight:700;color:rgba(255,255,255,0.9);margin-top:6px"></div>
+      </div>
+      <!-- Dagelijkse quote -->
+      <div class="hero-widget" id="quote-widget">
+        <div class="hw-label">✨ Quote van vandaag</div>
+        <div id="dagquote" style="font-size:0.88rem;font-weight:700;color:white;line-height:1.5;margin-top:4px"></div>
+      </div>
     </div>
   </div>
   <div class="home-grid">
@@ -633,7 +675,6 @@
     <div class="recipe-grid" id="receptGrid">
       <!-- gevuld via JS -->
     </div>
-    <div class="recipe-detail" id="receptDetail"></div>
   </div>
 
   <div class="card accent-pink">
@@ -1116,17 +1157,89 @@
   <div class="page-header">
     <div class="emoji">🎮</div>
     <h1>Roblox</h1>
-    <p>Games, codes & gratis items!</p>
+    <p>Milou's favoriete games, codes & gratis items!</p>
   </div>
 
-  <!-- PROMO CODES - handmatig bijwerken -->
+  <!-- MILOU'S FAVORIETE GAMES - visuele kaartjes -->
+  <div style="background:linear-gradient(135deg,#0d0d1a,#1a1a2e);border-radius:var(--radius);padding:22px;margin-bottom:18px">
+    <h2 style="color:white;margin-bottom:4px">🕹️ Milou's favoriete games</h2>
+    <p style="color:rgba(255,255,255,0.5);font-size:0.78rem;margin-bottom:16px">Tik op een game om hem direct te openen in Roblox 📱</p>
+    <div class="game-grid">
+
+      <a href="https://www.roblox.com/games/142823291/Murder-Mystery-2" target="_blank" class="game-card" style="--gc:linear-gradient(160deg,#1a0a0a,#4a0000)">
+        <div class="game-emoji">🔪</div>
+        <div class="game-naam">Murder Mystery 2</div>
+        <div class="game-sub">Moordenaar vs Sheriffs</div>
+        <div class="game-tag">🔥 Populair</div>
+      </a>
+
+      <a href="https://www.roblox.com/games/79546208627805/99-Nights-in-the-Forest" target="_blank" class="game-card" style="--gc:linear-gradient(160deg,#0a1a0a,#0d3d1a)">
+        <div class="game-emoji">🌲</div>
+        <div class="game-naam">99 Nights in the Forest</div>
+        <div class="game-sub">Overleef 99 nachten!</div>
+        <div class="game-tag">😱 Horror</div>
+      </a>
+
+      <a href="https://www.roblox.com/games/4924922222/Brookhaven-RP" target="_blank" class="game-card" style="--gc:linear-gradient(160deg,#0a0a2e,#1a1a5e)">
+        <div class="game-emoji">🏡</div>
+        <div class="game-naam">Brookhaven RP</div>
+        <div class="game-sub">Roleplay & outfits</div>
+        <div class="game-tag">⭐ #1 op Roblox</div>
+      </a>
+
+      <a href="https://www.roblox.com/games/137826330724902/Scary-Shawarma-Kiosk-the-ANOMALY" target="_blank" class="game-card" style="--gc:linear-gradient(160deg,#1a0d00,#4a2000)">
+        <div class="game-emoji">🌯</div>
+        <div class="game-naam">Scary Shawarma Kiosk</div>
+        <div class="game-sub">Werk je nachtdienst... of niet</div>
+        <div class="game-tag">👻 Spooky</div>
+      </a>
+
+      <a href="https://www.roblox.com/games/11848247239/Conveyor-Sushi-Restaurant" target="_blank" class="game-card" style="--gc:linear-gradient(160deg,#001a1a,#004d4d)">
+        <div class="game-emoji">🍣</div>
+        <div class="game-naam">Conveyor Sushi Restaurant</div>
+        <div class="game-sub">Eet sushi van de lopende band</div>
+        <div class="game-tag">🍜 Restaurantje</div>
+      </a>
+
+      <a href="https://www.roblox.com/games/102574559184919/Craft-Food" target="_blank" class="game-card" style="--gc:linear-gradient(160deg,#0a1a00,#2d4a00)">
+        <div class="game-emoji">🍳</div>
+        <div class="game-naam">Craft Food</div>
+        <div class="game-sub">500+ recepten ontdekken!</div>
+        <div class="game-tag">🥕 Koken</div>
+      </a>
+
+      <a href="https://www.roblox.com/games/15532962292/Dress-to-Impress" target="_blank" class="game-card" style="--gc:linear-gradient(160deg,#1a001a,#4d004d)">
+        <div class="game-emoji">👗</div>
+        <div class="game-naam">Y2K Outfits / Dress to Impress</div>
+        <div class="game-sub">Stijlen & scoren</div>
+        <div class="game-tag">💅 Fashion</div>
+      </a>
+
+      <a href="https://www.youtube.com/results?search_query=roblox+duel+murderer+vs+sheriff+game+2025" target="_blank" class="game-card" style="--gc:linear-gradient(160deg,#1a0a00,#3d1a00)">
+        <div class="game-emoji">🤠</div>
+        <div class="game-naam">Duels: Murderer vs Sheriff</div>
+        <div class="game-sub">Wie wint het duel?</div>
+        <div class="game-tag">⚔️ Actie</div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- Y2K OUTFIT CODES voor Brookhaven -->
+  <div style="background:linear-gradient(135deg,#1a0a2e,#2e0a4a);border-radius:var(--radius);padding:22px;margin-bottom:18px">
+    <h2 style="color:white;margin-bottom:4px">👗 Y2K Outfit codes — Brookhaven</h2>
+    <p style="color:rgba(255,255,255,0.5);font-size:0.78rem;margin-bottom:14px">Tik een code in bij Brookhaven → Avatar → Shirt/Pants ID</p>
+    <div class="promo-grid" id="y2kCodes"><!-- JS --></div>
+    <a href="https://www.youtube.com/results?search_query=brookhaven+y2k+outfit+codes+2025+meisjes" target="_blank" class="roblox-link-btn" style="margin-top:12px">
+      👗 Meer Y2K codes op YouTube →
+    </a>
+  </div>
+
+  <!-- PROMO CODES -->
   <div style="background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);border-radius:var(--radius);padding:22px;margin-bottom:18px">
     <h2 style="color:white;margin-bottom:6px">🎁 Gratis promo codes</h2>
-    <!-- ✏️ BIJWERKEN: verwijder verlopen codes en voeg nieuwe toe -->
-    <p style="color:rgba(255,255,255,0.6);font-size:0.78rem;margin-bottom:14px">Laatst bijgewerkt: maart 2025 · Tik de code in bij <strong style="color:white">roblox.com/promocodes</strong></p>
-    <div class="promo-grid" id="promoCodes">
-      <!-- codes worden via JS ingevuld -->
-    </div>
+    <p style="color:rgba(255,255,255,0.6);font-size:0.78rem;margin-bottom:14px">Inwisselen op <strong style="color:white">roblox.com/promocodes</strong> · ✏️ Bijwerken als codes verlopen</p>
+    <div class="promo-grid" id="promoCodes"></div>
     <a href="https://www.roblox.com/promocodes" target="_blank" class="roblox-link-btn" style="margin-top:14px">
       🎁 Codes inwisselen op Roblox.com →
     </a>
@@ -1135,17 +1248,14 @@
   <!-- ACTUELE EVENTS -->
   <div style="background:linear-gradient(135deg,#0f3460,#533483);border-radius:var(--radius);padding:22px;margin-bottom:18px">
     <h2 style="color:white;margin-bottom:6px">🌟 Actuele Events & Updates</h2>
-    <!-- ✏️ BIJWERKEN: pas events aan als er nieuwe zijn -->
-    <p style="color:rgba(255,255,255,0.6);font-size:0.78rem;margin-bottom:14px">Controleer regelmatig voor nieuwe events!</p>
-    <div class="event-lijst" id="robloxEvents">
-      <!-- events worden via JS ingevuld -->
-    </div>
+    <p style="color:rgba(255,255,255,0.6);font-size:0.78rem;margin-bottom:14px">✏️ Bijwerken als er nieuwe events zijn!</p>
+    <div class="event-lijst" id="robloxEvents"></div>
     <a href="https://www.youtube.com/results?search_query=roblox+events+2025+free+items" target="_blank" class="roblox-link-btn" style="margin-top:14px">
       📺 Bekijk event video's op YouTube →
     </a>
   </div>
 
-  <!-- GRATIS ITEMS TIPS -->
+  <!-- GRATIS ITEMS -->
   <div style="background:linear-gradient(135deg,#16213e,#1a3a2a);border-radius:var(--radius);padding:22px;margin-bottom:18px">
     <h2 style="color:white;margin-bottom:14px">💎 Gratis items scoren</h2>
     <div class="link-lijst-dark">
@@ -1156,49 +1266,22 @@
       </a>
       <a href="https://www.youtube.com/results?search_query=roblox+free+items+avatar+2025" target="_blank" class="link-rij-dark">
         <div class="link-icon">▶️</div>
-        <div><div class="link-titel-dark">Gratis items via YouTube</div><div class="link-sub-dark">Actuele gratis items video's</div></div>
+        <div><div class="link-titel-dark">Gratis items via YouTube</div><div class="link-sub-dark">Actuele video's met gratis items</div></div>
         <div class="link-arrow-dark">→</div>
       </a>
-      <a href="https://www.youtube.com/results?search_query=roblox+dress+to+impress+codes+2025" target="_blank" class="link-rij-dark">
-        <div class="link-icon">👗</div>
-        <div><div class="link-titel-dark">Dress to Impress codes</div><div class="link-sub-dark">Nieuwe outfit codes</div></div>
+      <a href="https://www.youtube.com/results?search_query=99+nights+in+the+forest+tips+codes+2025" target="_blank" class="link-rij-dark">
+        <div class="link-icon">🌲</div>
+        <div><div class="link-titel-dark">99 Nights — tips & codes</div><div class="link-sub-dark">Overleef alle nachten!</div></div>
         <div class="link-arrow-dark">→</div>
       </a>
-      <a href="https://www.youtube.com/results?search_query=adopt+me+codes+2025+free+pets" target="_blank" class="link-rij-dark">
-        <div class="link-icon">🐾</div>
-        <div><div class="link-titel-dark">Adopt Me! codes</div><div class="link-sub-dark">Gratis huisdieren & items</div></div>
+      <a href="https://www.youtube.com/results?search_query=scary+shawarma+kiosk+tips+endings+roblox" target="_blank" class="link-rij-dark">
+        <div class="link-icon">🌯</div>
+        <div><div class="link-titel-dark">Shawarma Kiosk — alle endings</div><div class="link-sub-dark">Hoe haal je het goede einde?</div></div>
         <div class="link-arrow-dark">→</div>
       </a>
-      <a href="https://www.youtube.com/results?search_query=royale+high+codes+2025" target="_blank" class="link-rij-dark">
-        <div class="link-icon">👸</div>
-        <div><div class="link-titel-dark">Royale High codes</div><div class="link-sub-dark">Gratis diamanten & items</div></div>
-        <div class="link-arrow-dark">→</div>
-      </a>
-    </div>
-  </div>
-
-  <!-- POPULAIRE GAMES -->
-  <div class="roblox-card">
-    <h2>🕹️ Populaire games om te spelen</h2>
-    <div class="link-lijst-dark" style="margin-top:8px">
-      <a href="https://www.roblox.com/games/920587237/Adopt-Me" target="_blank" class="link-rij-dark">
-        <div class="link-icon">🏠</div>
-        <div><div class="link-titel-dark">Adopt Me!</div><div class="link-sub-dark">Huisdieren & huizen</div></div>
-        <div class="link-arrow-dark">→</div>
-      </a>
-      <a href="https://www.roblox.com/games/15532962292/Dress-to-Impress" target="_blank" class="link-rij-dark">
-        <div class="link-icon">👗</div>
-        <div><div class="link-titel-dark">Dress to Impress</div><div class="link-sub-dark">Outfits stylen & scoren</div></div>
-        <div class="link-arrow-dark">→</div>
-      </a>
-      <a href="https://www.roblox.com/games/735030788/Royale-High" target="_blank" class="link-rij-dark">
-        <div class="link-icon">🌺</div>
-        <div><div class="link-titel-dark">Royale High</div><div class="link-sub-dark">Prinsessen & school</div></div>
-        <div class="link-arrow-dark">→</div>
-      </a>
-      <a href="https://www.roblox.com/games/6284583030/Theme-Park-Tycoon-2" target="_blank" class="link-rij-dark">
-        <div class="link-icon">🎢</div>
-        <div><div class="link-titel-dark">Theme Park Tycoon 2</div><div class="link-sub-dark">Bouw je eigen pretpark</div></div>
+      <a href="https://www.youtube.com/results?search_query=craft+food+roblox+recipes+guide+2025" target="_blank" class="link-rij-dark">
+        <div class="link-icon">🍳</div>
+        <div><div class="link-titel-dark">Craft Food — alle recepten</div><div class="link-sub-dark">500+ combinaties ontdekken</div></div>
         <div class="link-arrow-dark">→</div>
       </a>
     </div>
@@ -1208,9 +1291,10 @@
     <h2>💡 Handige tips</h2>
     <ul class="creative-list">
       <li><span class="ci-emoji">🔒</span><div><strong>Veiligheid eerst</strong> — zet chats op "vrienden alleen" in de instellingen.</div></li>
-      <li><span class="ci-emoji">🔔</span><div><strong>Blijf up-to-date</strong> — volg <a href="https://www.youtube.com/results?search_query=roblox+nieuws+2025" target="_blank" style="color:var(--pink);font-weight:700">Roblox nieuws op YouTube</a> voor nieuwe events.</div></li>
+      <li><span class="ci-emoji">🔔</span><div><strong>Blijf up-to-date</strong> — volg <a href="https://www.youtube.com/results?search_query=roblox+nieuws+updates+2025" target="_blank" style="color:var(--pink);font-weight:700">Roblox nieuws op YouTube</a> voor nieuwe events.</div></li>
+      <li><span class="ci-emoji">👗</span><div><strong>Y2K outfits</strong> — in Brookhaven ga je naar Avatar → gebruik outfit ID codes voor superleuke looks!</div></li>
       <li><span class="ci-emoji">💰</span><div><strong>Gratis is ook leuk</strong> — gebruik promo codes en gratis catalog items!</div></li>
-      <li><span class="ci-emoji">⏰</span><div><strong>Speeltijd</strong> — zet een timer, dan vergeet je de tijd niet.</div></li>
+      <li><span class="ci-emoji">⏰</span><div><strong>Speeltijd</strong> — zet een timer zodat je de tijd niet vergeet.</div></li>
     </ul>
   </div>
 </section>
@@ -1218,6 +1302,50 @@
 </main>
 
 <script>
+// ── HOME HERO ──
+const DAGQUOTES = [
+  "Jij bent een ster — zelfs als je dat zelf niet voelt. 🌟",
+  "Vandaag is een nieuwe dag vol mogelijkheden! 🌸",
+  "Je mag zijn wie je bent. Dat is meer dan genoeg. 💕",
+  "Kleine stappen tellen ook. Trots op jou! 🌱",
+  "Jouw lach maakt de wereld mooier. 😊",
+  "Doe vandaag iets wat je blij maakt. 🎨",
+  "Fouten zijn bewijs dat je het hebt geprobeerd. 💪",
+  "Jij bent sterker dan je denkt. Echt! 🦋",
+  "BLACKPINK in your area en jij ook! 🖤💗",
+  "Elke dag is een kans om iets leuks te ontdekken. ✨",
+  "Rustig ademen. Jij redt het. 💚",
+  "Vandaag ga jij er helemaal voor! 🎵",
+];
+const DAGGROETEN = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'];
+const dagNu = DAGGROETEN[new Date().getDay()];
+const uurNu = new Date().getHours();
+const groet = uurNu < 12 ? 'Goedemorgen' : uurNu < 18 ? 'Goedemiddag' : 'Goedenavond';
+const dagTekstEl = document.getElementById('hero-dag-tekst');
+if (dagTekstEl) dagTekstEl.textContent = `${groet}, het is ${dagNu} 🌸`;
+
+const quoteEl = document.getElementById('dagquote');
+if (quoteEl) {
+  const dagNr = new Date().getDay();
+  quoteEl.textContent = DAGQUOTES[dagNr % DAGQUOTES.length];
+}
+
+const STEMMING_REACTIES = {
+  '😊': ['Wat fijn! Geniet ervan! 🌟', 'Super! Jij straalt vandaag! ✨'],
+  '🥰': ['Aah wat lief! Geniet van dat fijne gevoel 💕', 'Zo mooi! Je bent geliefd! 🌸'],
+  '😐': ['Dat is ook goed. Niet elke dag hoeft bijzonder te zijn 🌿', 'Gewoon is prima! Rust maar even 💚'],
+  '😴': ['Doe het rustig aan vandaag. Jij mag ook uitrusten 😴', 'Moe zijn mag. Zorg goed voor jezelf 🌙'],
+  '😢': ['Dat is oké. Slechte dagen horen erbij. Je bent niet alleen 💕', 'Ik hoor je. Misschien helpt een knuffel of muziek? 🎵'],
+};
+function kiesStemming(emoji, label) {
+  document.querySelectorAll('.hw-btn').forEach(b => b.classList.remove('gekozen'));
+  event.target.classList.add('gekozen');
+  const reacties = STEMMING_REACTIES[emoji] || ['Bedankt dat je het deelt 💚'];
+  const r = reacties[Math.floor(Math.random() * reacties.length)];
+  const el = document.getElementById('stemming-reactie');
+  if (el) el.textContent = r;
+}
+
 // ── NAVIGATIE ──
 function toon(id, btn) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -1699,43 +1827,50 @@ const RECEPTEN_DATA = {
   },
 };
 
-let actief = null;
 const receptGrid = document.getElementById('receptGrid');
-const receptDetail = document.getElementById('receptDetail');
 
-RECEPTEN.forEach((r, i) => {
-  const data = RECEPTEN_DATA[r.naam] || RECEPTEN_DATA[r.naam.split(' ')[0]];
-  const div = document.createElement('div');
-  div.className = 'recipe-pill';
-  div.innerHTML = `<span>${r.emoji}</span><span>${r.naam}</span>`;
-  div.onclick = () => {
-    if (actief === i) { receptDetail.classList.remove('open'); actief = null; return; }
-    actief = i;
-    const d = zoekRecept(r.naam);
-    if (!d) {
-      receptDetail.innerHTML = `<h3>${r.emoji} ${r.naam}</h3><p style="color:var(--muted);font-size:0.85rem">Recept volgt nog!</p>`;
-    } else {
-      const badges = d.badge ? `<span style="background:var(--pink2);color:#9a4060;font-size:0.72rem;font-weight:800;padding:2px 10px;border-radius:20px;margin-left:6px">${d.badge}</span>` : '';
-      receptDetail.innerHTML = `
-        <h3>${d.emoji} ${r.naam} ${badges}</h3>
-        <div style="display:flex;gap:10px;margin:8px 0 12px;flex-wrap:wrap">
-          <span style="font-size:0.8rem;color:var(--muted)">⏱️ ${d.tijd}</span>
-          <span style="font-size:0.8rem;color:var(--muted)">${d.land}</span>
-        </div>
-        <p style="font-size:0.87rem;color:var(--text);margin-bottom:12px;font-style:italic">${d.intro}</p>
-        <strong style="font-size:0.85rem">🛒 Nodig:</strong>
-        <ul style="padding-left:18px;font-size:0.85rem;line-height:1.9;color:var(--text);margin:6px 0 14px">
-          ${d.ingredienten.map(i => `<li>${i}</li>`).join('')}
-        </ul>
-        <strong style="font-size:0.85rem">👩‍🍳 Zo maak je het:</strong>
-        <ol style="padding-left:18px;font-size:0.85rem;line-height:2;color:var(--text);margin-top:6px">
-          ${d.stappen.map(s => `<li>${s}</li>`).join('')}
-        </ol>
-      `;
+RECEPTEN.forEach((r) => {
+  const btn = document.createElement('button');
+  btn.className = 'recipe-pill';
+  btn.innerHTML = `<span class="rp-emoji">${r.emoji}</span><span class="rp-naam">${r.naam}</span><span class="rp-pijl">›</span>`;
+
+  const detail = document.createElement('div');
+  detail.className = 'recipe-detail';
+
+  btn.onclick = () => {
+    const isOpen = detail.classList.contains('open');
+    document.querySelectorAll('.recipe-pill').forEach(b => b.classList.remove('actief'));
+    document.querySelectorAll('.recipe-detail').forEach(d => d.classList.remove('open'));
+    if (!isOpen) {
+      btn.classList.add('actief');
+      detail.classList.add('open');
+      const d = zoekRecept(r.naam);
+      if (!d) {
+        detail.innerHTML = `<p style="color:var(--muted);font-size:0.85rem">Recept volgt nog!</p>`;
+      } else {
+        const badge = d.badge ? `<span style="background:var(--pink2);color:#9a4060;font-size:0.72rem;font-weight:800;padding:2px 10px;border-radius:20px;margin-left:6px">${d.badge}</span>` : '';
+        detail.innerHTML = `
+          <h3>${d.emoji} ${r.naam} ${badge}</h3>
+          <div style="display:flex;gap:10px;margin:6px 0 10px;flex-wrap:wrap">
+            <span style="font-size:0.8rem;color:var(--muted)">⏱️ ${d.tijd}</span>
+            <span style="font-size:0.8rem;color:var(--muted)">${d.land}</span>
+          </div>
+          <p style="font-size:0.87rem;color:var(--text);margin-bottom:12px;font-style:italic">${d.intro}</p>
+          <strong style="font-size:0.85rem">🛒 Nodig:</strong>
+          <ul style="padding-left:18px;font-size:0.85rem;line-height:1.9;color:var(--text);margin:6px 0 14px">
+            ${d.ingredienten.map(ig => `<li>${ig}</li>`).join('')}
+          </ul>
+          <strong style="font-size:0.85rem">👩‍🍳 Zo maak je het:</strong>
+          <ol style="padding-left:18px;font-size:0.85rem;line-height:2;color:var(--text);margin-top:6px">
+            ${d.stappen.map(s => `<li>${s}</li>`).join('')}
+          </ol>
+        `;
+      }
+      setTimeout(() => btn.scrollIntoView({ behavior:'smooth', block:'nearest' }), 100);
     }
-    receptDetail.classList.add('open');
   };
-  receptGrid.appendChild(div);
+  receptGrid.appendChild(btn);
+  receptGrid.appendChild(detail);
 });
 
 // ── POSITIEVE BERICHTEN ──
@@ -1829,6 +1964,39 @@ function volgendeVerjaardag() {
   `;
 }
 volgendeVerjaardag();
+
+// ── Y2K OUTFIT CODES Brookhaven ──
+// ✏️ BIJWERKEN: voeg nieuwe Y2K codes toe of verwijder verlopen
+const Y2K_CODES = [
+  { code: '6969788928', omschrijving: '👗 Y2K crop top roze', actief: true },
+  { code: '7082803949', omschrijving: '🩺 Y2K baggy jeans blauw', actief: true },
+  { code: '6256525985', omschrijving: '✨ Y2K glitter shirt zilver', actief: true },
+  { code: '5627819740', omschrijving: '🎀 Y2K butterfly top', actief: true },
+  { code: '7085704912', omschrijving: '🖤 Y2K zwart wit outfit', actief: true },
+];
+
+const y2kEl = document.getElementById('y2kCodes');
+if (y2kEl) {
+  Y2K_CODES.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'promo-item' + (c.actief ? '' : ' promo-verlopen');
+    div.innerHTML = `
+      <div style="flex:1">
+        <div class="promo-code">${c.code}</div>
+        <div class="promo-reward">${c.omschrijving}</div>
+      </div>
+      <span class="promo-copy">${c.actief ? '📋 Kopieer' : '❌ Verlopen'}</span>
+    `;
+    if (c.actief) {
+      div.onclick = () => {
+        navigator.clipboard.writeText(c.code).catch(()=>{});
+        div.querySelector('.promo-copy').textContent = '✅ Gekopieerd!';
+        setTimeout(()=> div.querySelector('.promo-copy').textContent = '📋 Kopieer', 2000);
+      };
+    }
+    y2kEl.appendChild(div);
+  });
+}
 
 // ── ROBLOX PROMO CODES ──
 // ✏️ BIJWERKEN: verwijder verlopen codes, voeg nieuwe toe
