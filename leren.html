@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>📚 Milou's Leerboek</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+:root {
+  --roze:   #ff6eb4;
+  --roze2:  #ffd6ec;
+  --groen:  #4caf50;
+  --geel:   #ffe066;
+  --blauw:  #64b5f6;
+  --paars:  #b39ddb;
+  --oranje: #ffb347;
+  --bg:     #fff9fc;
+  --wit:    #ffffff;
+  --tekst:  #3a2a3a;
+  --muted:  #9a8a9a;
+  --radius: 20px;
+  --shadow: 0 4px 20px rgba(200,100,160,0.12);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--tekst);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── BLOEMEN ACHTERGROND ── */
+.bloemen-bg {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+}
+.bloem-deco {
+  position: absolute; font-size: 1.8rem; opacity: 0.12;
+  animation: zweven 6s ease-in-out infinite alternate;
+}
+@keyframes zweven { from { transform: translateY(0) rotate(0); } to { transform: translateY(-12px) rotate(10deg); } }
+
+/* ── HEADER ── */
+header {
+  position: relative; z-index: 10;
+  background: linear-gradient(135deg, #ff6eb4, #ffb347, #ff6eb4);
+  background-size: 200% 200%;
+  animation: headerGlow 4s ease infinite;
+  padding: 12px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 4px 16px rgba(255,110,180,0.3);
+}
+@keyframes headerGlow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.header-logo {
+  font-family: 'Pacifico', cursive; font-size: 1.1rem; color: white;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.back-btn {
+  background: rgba(255,255,255,0.3); border: none; border-radius: 50px;
+  padding: 7px 14px; color: white; font-family: 'Nunito', sans-serif;
+  font-weight: 800; font-size: 0.82rem; cursor: pointer;
+  text-decoration: none; display: inline-block;
+}
+.sterren-teller {
+  background: rgba(255,255,255,0.3); border-radius: 50px;
+  padding: 5px 12px; color: white; font-weight: 900; font-size: 0.88rem;
+}
+
+/* ── MAIN ── */
+.container {
+  position: relative; z-index: 5;
+  max-width: 480px; margin: 0 auto;
+  padding: 16px;
+}
+
+/* ── MODULE KEUZE ── */
+.module-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+  margin-top: 8px;
+}
+.module-kaart {
+  background: var(--wit); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 22px 16px;
+  text-align: center; cursor: pointer;
+  transition: transform .2s, box-shadow .2s;
+  border: 3px solid transparent;
+}
+.module-kaart:hover, .module-kaart:active {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 28px rgba(200,100,160,0.2);
+  border-color: var(--roze);
+}
+.mk-emoji { font-size: 2.8rem; margin-bottom: 8px; }
+.mk-naam  { font-weight: 900; font-size: 0.95rem; color: var(--tekst); }
+.mk-sub   { font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
+
+/* ── SCHERM SYSTEEM ── */
+.scherm { display: none; }
+.scherm.actief { display: block; animation: fadeIn .3s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+/* ── REKENBOEK ── */
+.boek-wrap {
+  position: relative;
+  background: var(--wit);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(200,100,160,0.15);
+  padding: 24px 20px 20px;
+  min-height: 420px;
+  border: 3px solid var(--roze2);
+  overflow: hidden;
+}
+.boek-bloemen {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; padding: 6px 10px;
+  font-size: 1.2rem; pointer-events: none; opacity: 0.5;
+}
+.bladnummer {
+  text-align: center; font-size: 0.78rem; color: var(--muted);
+  font-weight: 800; margin-bottom: 14px;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+.bladzijde-titel {
+  font-family: 'Pacifico', cursive;
+  font-size: 1.4rem; text-align: center;
+  margin-bottom: 20px;
+}
+.som-display {
+  text-align: center;
+  font-size: 3rem; font-weight: 900;
+  color: var(--tekst); margin: 16px 0;
+  line-height: 1.2;
+}
+.som-display .operator { color: var(--roze); }
+.som-display .getal    { color: var(--blauw); }
+
+/* Meerkeuze knoppen */
+.mc-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin: 16px 0;
+}
+.mc-btn {
+  background: var(--bg); border: 3px solid var(--roze2);
+  border-radius: 14px; padding: 14px 10px;
+  font-family: 'Nunito', sans-serif; font-weight: 900;
+  font-size: 1.4rem; cursor: pointer; color: var(--tekst);
+  transition: all .15s;
+}
+.mc-btn:active { transform: scale(0.95); }
+.mc-btn.goed  { background: #d4f8d4; border-color: var(--groen); color: #2a7a2a; }
+.mc-btn.fout  { background: #ffd6d6; border-color: #e63946; color: #8a1a1a; }
+
+/* Intypen */
+.typ-wrap {
+  display: flex; gap: 10px; justify-content: center; margin: 16px 0;
+}
+.typ-input {
+  width: 100px; text-align: center;
+  border: 3px solid var(--roze2); border-radius: 14px;
+  font-family: 'Nunito', sans-serif; font-weight: 900;
+  font-size: 2rem; padding: 10px; color: var(--tekst);
+  background: var(--bg); outline: none;
+}
+.typ-input:focus { border-color: var(--roze); }
+.typ-btn {
+  background: var(--roze); border: none; border-radius: 14px;
+  padding: 0 20px; font-family: 'Nunito', sans-serif; font-weight: 900;
+  font-size: 1rem; color: white; cursor: pointer;
+}
+
+/* Feedback */
+.feedback-vak {
+  text-align: center; font-size: 1.1rem; font-weight: 900;
+  min-height: 40px; margin: 8px 0; padding: 8px;
+  border-radius: 12px; transition: all .3s;
+}
+.feedback-vak.goed { background: #d4f8d4; color: #2a7a2a; }
+.feedback-vak.fout { background: #ffd6d6; color: #8a1a1a; }
+
+/* Pijlknoppen */
+.pijl-nav {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: 16px;
+}
+.pijl-btn {
+  background: var(--roze2); border: none; border-radius: 50%;
+  width: 48px; height: 48px; font-size: 1.4rem; cursor: pointer;
+  transition: all .15s; display: flex; align-items: center; justify-content: center;
+}
+.pijl-btn:active { transform: scale(0.9); background: var(--roze); color: white; }
+.pijl-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.volgende-som-btn {
+  background: var(--groen); border: none; border-radius: 50px;
+  padding: 10px 22px; color: white; font-family: 'Nunito', sans-serif;
+  font-weight: 900; font-size: 0.9rem; cursor: pointer;
+  display: none; transition: all .15s;
+}
+.volgende-som-btn:active { transform: scale(0.95); }
+
+/* ── STOPLICHT ── */
+.stoplicht-wrap { text-align: center; padding: 10px 0; }
+.stoplicht {
+  display: inline-flex; flex-direction: column;
+  background: #333; border-radius: 16px; padding: 12px 16px;
+  gap: 10px; margin: 0 auto 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+.lamp {
+  width: 56px; height: 56px; border-radius: 50%;
+  transition: all .4s; position: relative;
+}
+.lamp.rood   { background: #ff0000; box-shadow: 0 0 20px #ff0000; }
+.lamp.oranje { background: #ff8800; box-shadow: 0 0 20px #ff8800; }
+.lamp.groen  { background: #00cc44; box-shadow: 0 0 20px #00cc44; }
+.lamp.uit    { background: #555; box-shadow: none; }
+.voertuig { font-size: 3rem; margin: 10px 0; animation: rij .5s ease; }
+@keyframes rij { from { transform: translateX(-20px); } to { transform: translateX(0); } }
+.stoplicht-vraag {
+  background: var(--geel); border-radius: 14px; padding: 14px;
+  font-size: 1rem; font-weight: 800; margin: 12px 0;
+  border: 2px solid #f0c000;
+}
+
+/* ── OVERTREKKEN ── */
+.overtrek-wrap {
+  background: var(--wit); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 20px;
+  border: 3px solid var(--roze2);
+}
+.overtrek-letter {
+  font-size: 8rem; font-weight: 900; text-align: center;
+  color: rgba(200,150,200,0.2); line-height: 1; position: relative;
+  font-family: 'Nunito', sans-serif; user-select: none;
+}
+.overtrek-canvas-wrap { position: relative; margin: 10px 0; }
+canvas.overtrek-canvas {
+  position: absolute; top: 0; left: 0;
+  touch-action: none; cursor: none;
+  border-radius: 14px;
+}
+.overtrek-voorbeeld {
+  width: 100%; border-radius: 14px;
+  background: #fdf0f8; display: flex;
+  align-items: center; justify-content: center;
+}
+.nav-letter-rij {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  justify-content: center; margin: 14px 0;
+}
+.letter-knop {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--bg); border: 2px solid var(--roze2);
+  font-family: 'Nunito', sans-serif; font-weight: 900;
+  font-size: 0.95rem; cursor: pointer; color: var(--tekst);
+  transition: all .15s;
+}
+.letter-knop.actief { background: var(--roze); color: white; border-color: var(--roze); }
+.letter-knop.voltooid { background: #d4f8d4; border-color: var(--groen); }
+.overtrek-feedback {
+  text-align: center; font-size: 1rem; font-weight: 900;
+  min-height: 36px; margin-top: 8px;
+}
+
+/* ── VETERS ── */
+.schoen-wrap {
+  background: var(--wit); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 20px;
+  border: 3px solid var(--roze2); text-align: center;
+}
+.schoen-canvas-wrap { position: relative; margin: 10px auto; }
+#veter-canvas {
+  touch-action: none; cursor: pointer;
+  border-radius: 14px; background: #fff8fc;
+  display: block; margin: 0 auto;
+}
+.stap-indicator {
+  display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 10px 0;
+}
+.stap-dot {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--bg); border: 2px solid var(--roze2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 900; transition: all .3s;
+}
+.stap-dot.actief  { background: var(--roze); color: white; border-color: var(--roze); }
+.stap-dot.klaar   { background: var(--groen); color: white; border-color: var(--groen); }
+.stap-uitleg {
+  background: var(--geel); border-radius: 14px; padding: 12px 16px;
+  font-size: 0.92rem; font-weight: 800; margin: 10px 0;
+  border: 2px solid #f0c000; text-align: center;
+}
+
+/* ── BELONING ── */
+.ster-pop {
+  position: fixed; font-size: 2rem; pointer-events: none; z-index: 500;
+  animation: sterVlieg .9s ease-out forwards;
+}
+@keyframes sterVlieg {
+  0%   { transform: scale(0) rotate(0); opacity: 1; }
+  60%  { transform: scale(1.4) rotate(20deg); opacity: 1; }
+  100% { transform: scale(0.8) translateY(-80px); opacity: 0; }
+}
+.vinkje-anim {
+  font-size: 3rem; animation: vinkjePop .5s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes vinkjePop { from { transform: scale(0); } to { transform: scale(1); } }
+.confetti-stuk {
+  position: fixed; pointer-events: none; z-index: 400;
+  width: 8px; height: 8px; border-radius: 2px;
+  animation: confFall 1.8s ease-in forwards;
+}
+@keyframes confFall {
+  0%   { opacity:1; transform: translateY(0) rotate(0); }
+  100% { opacity:0; transform: translateY(100vh) rotate(540deg); }
+}
+
+/* ── KNOPPEN ── */
+.btn {
+  width: 100%; padding: 14px; border: none; border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--roze), var(--oranje));
+  color: white; font-family: 'Nunito', sans-serif; font-weight: 900;
+  font-size: 1rem; cursor: pointer; transition: all .2s;
+  box-shadow: 0 4px 14px rgba(255,110,180,0.3); margin-top: 10px;
+}
+.btn:active { transform: scale(0.97); }
+.btn-secundair {
+  width: 100%; padding: 11px; border: 2px solid var(--roze2);
+  border-radius: var(--radius); background: var(--bg);
+  color: var(--tekst); font-family: 'Nunito', sans-serif;
+  font-weight: 800; font-size: 0.9rem; cursor: pointer; margin-top: 8px;
+}
+</style>
+</head>
+<body>
+
+<div class="bloemen-bg" id="bloemBg"></div>
+
+<header>
+  <a href="index.html" class="back-btn">← Terug</a>
+  <span class="header-logo">📚 Milou's Leerboek</span>
+  <div class="sterren-teller">⭐ <span id="totaal-sterren">0</span></div>
+</header>
+
+<div class="container">
+
+  <!-- ══ KEUZE MENU ══ -->
+  <div class="scherm actief" id="scherm-menu">
+    <div style="text-align:center;padding:12px 0 20px">
+      <div style="font-size:2.5rem">📚🌸</div>
+      <h1 style="font-family:'Pacifico',cursive;font-size:1.5rem;color:var(--roze);margin-top:6px">Milou's Leerboek</h1>
+      <p style="color:var(--muted);font-size:0.88rem;margin-top:4px">Kies wat je wilt leren vandaag!</p>
+    </div>
+    <div class="module-grid">
+      <div class="module-kaart" onclick="startRekenboek('plus')">
+        <div class="mk-emoji">➕</div>
+        <div class="mk-naam">Optellen</div>
+        <div class="mk-sub">Sommen tot 100</div>
+      </div>
+      <div class="module-kaart" onclick="startRekenboek('min')">
+        <div class="mk-emoji">➖</div>
+        <div class="mk-naam">Aftrekken</div>
+        <div class="mk-sub">Sommen tot 100</div>
+      </div>
+      <div class="module-kaart" onclick="startRekenboek('keer')">
+        <div class="mk-emoji">✖️</div>
+        <div class="mk-naam">Vermenigvuldigen</div>
+        <div class="mk-sub">Tafels 1 t/m 10</div>
+      </div>
+      <div class="module-kaart" onclick="startStoplicht()">
+        <div class="mk-emoji">🚦</div>
+        <div class="mk-naam">Stoplicht</div>
+        <div class="mk-sub">Wat doe jij?</div>
+      </div>
+      <div class="module-kaart" onclick="startOvertrekken()">
+        <div class="mk-emoji">✏️</div>
+        <div class="mk-naam">Overtrekken</div>
+        <div class="mk-sub">Cijfers & letters</div>
+      </div>
+      <div class="module-kaart" onclick="startVeters()">
+        <div class="mk-emoji">👟</div>
+        <div class="mk-naam">Veters strikken</div>
+        <div class="mk-sub">Stap voor stap</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ REKENBOEK ══ -->
+  <div class="scherm" id="scherm-reken">
+    <div class="boek-wrap">
+      <div class="boek-bloemen">🌸🌷🌼🌺🌸🌷🌼🌺🌸</div>
+      <div class="bladnummer" id="reken-bladnummer">Bladzijde 1</div>
+      <div class="bladzijde-titel" id="reken-titel" style="color:var(--roze)">➕ Optellen</div>
+      <div class="som-display" id="som-display"></div>
+      <div id="reken-invoer"></div>
+      <div class="feedback-vak" id="reken-feedback"></div>
+      <div style="text-align:center">
+        <button class="volgende-som-btn" id="volgende-som-btn" onclick="nieuweSom()">
+          Volgende som ➡️
+        </button>
+      </div>
+    </div>
+    <div class="pijl-nav">
+      <button class="pijl-btn" id="pijl-links"  onclick="bladOmslaan(-1)">◀</button>
+      <div style="font-size:0.8rem;color:var(--muted);font-weight:800" id="reken-type-label"></div>
+      <button class="pijl-btn" id="pijl-rechts" onclick="bladOmslaan(1)">▶</button>
+    </div>
+    <button class="btn-secundair" onclick="naarMenu()">← Terug naar menu</button>
+  </div>
+
+  <!-- ══ STOPLICHT ══ -->
+  <div class="scherm" id="scherm-stoplicht">
+    <div class="boek-wrap">
+      <div class="boek-bloemen">🌸🌷🌼🌺🌸🌷🌼🌺🌸</div>
+      <div class="bladzijde-titel" style="color:var(--oranje)">🚦 Het Stoplicht</div>
+      <div class="stoplicht-wrap">
+        <div class="stoplicht">
+          <div class="lamp uit" id="lamp-rood"></div>
+          <div class="lamp uit" id="lamp-oranje"></div>
+          <div class="lamp uit" id="lamp-groen"></div>
+        </div>
+        <div class="voertuig" id="voertuig">🚲</div>
+        <div class="stoplicht-vraag" id="stoplicht-vraag">Druk op start om te spelen!</div>
+        <div id="stoplicht-opties" class="mc-grid" style="margin:0"></div>
+        <div class="feedback-vak" id="stoplicht-feedback"></div>
+      </div>
+      <button class="btn" onclick="nieuwStoplicht()" id="stoplicht-start-btn">🚦 Start!</button>
+    </div>
+    <button class="btn-secundair" onclick="naarMenu()">← Terug naar menu</button>
+  </div>
+
+  <!-- ══ OVERTREKKEN ══ -->
+  <div class="scherm" id="scherm-overtrek">
+    <div class="overtrek-wrap">
+      <div class="bladzijde-titel" style="color:var(--paars)">✏️ Trekken maar!</div>
+      <p style="text-align:center;font-size:0.85rem;color:var(--muted);margin-bottom:12px">
+        Trek het cijfer of letter na met je vinger!
+      </p>
+      <div class="nav-letter-rij" id="letter-rij"></div>
+      <div class="overtrek-canvas-wrap" id="overtrek-wrap-inner">
+        <div class="overtrek-voorbeeld" id="overtrek-voorbeeld" style="height:200px"></div>
+        <canvas class="overtrek-canvas" id="overtrek-canvas"></canvas>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button onclick="wisOvertrek()" style="flex:1;background:#fee2e2;border:2px solid #ffaaaa;border-radius:12px;padding:9px;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.85rem;color:#c0392b;cursor:pointer">🗑️ Opnieuw</button>
+        <button onclick="controleerOvertrek()" style="flex:1;background:var(--groen);border:none;border-radius:12px;padding:9px;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.85rem;color:white;cursor:pointer">✅ Klaar!</button>
+      </div>
+      <div class="overtrek-feedback" id="overtrek-feedback"></div>
+      <div style="text-align:center;margin-top:10px;font-size:0.78rem;color:var(--muted)">
+        Voortgang: <span id="overtrek-score">0</span> / <span id="overtrek-totaal">0</span> voltooid ⭐
+      </div>
+    </div>
+    <button class="btn-secundair" onclick="naarMenu()">← Terug naar menu</button>
+  </div>
+
+  <!-- ══ VETERS ══ -->
+  <div class="scherm" id="scherm-veters">
+    <div class="schoen-wrap">
+      <div class="bladzijde-titel" style="color:var(--blauw)">👟 Veters Strikken</div>
+      <p style="text-align:center;font-size:0.85rem;color:var(--muted);margin-bottom:10px">
+        Volg de stappen en strik de veter!
+      </p>
+      <div class="stap-indicator" id="stap-dots"></div>
+      <div class="stap-uitleg" id="stap-uitleg">Druk op start!</div>
+      <canvas id="veter-canvas" width="300" height="280"></canvas>
+      <div class="feedback-vak" id="veter-feedback"></div>
+      <button class="btn" onclick="volgendVeterStap()" id="veter-btn">👟 Start!</button>
+    </div>
+    <button class="btn-secundair" onclick="naarMenu()">← Terug naar menu</button>
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  STATE & HELPERS
+// ══════════════════════════════════════════════════
+let totaalSterren = 0;
+let rekenState = { type: 'plus', bladzijde: 1, som: null, antwoord: null, aantalGoed: 0, totaal: 0 };
+
+const TYPES = ['plus', 'min', 'keer'];
+const TYPE_LABELS = { plus: '➕ Optellen', min: '➖ Aftrekken', keer: '✖️ Vermenigvuldigen' };
+const TYPE_KLEUREN = { plus: 'var(--roze)', min: 'var(--blauw)', keer: 'var(--oranje)' };
+
+function laadSterren() {
+  try { totaalSterren = parseInt(localStorage.getItem('milou_leer_sterren') || '0'); } catch(e) {}
+  document.getElementById('totaal-sterren').textContent = totaalSterren;
+}
+function slaaSterrenOp() {
+  localStorage.setItem('milou_leer_sterren', totaalSterren);
+  document.getElementById('totaal-sterren').textContent = totaalSterren;
+}
+function voegSterToe(aantal, x, y) {
+  totaalSterren += aantal;
+  slaaSterrenOp();
+  for (let i = 0; i < aantal; i++) {
+    setTimeout(() => {
+      const s = document.createElement('div');
+      s.className = 'ster-pop';
+      s.textContent = '⭐';
+      s.style.left = (x || window.innerWidth/2) + (Math.random()*40-20) + 'px';
+      s.style.top  = (y || window.innerHeight/2) + 'px';
+      document.body.appendChild(s);
+      setTimeout(() => s.remove(), 1000);
+    }, i * 150);
+  }
+}
+function speelGeluid(type) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    if (type === 'goed') {
+      osc.frequency.setValueAtTime(523, ctx.currentTime);
+      osc.frequency.setValueAtTime(659, ctx.currentTime + 0.1);
+      osc.frequency.setValueAtTime(784, ctx.currentTime + 0.2);
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+      osc.start(); osc.stop(ctx.currentTime + 0.5);
+    } else {
+      osc.frequency.setValueAtTime(300, ctx.currentTime);
+      osc.frequency.setValueAtTime(200, ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      osc.start(); osc.stop(ctx.currentTime + 0.3);
+    }
+  } catch(e) {}
+}
+function maakConfetti() {
+  const kl = ['#ff6eb4','#ffe066','#64b5f6','#4caf50','#b39ddb','#ff9800'];
+  for (let i = 0; i < 40; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti-stuk';
+    c.style.cssText = `left:${Math.random()*100}%;top:-10px;background:${kl[Math.floor(Math.random()*kl.length)]};animation-delay:${Math.random()*0.8}s;animation-duration:${1.2+Math.random()*0.8}s;transform:rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 2500);
+  }
+}
+
+function toonScherm(id) {
+  document.querySelectorAll('.scherm').forEach(s => s.classList.remove('actief'));
+  document.getElementById('scherm-' + id).classList.add('actief');
+}
+function naarMenu() { toonScherm('menu'); }
+
+// ══════════════════════════════════════════════════
+//  REKENBOEK
+// ══════════════════════════════════════════════════
+function maakSom(type) {
+  let a, b, antw;
+  if (type === 'plus') {
+    a = Math.floor(Math.random() * 90) + 5;
+    b = Math.floor(Math.random() * (100 - a)) + 1;
+    antw = a + b;
+    return { tekst: `${a} + ${b} = ?`, antwoord: antw, a, b, op: '+' };
+  } else if (type === 'min') {
+    a = Math.floor(Math.random() * 80) + 15;
+    b = Math.floor(Math.random() * (a - 1)) + 1;
+    antw = a - b;
+    return { tekst: `${a} - ${b} = ?`, antwoord: antw, a, b, op: '-' };
+  } else {
+    a = Math.floor(Math.random() * 10) + 1;
+    b = Math.floor(Math.random() * 10) + 1;
+    antw = a * b;
+    return { tekst: `${a} × ${b} = ?`, antwoord: antw, a, b, op: '×' };
+  }
+}
+
+function maakFouteAntwoorden(goed, type) {
+  const fouten = new Set();
+  while (fouten.size < 3) {
+    let fout = goed + (Math.floor(Math.random() * 10) - 5);
+    if (fout <= 0) fout = goed + Math.floor(Math.random() * 5) + 1;
+    if (fout !== goed && fout > 0) fouten.add(fout);
+  }
+  const opties = [goed, ...fouten];
+  return opties.sort(() => Math.random() - 0.5);
+}
+
+function startRekenboek(type) {
+  rekenState.type = type;
+  rekenState.bladzijde = 1;
+  rekenState.aantalGoed = 0;
+  rekenState.totaal = 0;
+  updateRekenUI();
+  nieuweSom();
+  toonScherm('reken');
+}
+
+function updateRekenUI() {
+  const t = rekenState.type;
+  document.getElementById('reken-titel').textContent = TYPE_LABELS[t];
+  document.getElementById('reken-titel').style.color = TYPE_KLEUREN[t];
+  document.getElementById('reken-bladnummer').textContent = `Bladzijde ${rekenState.bladzijde}`;
+  document.getElementById('reken-type-label').textContent = `${rekenState.aantalGoed} ✅ van ${rekenState.totaal}`;
+  const tIdx = TYPES.indexOf(t);
+  document.getElementById('pijl-links').disabled  = tIdx === 0;
+  document.getElementById('pijl-rechts').disabled = tIdx === TYPES.length - 1;
+}
+
+function nieuweSom() {
+  const som = maakSom(rekenState.type);
+  rekenState.som = som;
+  rekenState.totaal++;
+  rekenState.bladzijde++;
+
+  // Som weergeven
+  const disp = document.getElementById('som-display');
+  disp.innerHTML = `<span class="getal">${som.a}</span> <span class="operator">${som.op}</span> <span class="getal">${som.b}</span> <span class="operator">=</span> <span style="color:var(--muted)">?</span>`;
+
+  // Feedback leegmaken
+  const fb = document.getElementById('reken-feedback');
+  fb.textContent = ''; fb.className = 'feedback-vak';
+  document.getElementById('volgende-som-btn').style.display = 'none';
+  document.getElementById('reken-bladnummer').textContent = `Bladzijde ${rekenState.bladzijde}`;
+
+  // Wissel tussen meerkeuze en intypen
+  if (rekenState.bladzijde % 3 === 0) {
+    renderIntypen();
+  } else {
+    renderMeerkeuze(som.antwoord);
+  }
+}
+
+function renderMeerkeuze(goed) {
+  const opties = maakFouteAntwoorden(goed, rekenState.type);
+  const invoer = document.getElementById('reken-invoer');
+  invoer.innerHTML = `<div class="mc-grid">${opties.map(o =>
+    `<button class="mc-btn" onclick="checkMC(${o}, ${goed}, this)">${o}</button>`
+  ).join('')}</div>`;
+}
+
+function renderIntypen() {
+  document.getElementById('reken-invoer').innerHTML = `
+    <div class="typ-wrap">
+      <input type="number" class="typ-input" id="typ-input" placeholder="?" inputmode="numeric" pattern="[0-9]*">
+      <button class="typ-btn" onclick="checkTyp()">✓</button>
+    </div>`;
+  setTimeout(() => {
+    const inp = document.getElementById('typ-input');
+    if (inp) inp.focus();
+  }, 100);
+}
+
+function checkMC(gekozen, goed, el) {
+  // Blokkeer als al beantwoord
+  if (document.querySelector('.mc-btn.goed, .mc-btn.fout')) return;
+  const juist = gekozen === goed;
+  verwerkAntwoord(juist, el, goed);
+}
+
+function checkTyp() {
+  const inp = document.getElementById('typ-input');
+  if (!inp) return;
+  const val = parseInt(inp.value);
+  if (isNaN(val)) return;
+  const goed = rekenState.som.antwoord;
+  inp.disabled = true;
+  verwerkAntwoord(val === goed, inp, goed);
+}
+
+function verwerkAntwoord(juist, el, goed) {
+  const fb = document.getElementById('reken-feedback');
+  if (juist) {
+    if (el) el.classList.add('goed');
+    fb.textContent = '✅ Super goed! Knap hoor! 🌟';
+    fb.className = 'feedback-vak goed';
+    rekenState.aantalGoed++;
+    speelGeluid('goed');
+    voegSterToe(1, window.innerWidth/2, window.innerHeight/2);
+    maakConfetti();
+    document.getElementById('volgende-som-btn').style.display = 'inline-block';
+  } else {
+    if (el) el.classList.add('fout');
+    // Toon juiste antwoord
+    document.querySelectorAll('.mc-btn').forEach(b => {
+      if (parseInt(b.textContent) === goed) b.classList.add('goed');
+    });
+    fb.textContent = `😊 Jammer! Het was ${goed}. Probeer de volgende!`;
+    fb.className = 'feedback-vak fout';
+    speelGeluid('fout');
+    document.getElementById('volgende-som-btn').style.display = 'inline-block';
+  }
+  updateRekenUI();
+}
+
+function bladOmslaan(richting) {
+  const huidig = TYPES.indexOf(rekenState.type);
+  const nieuw  = huidig + richting;
+  if (nieuw < 0 || nieuw >= TYPES.length) return;
+  startRekenboek(TYPES[nieuw]);
+}
+
+// ══════════════════════════════════════════════════
+//  STOPLICHT
+// ══════════════════════════════════════════════════
+const VOERTUIGEN = ['🚲','🛵','🚗','🏍️','🚌'];
+const STOPLICHT_VRAGEN = [
+  {
+    licht: 'rood',
+    vraag: 'Het stoplicht staat op ROOD. Wat doe je?',
+    opties: ['🛑 Stoppen!', '🚀 Doorrijden', '🤔 Wachten tot groen', '💨 Snel erdoor'],
+    goed: [0, 2],
+    uitleg: '🛑 Bij ROOD moet je altijd stoppen en wachten!',
+  },
+  {
+    licht: 'groen',
+    vraag: 'Het stoplicht staat op GROEN. Mag je rijden?',
+    opties: ['✅ Ja, doorrijden!', '🛑 Stoppen', '😴 Wachten', '🔙 Terugrijden'],
+    goed: [0],
+    uitleg: '✅ Bij GROEN mag je veilig doorrijden!',
+  },
+  {
+    licht: 'oranje',
+    vraag: 'Het stoplicht staat op ORANJE. Wat doe je?',
+    opties: ['🚀 Snel doorrijden', '🛑 Remmen en stoppen', '😎 Niets doen', '📱 Even kijken'],
+    goed: [1],
+    uitleg: '🛑 Bij ORANJE moet je stoppen als je dat veilig kunt!',
+  },
+  {
+    licht: 'rood',
+    vraag: 'Je rijdt op je fiets. Het licht is ROOD. Jij...',
+    opties: ['🚲 Stop en wacht', '💨 Rijd toch door', '🔔 Bel hard', '🤷 Doe maar wat'],
+    goed: [0],
+    uitleg: '🚲 Altijd stoppen bij rood, ook op de fiets!',
+  },
+  {
+    licht: 'groen',
+    vraag: 'GROEN licht! Maar er loopt nog iemand over. Wat doe je?',
+    opties: ['🚀 Rijden, ik heb groen!', '⏸️ Wachten tot ze over zijn', '📢 Toeter', '🔙 Wegrij snel'],
+    goed: [1],
+    uitleg: '⏸️ Altijd voetgangers laten oversteken, ook bij groen!',
+  },
+];
+
+let stoplichtActief = false;
+let huidigStoplicht = 0;
+
+function setLampen(kleur) {
+  ['rood','oranje','groen'].forEach(k => {
+    document.getElementById('lamp-' + k).className = 'lamp ' + (k === kleur ? k : 'uit');
+  });
+}
+
+function nieuwStoplicht() {
+  huidigStoplicht = Math.floor(Math.random() * STOPLICHT_VRAGEN.length);
+  const v = STOPLICHT_VRAGEN[huidigStoplicht];
+  // Voertuig kiezen
+  document.getElementById('voertuig').textContent = VOERTUIGEN[Math.floor(Math.random() * VOERTUIGEN.length)];
+  // Lampen animatie
+  setLampen('uit');
+  document.getElementById('stoplicht-feedback').textContent = '';
+  document.getElementById('stoplicht-feedback').className = 'feedback-vak';
+  document.getElementById('stoplicht-opties').innerHTML = '';
+  document.getElementById('stoplicht-vraag').textContent = '🔄 Stoplicht gaat aan...';
+
+  setTimeout(() => { setLampen('rood'); }, 400);
+  setTimeout(() => {
+    if (v.licht === 'oranje') setLampen('oranje');
+    else if (v.licht === 'groen') { setLampen('oranje'); }
+  }, 900);
+  setTimeout(() => {
+    setLampen(v.licht);
+    document.getElementById('stoplicht-vraag').textContent = v.vraag;
+    renderStoplichtOpties(v);
+    document.getElementById('stoplicht-start-btn').textContent = '🔄 Nieuwe vraag';
+  }, 1500);
+}
+
+function renderStoplichtOpties(v) {
+  const c = document.getElementById('stoplicht-opties');
+  c.innerHTML = v.opties.map((o, i) =>
+    `<button class="mc-btn" style="font-size:0.95rem;padding:10px 6px" onclick="checkStoplicht(${i})">${o}</button>`
+  ).join('');
+}
+
+function checkStoplicht(index) {
+  const v = STOPLICHT_VRAGEN[huidigStoplicht];
+  if (document.querySelector('#stoplicht-opties .mc-btn.goed')) return;
+  const juist = v.goed.includes(index);
+  const btns = document.querySelectorAll('#stoplicht-opties .mc-btn');
+  btns.forEach((b, i) => {
+    if (v.goed.includes(i)) b.classList.add('goed');
+  });
+  btns[index].classList.add(juist ? 'goed' : 'fout');
+  const fb = document.getElementById('stoplicht-feedback');
+  if (juist) {
+    fb.textContent = `✅ Goed! ${v.uitleg}`;
+    fb.className = 'feedback-vak goed';
+    speelGeluid('goed');
+    voegSterToe(1, window.innerWidth/2, window.innerHeight/2);
+    maakConfetti();
+  } else {
+    fb.textContent = `😊 Jammer! ${v.uitleg}`;
+    fb.className = 'feedback-vak fout';
+    speelGeluid('fout');
+  }
+}
+
+function startStoplicht() {
+  toonScherm('stoplicht');
+  setLampen('uit');
+}
+
+// ══════════════════════════════════════════════════
+//  OVERTREKKEN
+// ══════════════════════════════════════════════════
+const OVERTREK_ITEMS = [
+  '1','2','3','4','5','6','7','8','9','0',
+  'A','B','C','D','E','M','S','N','P','R'
+];
+let overtrekActief = null;
+let overtrekVoltooid = new Set();
+let overtrekCanvas, overtrekCtx;
+let overtrekTekening = false;
+let overtrekLijnen = 0;
+
+function startOvertrekken() {
+  toonScherm('overtrek');
+  document.getElementById('overtrek-totaal').textContent = OVERTREK_ITEMS.length;
+  renderLetterRij();
+  kiesOvertrekItem(OVERTREK_ITEMS[0]);
+  initOvertrekCanvas();
+}
+
+function renderLetterRij() {
+  const r = document.getElementById('letter-rij');
+  r.innerHTML = OVERTREK_ITEMS.map(item =>
+    `<button class="letter-knop${item===overtrekActief?' actief':''}${overtrekVoltooid.has(item)?' voltooid':''}"
+      onclick="kiesOvertrekItem('${item}')">${item}</button>`
+  ).join('');
+}
+
+function kiesOvertrekItem(item) {
+  overtrekActief = item;
+  overtrekLijnen = 0;
+  document.getElementById('overtrek-feedback').textContent = '';
+
+  // Toon groot voorbeeld
+  const vb = document.getElementById('overtrek-voorbeeld');
+  vb.innerHTML = `<div style="font-size:9rem;font-weight:900;color:rgba(180,120,180,0.18);font-family:'Nunito',sans-serif;line-height:1;user-select:none;pointer-events:none">${item}</div>`;
+
+  renderLetterRij();
+  setTimeout(() => {
+    initOvertrekCanvas();
+    wisOvertrek();
+  }, 50);
+}
+
+function initOvertrekCanvas() {
+  const wrap = document.getElementById('overtrek-wrap-inner');
+  const vb   = document.getElementById('overtrek-voorbeeld');
+  if (!vb.offsetHeight) return;
+
+  overtrekCanvas = document.getElementById('overtrek-canvas');
+  overtrekCanvas.width  = vb.offsetWidth;
+  overtrekCanvas.height = vb.offsetHeight;
+  overtrekCanvas.style.width  = vb.offsetWidth + 'px';
+  overtrekCanvas.style.height = vb.offsetHeight + 'px';
+  overtrekCtx = overtrekCanvas.getContext('2d');
+  overtrekCtx.lineCap = 'round'; overtrekCtx.lineJoin = 'round';
+
+  if (overtrekCanvas._init) return;
+  overtrekCanvas._init = true;
+
+  overtrekCanvas.addEventListener('touchstart', e => {
+    e.preventDefault(); overtrekTekening = true;
+    const p = overtrekPos(e.touches[0]);
+    overtrekCtx.beginPath(); overtrekCtx.moveTo(p.x, p.y);
+  }, { passive: false });
+  overtrekCanvas.addEventListener('touchmove', e => {
+    e.preventDefault(); if (!overtrekTekening) return;
+    const p = overtrekPos(e.touches[0]);
+    overtrekCtx.lineWidth = 8; overtrekCtx.strokeStyle = 'rgba(255,110,180,0.85)';
+    overtrekCtx.lineTo(p.x, p.y); overtrekCtx.stroke();
+    overtrekCtx.beginPath(); overtrekCtx.moveTo(p.x, p.y);
+    overtrekLijnen++;
+  }, { passive: false });
+  overtrekCanvas.addEventListener('touchend', () => { overtrekTekening = false; });
+
+  overtrekCanvas.addEventListener('mousedown', e => {
+    overtrekTekening = true;
+    const p = overtrekPos(e); overtrekCtx.beginPath(); overtrekCtx.moveTo(p.x, p.y);
+  });
+  overtrekCanvas.addEventListener('mousemove', e => {
+    if (!overtrekTekening) return;
+    const p = overtrekPos(e);
+    overtrekCtx.lineWidth = 8; overtrekCtx.strokeStyle = 'rgba(255,110,180,0.85)';
+    overtrekCtx.lineTo(p.x, p.y); overtrekCtx.stroke();
+    overtrekCtx.beginPath(); overtrekCtx.moveTo(p.x, p.y);
+    overtrekLijnen++;
+  });
+  overtrekCanvas.addEventListener('mouseup', () => { overtrekTekening = false; });
+}
+
+function overtrekPos(e) {
+  const r = overtrekCanvas.getBoundingClientRect();
+  return {
+    x: (e.clientX - r.left) * (overtrekCanvas.width / r.width),
+    y: (e.clientY - r.top)  * (overtrekCanvas.height / r.height),
+  };
+}
+
+function wisOvertrek() {
+  if (overtrekCtx) overtrekCtx.clearRect(0, 0, overtrekCanvas.width, overtrekCanvas.height);
+  overtrekLijnen = 0;
+  document.getElementById('overtrek-feedback').textContent = '';
+}
+
+function controleerOvertrek() {
+  if (overtrekLijnen < 5) {
+    document.getElementById('overtrek-feedback').textContent = '✏️ Teken eerst het cijfer/letter na!';
+    return;
+  }
+  // Markeer als voltooid
+  overtrekVoltooid.add(overtrekActief);
+  document.getElementById('overtrek-score').textContent = overtrekVoltooid.size;
+  renderLetterRij();
+
+  const fb = document.getElementById('overtrek-feedback');
+  fb.innerHTML = '<span class="vinkje-anim">✅</span> Geweldig goed gedaan! 🌟';
+  speelGeluid('goed');
+  voegSterToe(1, window.innerWidth/2, window.innerHeight/2);
+  if (overtrekVoltooid.size % 5 === 0) maakConfetti();
+
+  // Ga automatisch naar volgende
+  const huidigIdx = OVERTREK_ITEMS.indexOf(overtrekActief);
+  if (huidigIdx < OVERTREK_ITEMS.length - 1) {
+    setTimeout(() => kiesOvertrekItem(OVERTREK_ITEMS[huidigIdx + 1]), 1200);
+  } else {
+    setTimeout(() => {
+      fb.innerHTML = '🏆 Alle letters en cijfers gedaan! Super! 🌟🌟🌟';
+      maakConfetti(); voegSterToe(3, window.innerWidth/2, window.innerHeight/2);
+    }, 1200);
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  VETERS STRIKKEN
+// ══════════════════════════════════════════════════
+const VETER_STAPPEN = [
+  { uitleg: '👟 Stap 1: Trek beide veters gelijkmatig aan. Tik op de schoen!', actie: 'tik' },
+  { uitleg: '✂️ Stap 2: Leg de rechterveter OVER de linkerveter. Tik!',         actie: 'tik' },
+  { uitleg: '🔄 Stap 3: Duw de rechter door het gaatje en trek aan. Tik!',      actie: 'tik' },
+  { uitleg: '🌸 Stap 4: Maak een lus met de linkerveter. Tik!',                  actie: 'tik' },
+  { uitleg: '🔁 Stap 5: Wikkel de rechter om de lus heen. Tik!',                actie: 'tik' },
+  { uitleg: '👆 Stap 6: Duw de rechter door het gaatje — maak de tweede lus!', actie: 'tik' },
+  { uitleg: '💪 Stap 7: Trek beide lussen stevig aan. Tik!',                    actie: 'tik' },
+  { uitleg: '🎉 Klaar! Je hebt je veter gestrikken!',                           actie: 'klaar' },
+];
+let veterStap = -1;
+let veterCanvas, veterCtx;
+
+function startVeters() {
+  toonScherm('veters');
+  veterStap = -1;
+  initVeterCanvas();
+  renderVeterStappen();
+  tekenSchoen(0);
+}
+
+function renderVeterStappen() {
+  const dots = document.getElementById('stap-dots');
+  dots.innerHTML = VETER_STAPPEN.map((s, i) =>
+    `<div class="stap-dot${i < veterStap ? ' klaar' : i === veterStap ? ' actief' : ''}">${i + 1}</div>`
+  ).join('');
+}
+
+function initVeterCanvas() {
+  veterCanvas = document.getElementById('veter-canvas');
+  veterCtx = veterCanvas.getContext('2d');
+  if (veterCanvas._init) return;
+  veterCanvas._init = true;
+  veterCanvas.addEventListener('click', () => volgendVeterStap());
+  veterCanvas.addEventListener('touchend', e => { e.preventDefault(); volgendVeterStap(); }, { passive: false });
+}
+
+function volgendVeterStap() {
+  veterStap++;
+  if (veterStap >= VETER_STAPPEN.length) {
+    veterStap = 0;
+    document.getElementById('veter-feedback').textContent = '';
+  }
+  const stap = VETER_STAPPEN[veterStap];
+  document.getElementById('stap-uitleg').textContent = stap.uitleg;
+  document.getElementById('veter-btn').textContent = veterStap === 0 ? '👟 Start!' :
+    veterStap >= VETER_STAPPEN.length - 1 ? '🔄 Opnieuw' : '👆 Volgende stap';
+
+  tekenSchoen(veterStap);
+  renderVeterStappen();
+
+  if (stap.actie === 'klaar') {
+    document.getElementById('veter-feedback').innerHTML = '<span class="vinkje-anim">✅</span> Gelukt! Je kan je veters strikken! 🌟';
+    speelGeluid('goed');
+    voegSterToe(3, window.innerWidth/2, window.innerHeight/2);
+    maakConfetti();
+  } else {
+    document.getElementById('veter-feedback').textContent = '';
+    speelGeluid('goed');
+  }
+}
+
+function tekenSchoen(stap) {
+  if (!veterCtx) return;
+  const c = veterCtx;
+  const W = veterCanvas.width, H = veterCanvas.height;
+  c.clearRect(0, 0, W, H);
+
+  // Schoen body
+  c.fillStyle = '#5b8af5';
+  c.beginPath();
+  c.moveTo(40, 180); c.lineTo(260, 180); c.lineTo(270, 230);
+  c.lineTo(30, 230); c.closePath(); c.fill();
+
+  // Schoenrand
+  c.fillStyle = '#fff';
+  c.fillRect(30, 225, 240, 12);
+
+  // Zool
+  c.fillStyle = '#3a3a3a';
+  c.fillRect(25, 235, 250, 18);
+
+  // Bovenkant schoen
+  c.fillStyle = '#4a7ae8';
+  c.beginPath();
+  c.moveTo(60, 80); c.lineTo(200, 80); c.lineTo(260, 180); c.lineTo(40, 180); c.closePath();
+  c.fill();
+
+  // Gaatjes voor veters
+  const gaatjesX = [90, 110, 130, 150, 170, 190];
+  c.fillStyle = '#2a4aaa';
+  gaatjesX.forEach(x => {
+    c.beginPath(); c.arc(x, 120, 5, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(x, 145, 5, 0, Math.PI * 2); c.fill();
+  });
+
+  // Veter tekenen per stap
+  c.lineWidth = 4; c.lineCap = 'round';
+
+  const VETER_KLEUREN = ['#fff','#ffcccc','#ffaaaa','#ff7777','#ff4444','#cc0000','#880000'];
+  const kleur = VETER_KLEUREN[Math.min(stap, VETER_KLEUREN.length - 1)];
+  c.strokeStyle = kleur;
+
+  if (stap >= 1) {
+    // Basis kruisje
+    c.beginPath(); c.moveTo(90,120); c.lineTo(190,120); c.stroke();
+    c.beginPath(); c.moveTo(90,145); c.lineTo(190,145); c.stroke();
+  }
+  if (stap >= 2) {
+    // Kruisende veters
+    c.beginPath(); c.moveTo(150,120); c.lineTo(140,145); c.stroke();
+    c.beginPath(); c.moveTo(140,120); c.lineTo(150,145); c.stroke();
+  }
+  if (stap >= 3) {
+    // Knoop
+    c.beginPath(); c.arc(150, 100, 12, 0, Math.PI * 2);
+    c.fillStyle = kleur; c.fill();
+  }
+  if (stap >= 4) {
+    // Eerste lus
+    c.beginPath();
+    c.moveTo(150, 100); c.bezierCurveTo(120, 60, 100, 50, 110, 70);
+    c.stroke();
+  }
+  if (stap >= 5) {
+    // Tweede lus om wikkelen
+    c.beginPath();
+    c.moveTo(150, 100); c.bezierCurveTo(180, 60, 200, 50, 190, 70);
+    c.stroke();
+  }
+  if (stap >= 6) {
+    // Tweede lus door gat
+    c.beginPath();
+    c.moveTo(190, 70); c.bezierCurveTo(200, 55, 195, 45, 185, 55);
+    c.stroke();
+    c.beginPath();
+    c.moveTo(110, 70); c.bezierCurveTo(100, 55, 105, 45, 115, 55);
+    c.stroke();
+  }
+  if (stap >= 7) {
+    // Afgewerkte strik!
+    c.strokeStyle = '#ffd700'; c.lineWidth = 5;
+    // Linker lus
+    c.beginPath();
+    c.moveTo(150,100); c.bezierCurveTo(110,55,90,45,105,65); c.stroke();
+    // Rechter lus
+    c.beginPath();
+    c.moveTo(150,100); c.bezierCurveTo(190,55,210,45,195,65); c.stroke();
+    // Middenknoop
+    c.beginPath(); c.arc(150, 100, 8, 0, Math.PI*2);
+    c.fillStyle = '#ffd700'; c.fill();
+    // Losse eindjes
+    c.beginPath(); c.moveTo(140,100); c.lineTo(115,125); c.stroke();
+    c.beginPath(); c.moveTo(160,100); c.lineTo(185,125); c.stroke();
+    // Tekst
+    c.fillStyle = '#ffd700';
+    c.font = 'bold 20px Nunito, sans-serif';
+    c.textAlign = 'center';
+    c.fillText('🎉 Gelukt!', 150, 50);
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  BLOEMEN ACHTERGROND
+// ══════════════════════════════════════════════════
+function maakBloemenBg() {
+  const bg = document.getElementById('bloemBg');
+  const bloemen = ['🌸','🌷','🌼','🌺','🌻','💮','🌹'];
+  for (let i = 0; i < 18; i++) {
+    const b = document.createElement('div');
+    b.className = 'bloem-deco';
+    b.textContent = bloemen[Math.floor(Math.random() * bloemen.length)];
+    b.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*4}s;animation-duration:${4+Math.random()*4}s;font-size:${1.2+Math.random()*1.5}rem`;
+    bg.appendChild(b);
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════
+laadSterren();
+maakBloemenBg();
+</script>
+</body>
+</html>
