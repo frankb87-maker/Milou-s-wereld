@@ -664,7 +664,7 @@
   <div class="card accent-pink">
     <h2>😴 Slaaptijden</h2>
 
-    <p style="font-size:0.8rem;font-weight:800;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">📚 Schooldagen (ma t/m do)</p>
+    <p style="font-size:0.8rem;font-weight:800;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">📚 Schooldagen (ma t/m vr)</p>
     <div class="time-card tc-sleep">
       <span class="tc-emoji">🌙</span>
       <div>
@@ -680,7 +680,7 @@
       </div>
     </div>
 
-    <p style="font-size:0.8rem;font-weight:800;color:var(--muted);margin:14px 0 8px;text-transform:uppercase;letter-spacing:1px">🌟 Weekend (vr & za)</p>
+    <p style="font-size:0.8rem;font-weight:800;color:var(--muted);margin:14px 0 8px;text-transform:uppercase;letter-spacing:1px">🌟 Zaterdag</p>
     <div class="time-card" style="background:#f0f8ff">
       <span class="tc-emoji">🌙</span>
       <div>
@@ -1685,9 +1685,9 @@ function updateKlok() {
   const isRustdag  = dag === 4; // donderdag
   let badgeTekst = dagNaam;
   if (isRustdag)          badgeTekst = '🌿 Rustdag!';
-  else if (isVrijdag)     badgeTekst = '🎉 Weekend begint!';
   else if (isZaterdag)    badgeTekst = '🌟 Zaterdag!';
   else if (dag === 0)     badgeTekst = '😴 Zondag';
+  else if (isVrijdag)     badgeTekst = '🎒 Vrijdag — bijna weekend!';
   if (badgeEl) badgeEl.textContent = badgeTekst;
 
   // ── Slimme melding — per dag én tijdstip ──
@@ -1705,8 +1705,8 @@ function updateKlok() {
   const opstaaanTijd   = 7 * 60;         // 07:00
   const nuMinuten = uur * 60 + nu.getMinutes();
 
-  const isSchooldag = dag >= 1 && dag <= 4;  // ma t/m do
-  const isWeekendNacht = isVrijdag || isZaterdag;
+  const isSchooldag = dag >= 1 && dag <= 5;  // ma t/m vr
+  const isZaterdag  = dag === 6;
 
   if (isRustdag) {
     // Donderdag = rustdag
@@ -1752,20 +1752,6 @@ function updateKlok() {
     } else {
       emoji = '🌙'; titel = 'Het is bedtijd! 😴';
       sub = 'Telefoon uit, lekker slapen. Morgen is een nieuwe dag 🌸'; kleur = '#e8e0ff';
-    }
-  } else if (isVrijdag) {
-    if (uur < 7) {
-      emoji = '😴'; titel = 'Nog even slapen!'; sub = 'Wekker om 07:00.'; kleur = '#eee6ff';
-    } else if (uur < 16) {
-      emoji = '🎉'; titel = 'Vrijdag! Weekend begint vanavond 🥳';
-      sub = `Vandaag: ${SCHEMA.find(s=>s.dag==='Vrijdag')?.juf || 'Juf Romy'}`; kleur = '#fff8e0';
-    } else if (nuMinuten < bedtijdWeekend) {
-      const over = bedtijdWeekend - nuMinuten;
-      emoji = '🌟'; titel = `Vrijdagavond 🎉 Nog ${over} min tot bedtijd (22:00).`;
-      sub = 'Geniet van je vrije avond!'; kleur = '#fff0f0';
-    } else {
-      emoji = '🌙'; titel = 'Bedtijd! (22:00) 😴';
-      sub = 'Morgen mag je uitslapen. Slaap lekker!'; kleur = '#e8e0ff';
     }
   } else if (isZaterdag) {
     if (nuMinuten < bedtijdWeekend) {
