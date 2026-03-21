@@ -1,0 +1,1886 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Milou's Wereld 🌸</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink:    #f7a8c4;
+    --pink2:   #f9c9d8;
+    --mint:    #a8e6cf;
+    --lavender:#c9b8f0;
+    --yellow:  #ffe49a;
+    --sky:     #a8d8f0;
+    --bg:      #fdf6fa;
+    --card:    #ffffff;
+    --text:    #3a2a3a;
+    --muted:   #8a7a8a;
+    --radius:  20px;
+    --shadow:  0 4px 24px rgba(180,100,140,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(253,246,250,0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 2px solid var(--pink2);
+    padding: 12px 20px;
+    display: flex; align-items: center; gap: 8px;
+    overflow-x: auto;
+  }
+  nav .logo {
+    font-family: 'Pacifico', cursive;
+    font-size: 1.2rem;
+    color: var(--pink);
+    white-space: nowrap;
+    margin-right: 12px;
+  }
+  nav button {
+    border: none; background: none; cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.85rem; font-weight: 700;
+    padding: 7px 14px; border-radius: 50px;
+    color: var(--muted); white-space: nowrap;
+    transition: all .2s;
+  }
+  nav button:hover { background: var(--pink2); color: var(--text); }
+  nav button.active { background: var(--pink); color: white; }
+
+  /* ─── MAIN ─── */
+  main { padding: 24px 16px 60px; max-width: 700px; margin: 0 auto; }
+
+  /* ─── SECTIONS ─── */
+  .section { display: none; animation: fadeIn .35s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ─── PAGE HEADER ─── */
+  .page-header {
+    text-align: center; margin-bottom: 28px;
+  }
+  .page-header .emoji { font-size: 3rem; }
+  .page-header h1 {
+    font-family: 'Pacifico', cursive;
+    font-size: 1.9rem; color: var(--text);
+    margin: 6px 0 8px;
+  }
+  .page-header p { color: var(--muted); font-size: 0.95rem; }
+
+  /* ─── CARDS ─── */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 22px;
+    margin-bottom: 18px;
+  }
+  .card h2 {
+    font-size: 1.1rem; font-weight: 800; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .accent-pink { border-top: 4px solid var(--pink); }
+  .accent-mint  { border-top: 4px solid var(--mint); }
+  .accent-lav   { border-top: 4px solid var(--lavender); }
+  .accent-sky   { border-top: 4px solid var(--sky); }
+  .accent-yellow{ border-top: 4px solid var(--yellow); }
+
+  /* ─── HOME ─── */
+  .home-hero {
+    background: linear-gradient(135deg, var(--pink2) 0%, var(--lavender) 50%, var(--sky) 100%);
+    border-radius: 24px;
+    padding: 36px 24px;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .home-hero h1 {
+    font-family: 'Pacifico', cursive;
+    font-size: 2.4rem; color: white;
+    text-shadow: 0 2px 8px rgba(100,60,120,.25);
+    margin-bottom: 8px;
+  }
+  .home-hero p { color: rgba(255,255,255,0.85); font-size: 1rem; font-weight: 600; }
+
+  .home-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .home-tile {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 22px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s;
+    border: none; width: 100%; font-family: 'Nunito', sans-serif;
+  }
+  .home-tile:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(180,100,140,.15); }
+  .home-tile .tile-emoji { font-size: 2.4rem; margin-bottom: 8px; }
+  .home-tile .tile-label { font-weight: 800; font-size: 0.95rem; color: var(--text); }
+  .home-tile .tile-sub   { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+
+  /* ─── SCHEMA ─── */
+  .time-card {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px;
+    border-radius: 14px;
+    margin-bottom: 10px;
+    font-weight: 700;
+  }
+  .time-card .tc-emoji { font-size: 1.8rem; }
+  .time-card .tc-label { color: var(--muted); font-size: 0.82rem; font-weight: 600; }
+  .time-card .tc-value { font-size: 1.4rem; font-weight: 900; }
+  .tc-sleep  { background: #eee6ff; }
+  .tc-wake   { background: #fff8e0; }
+
+  .day-grid { display: flex; flex-direction: column; gap: 8px; }
+  .day-row {
+    display: flex; align-items: center; gap: 12px;
+    background: #fafafa; border-radius: 12px; padding: 12px 16px;
+    border-left: 4px solid transparent;
+  }
+  .day-row.today { border-left-color: var(--pink); background: #fff0f5; }
+  .day-row.rest  { border-left-color: var(--mint); background: #f0fff8; }
+  .day-row .dr-day  { font-weight: 800; min-width: 90px; }
+  .day-row .dr-juf  { color: var(--muted); font-size: 0.9rem; }
+  .day-row .dr-badge {
+    margin-left: auto;
+    font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 20px;
+    background: var(--mint); color: #2a7a5a;
+  }
+
+  /* ─── RECEPTEN ─── */
+  .recipe-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  }
+  .recipe-pill {
+    background: var(--bg); border-radius: 12px; padding: 10px 14px;
+    font-weight: 700; font-size: 0.9rem;
+    display: flex; align-items: center; gap: 8px;
+    border: 2px solid transparent;
+    cursor: pointer; transition: all .15s;
+  }
+  .recipe-pill:hover { border-color: var(--pink); background: #fff0f5; }
+  .recipe-detail {
+    display: none;
+    background: #fff8fb; border-radius: 14px; padding: 18px;
+    margin-top: 14px; border: 2px solid var(--pink2);
+  }
+  .recipe-detail.open { display: block; animation: fadeIn .25s ease; }
+  .recipe-detail h3 { margin-bottom: 10px; font-size: 1rem; }
+  .recipe-detail ul { padding-left: 18px; color: var(--muted); font-size: 0.9rem; line-height: 1.8; }
+  .recipe-detail .stappen { margin-top: 12px; font-size: 0.9rem; line-height: 1.9; color: var(--text); }
+
+  /* ─── BLACKPINK ─── */
+  .bp-members { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .bp-card {
+    border-radius: 16px; padding: 18px 16px; text-align: center;
+    transition: transform .2s;
+  }
+  .bp-card:hover { transform: translateY(-3px); }
+  .bp-card .bp-emoji { font-size: 2.4rem; }
+  .bp-card .bp-name  { font-weight: 900; font-size: 1rem; margin: 6px 0 4px; }
+  .bp-card .bp-info  { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+  .bp-jisoo  { background: #fff0f5; }
+  .bp-jennie { background: #fff8e0; }
+  .bp-rose   { background: #f0f8ff; }
+  .bp-lisa   { background: #f0fff8; }
+
+  .bp-funfacts { margin-top: 6px; }
+  .bp-fact {
+    background: var(--bg); border-radius: 12px; padding: 12px 16px;
+    margin-bottom: 8px; font-size: 0.88rem; line-height: 1.6;
+    border-left: 3px solid var(--pink);
+  }
+
+  /* ─── CREATIEF ─── */
+  .creative-list { list-style: none; }
+  .creative-list li {
+    padding: 10px 0; border-bottom: 1px solid #f0e8f0;
+    display: flex; gap: 12px; font-size: 0.93rem; align-items: flex-start;
+  }
+  .creative-list li:last-child { border-bottom: none; }
+  .creative-list .ci-emoji { font-size: 1.3rem; margin-top: 1px; }
+
+  .kleur-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+  .kleur-dot {
+    width: 44px; height: 44px; border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,.1);
+    cursor: pointer; transition: transform .15s;
+  }
+  .kleur-dot:hover { transform: scale(1.15); }
+
+  /* ─── RUST PAGINA ─── */
+  .adem-box {
+    text-align: center;
+    padding: 28px 20px;
+    background: linear-gradient(135deg, #e8f8f0, #f0ecff);
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .adem-circle {
+    width: 120px; height: 120px; border-radius: 50%;
+    background: rgba(168,230,207,0.4);
+    border: 4px solid var(--mint);
+    margin: 0 auto 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem;
+    transition: transform 4s ease-in-out;
+  }
+  .adem-circle.grow { transform: scale(1.5); }
+  .adem-circle.shrink { transform: scale(1); }
+  #adem-tekst { font-weight: 800; font-size: 1.1rem; color: #4a7a6a; margin-bottom: 14px; }
+  #adem-btn {
+    background: var(--mint); border: none; cursor: pointer;
+    font-family: 'Nunito', sans-serif; font-weight: 800;
+    padding: 10px 28px; border-radius: 50px; font-size: 0.95rem;
+    color: #2a6a4a;
+    transition: background .2s;
+  }
+  #adem-btn:hover { background: #8adcbe; }
+
+  .positief-kaart {
+    background: var(--card); border-radius: 16px; padding: 20px;
+    text-align: center; box-shadow: var(--shadow);
+    margin-bottom: 10px;
+  }
+  .positief-kaart .pk-tekst {
+    font-size: 1.1rem; font-weight: 700; line-height: 1.6;
+    color: var(--text); margin-bottom: 8px;
+  }
+  .positief-kaart .pk-sub {
+    font-size: 0.82rem; color: var(--muted);
+  }
+  #nieuw-bericht-btn {
+    width: 100%; background: var(--lavender);
+    border: none; cursor: pointer;
+    font-family: 'Nunito', sans-serif; font-weight: 800;
+    padding: 12px; border-radius: 14px; font-size: 0.95rem;
+    color: #5a4a9a; margin-top: 6px;
+    transition: background .2s;
+  }
+  #nieuw-bericht-btn:hover { background: #b8a8e8; }
+
+  .geruststelling {
+    background: #fff8e0; border-radius: 14px; padding: 16px 18px;
+    border-left: 4px solid var(--yellow); font-size: 0.88rem; line-height: 1.75;
+    color: var(--text); margin-bottom: 10px;
+  }
+  .geruststelling strong { font-weight: 900; }
+
+  /* ─── ROBLOX ─── */
+  .roblox-card {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: var(--radius); padding: 22px;
+    color: white; margin-bottom: 18px;
+  }
+  .roblox-card h2 { color: white; }
+  .roblox-list { list-style: none; }
+  .roblox-list li {
+    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.1);
+    display: flex; gap: 12px; align-items: center; font-size: 0.9rem;
+    color: rgba(255,255,255,.85);
+  }
+  .roblox-list li:last-child { border-bottom: none; }
+
+  /* ─── TODAY BADGE ─── */
+  .vandaag-badge {
+    display: inline-block;
+    background: var(--pink); color: white;
+    font-size: 0.7rem; font-weight: 800; padding: 2px 8px;
+    border-radius: 10px; margin-left: 8px; vertical-align: middle;
+  }
+
+  /* ─── BLACKPINK BIG MEMBER CARDS ─── */
+  .bp-members-big { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .bp-big-card {
+    position: relative; border-radius: 16px; overflow: hidden;
+    aspect-ratio: 4/3; display: block; text-decoration: none;
+    transition: transform .2s; background: #222;
+  }
+  .bp-big-card:hover { transform: scale(1.03); }
+  .bp-big-card img { width:100%; height:100%; object-fit:cover; display:block; }
+  .bp-avatar {
+    width:100%; height:100%;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:6px;
+  }
+  .bp-avatar-letter {
+    font-family:'Pacifico',cursive; font-size:2rem; color:white;
+    text-shadow:0 2px 8px rgba(0,0,0,0.3);
+  }
+  .bp-avatar-deco { font-size:1.1rem; letter-spacing:4px; }
+  .bp-big-overlay {
+    position: absolute; bottom:0; left:0; right:0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    padding: 24px 12px 12px; color: white;
+  }
+  .bp-big-name  { font-weight: 900; font-size: 1rem; }
+  .bp-big-role  { font-size: 0.72rem; opacity: 0.85; }
+  .bp-big-info  { font-size: 0.7rem; opacity: 0.7; margin-top: 2px; }
+  .bp-jisoo  { border: 3px solid #f9c9d8; }
+  .bp-jennie { border: 3px solid #ffe49a; }
+  .bp-rose   { border: 3px solid #a8d8f0; }
+  .bp-lisa   { border: 3px solid #a8e6cf; }
+
+  /* ─── YOUTUBE GRID ─── */
+  .yt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .yt-card {
+    position: relative; border-radius: 12px; overflow: hidden;
+    display: block; text-decoration: none; background: #111;
+    transition: transform .2s;
+  }
+  .yt-card:hover { transform: scale(1.03); }
+  .yt-card img { width:100%; display:block; aspect-ratio:16/9; object-fit:cover; }
+  .yt-play {
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-60%);
+    background:rgba(255,0,0,0.85); color:white;
+    width:36px; height:36px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:0.9rem; font-weight:900;
+  }
+  .yt-label {
+    position:absolute; bottom:0; left:0; right:0;
+    background:rgba(0,0,0,0.75); color:white;
+    font-size:0.72rem; font-weight:700; padding:5px 8px;
+  }
+  .yt-tutorial { aspect-ratio: unset; background: none; }
+  .yt-tutorial-inner {
+    padding: 16px 10px; text-align: center; border-radius: 12px;
+    background: linear-gradient(135deg,#f0fff8,#a8e6cf);
+    height: 100%;
+  }
+  .yt-sub { font-size:0.7rem; color:var(--muted); margin-top:2px; }
+
+  /* ─── SOCIAL BUTTONS ─── */
+  .social-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+  .social-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 18px; border-radius: 50px; color: white;
+    text-decoration: none; font-weight: 800; font-size: 0.88rem;
+    transition: opacity .2s;
+  }
+  .social-btn:hover { opacity: 0.85; }
+
+  /* ─── LINK LIJST ─── */
+  .link-lijst { display: flex; flex-direction: column; gap: 8px; }
+  .link-rij {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--bg); border-radius: 12px; padding: 12px 14px;
+    text-decoration: none; border-left: 4px solid var(--pink);
+    transition: background .15s;
+  }
+  .link-rij:hover { background: #fff0f5; }
+  .link-icon { font-size: 1.4rem; }
+  .link-titel { font-weight: 800; font-size: 0.88rem; color: var(--text); }
+  .link-sub   { font-size: 0.75rem; color: var(--muted); }
+  .link-arrow { margin-left: auto; font-weight: 900; color: var(--muted); font-size: 1rem; }
+
+  /* ─── DARK LINK LIJST (Roblox) ─── */
+  .link-lijst-dark { display: flex; flex-direction: column; gap: 8px; }
+  .link-rij-dark {
+    display: flex; align-items: center; gap: 12px;
+    background: rgba(255,255,255,0.07); border-radius: 12px; padding: 12px 14px;
+    text-decoration: none; transition: background .15s;
+  }
+  .link-rij-dark:hover { background: rgba(255,255,255,0.15); }
+  .link-titel-dark { font-weight: 800; font-size: 0.88rem; color: white; }
+  .link-sub-dark   { font-size: 0.75rem; color: rgba(255,255,255,0.6); }
+  .link-arrow-dark { margin-left: auto; font-weight: 900; color: rgba(255,255,255,0.4); }
+
+  /* ─── PROMO CODES ─── */
+  .promo-grid { display: flex; flex-direction: column; gap: 8px; }
+  .promo-item {
+    background: rgba(255,255,255,0.08); border-radius: 12px;
+    padding: 12px 14px; display: flex; align-items: center; gap: 12px;
+    cursor: pointer; transition: background .15s;
+  }
+  .promo-item:hover { background: rgba(255,255,255,0.15); }
+  .promo-code {
+    font-family: monospace; font-size: 1rem; font-weight: 900;
+    color: #ffd700; letter-spacing: 1px; flex: 1;
+  }
+  .promo-reward { font-size: 0.78rem; color: rgba(255,255,255,0.75); }
+  .promo-copy {
+    background: rgba(255,215,0,0.2); color: #ffd700;
+    font-size: 0.72rem; font-weight: 800; padding: 3px 10px;
+    border-radius: 20px; white-space: nowrap;
+  }
+  .promo-verlopen { opacity: 0.4; }
+
+  /* ─── EVENT LIJST ─── */
+  .event-lijst { display: flex; flex-direction: column; gap: 8px; }
+  .event-item {
+    background: rgba(255,255,255,0.08); border-radius: 12px;
+    padding: 12px 14px; display: flex; gap: 12px; align-items: flex-start;
+  }
+  .event-emoji { font-size: 1.5rem; }
+  .event-naam { font-weight: 800; font-size: 0.88rem; color: white; }
+  .event-info { font-size: 0.75rem; color: rgba(255,255,255,0.65); margin-top: 2px; }
+  .event-badge {
+    margin-left: auto; font-size: 0.68rem; font-weight: 800;
+    padding: 3px 8px; border-radius: 20px; white-space: nowrap;
+  }
+  .badge-nieuw  { background: #22c55e; color: white; }
+  .badge-binnenkort { background: #f59e0b; color: white; }
+  .badge-actief { background: #3b82f6; color: white; }
+
+  /* ─── ROBLOX LINK BTN ─── */
+  .roblox-link-btn {
+    display: block; text-align: center;
+    background: rgba(255,255,255,0.1); color: white;
+    text-decoration: none; padding: 10px; border-radius: 12px;
+    font-weight: 800; font-size: 0.88rem;
+    transition: background .15s;
+  }
+  .roblox-link-btn:hover { background: rgba(255,255,255,0.2); }
+
+  /* ─── HOME HERO met BP leden ─── */
+  .home-bp-strip {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 6px; margin-top: 14px;
+  }
+  .home-bp-thumb {
+    border-radius: 12px; overflow: hidden;
+    aspect-ratio: 1; position: relative;
+    text-decoration: none; display: block;
+  }
+  .home-bp-thumb img { width:100%; height:100%; object-fit:cover; }
+  .home-bp-thumb .hbt-label {
+    position: absolute; bottom: 0; left:0; right:0;
+    background: rgba(0,0,0,0.6); color: white;
+    font-size: 0.68rem; font-weight: 800; text-align: center; padding: 3px;
+  }
+
+  @media (max-width: 400px) {
+    .bp-members-big { grid-template-columns: 1fr 1fr; }
+    .yt-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">🌸 Milou</span>
+  <button class="active" onclick="toon('home', this)">🏠 Home</button>
+  <button onclick="toon('schema', this)">🗓️ Schema</button>
+  <button onclick="toon('recepten', this)">🍽️ Koken</button>
+  <button onclick="toon('blackpink', this)">🎵 BLACKPINK</button>
+  <button onclick="toon('creatief', this)">🎨 Creatief</button>
+  <button onclick="toon('rust', this)">💚 Rust</button>
+  <button onclick="toon('roblox', this)">🎮 Roblox</button>
+</nav>
+
+<main>
+
+<!-- ══════════ HOME ══════════ -->
+<section class="section active" id="home">
+  <div class="home-hero">
+    <h1>Hoi Milou! 🌸</h1>
+    <p>Dit is jouw eigen plekje. Welkom!</p>
+    <div class="home-bp-strip">
+      <a href="#" onclick="toon('blackpink',navBtn('blackpink'));return false" class="home-bp-thumb" style="background:linear-gradient(160deg,#ffb6c1,#c9184a)">
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);font-size:1.6rem">🌸</div>
+        <div class="hbt-label">Jisoo</div>
+      </a>
+      <a href="#" onclick="toon('blackpink',navBtn('blackpink'));return false" class="home-bp-thumb" style="background:linear-gradient(160deg,#ffe066,#e76f51)">
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);font-size:1.6rem">👑</div>
+        <div class="hbt-label">Jennie</div>
+      </a>
+      <a href="#" onclick="toon('blackpink',navBtn('blackpink'));return false" class="home-bp-thumb" style="background:linear-gradient(160deg,#a8d8ea,#4dabf7)">
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);font-size:1.6rem">🌹</div>
+        <div class="hbt-label">Rosé</div>
+      </a>
+      <a href="#" onclick="toon('blackpink',navBtn('blackpink'));return false" class="home-bp-thumb" style="background:linear-gradient(160deg,#b7e4c7,#40916c)">
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);font-size:1.6rem">⚡</div>
+        <div class="hbt-label">Lisa</div>
+      </a>
+    </div>
+  </div>
+  <div class="home-grid">
+    <button class="home-tile" onclick="toon('schema', navBtn('schema'))">
+      <div class="tile-emoji">🗓️</div>
+      <div class="tile-label">Mijn Schema</div>
+      <div class="tile-sub">Slaaptijden & juf</div>
+    </button>
+    <button class="home-tile" onclick="toon('recepten', navBtn('recepten'))">
+      <div class="tile-emoji">🍽️</div>
+      <div class="tile-label">Koken & Bakken</div>
+      <div class="tile-sub">Mijn favoriete gerechten</div>
+    </button>
+    <button class="home-tile" onclick="toon('blackpink', navBtn('blackpink'))">
+      <div class="tile-emoji">🎵</div>
+      <div class="tile-label">BLACKPINK</div>
+      <div class="tile-sub">Jisoo, Jennie, Rosé & Lisa</div>
+    </button>
+    <button class="home-tile" onclick="toon('creatief', navBtn('creatief'))">
+      <div class="tile-emoji">🎨</div>
+      <div class="tile-label">Creatief</div>
+      <div class="tile-sub">Tekenen & verven</div>
+    </button>
+    <button class="home-tile" onclick="toon('rust', navBtn('rust'))">
+      <div class="tile-emoji">💚</div>
+      <div class="tile-label">Even Uitblazen</div>
+      <div class="tile-sub">Rustmoment voor jou</div>
+    </button>
+    <button class="home-tile" onclick="toon('roblox', navBtn('roblox'))">
+      <div class="tile-emoji">🎮</div>
+      <div class="tile-label">Roblox</div>
+      <div class="tile-sub">Games & tips</div>
+    </button>
+  </div>
+</section>
+
+<!-- ══════════ SCHEMA ══════════ -->
+<section class="section" id="schema">
+  <div class="page-header">
+    <div class="emoji">🗓️</div>
+    <h1>Mijn Schema</h1>
+    <p>Rust begint met weten wat er komt</p>
+  </div>
+
+  <div class="card accent-pink">
+    <h2>😴 Slaaptijden</h2>
+
+    <p style="font-size:0.8rem;font-weight:800;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">📚 Schooldagen (ma t/m do)</p>
+    <div class="time-card tc-sleep">
+      <span class="tc-emoji">🌙</span>
+      <div>
+        <div class="tc-label">Naar bed</div>
+        <div class="tc-value">19:30</div>
+      </div>
+    </div>
+    <div class="time-card tc-wake">
+      <span class="tc-emoji">☀️</span>
+      <div>
+        <div class="tc-label">Opstaan</div>
+        <div class="tc-value">07:00</div>
+      </div>
+    </div>
+
+    <p style="font-size:0.8rem;font-weight:800;color:var(--muted);margin:14px 0 8px;text-transform:uppercase;letter-spacing:1px">🌟 Weekend (vr & za)</p>
+    <div class="time-card" style="background:#f0f8ff">
+      <span class="tc-emoji">🌙</span>
+      <div>
+        <div class="tc-label">Naar bed</div>
+        <div class="tc-value">22:00</div>
+      </div>
+    </div>
+    <div class="time-card" style="background:#f0fff8">
+      <span class="tc-emoji">☀️</span>
+      <div>
+        <div class="tc-label">Opstaan</div>
+        <div class="tc-value" style="color:#5a9a7a">Lekker uitslapen! 😴</div>
+      </div>
+    </div>
+
+    <p style="font-size:0.8rem;font-weight:800;color:var(--muted);margin:14px 0 8px;text-transform:uppercase;letter-spacing:1px">🌿 Zondag</p>
+    <div class="time-card" style="background:#eee6ff">
+      <span class="tc-emoji">🌙</span>
+      <div>
+        <div class="tc-label">Naar bed</div>
+        <div class="tc-value">19:30</div>
+      </div>
+    </div>
+    <div class="time-card tc-wake">
+      <span class="tc-emoji">☀️</span>
+      <div>
+        <div class="tc-label">Opstaan</div>
+        <div class="tc-value">07:00</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card accent-mint">
+    <h2>📅 Weekschema</h2>
+    <div class="day-grid" id="dagGrid">
+      <!-- wordt gevuld via JS -->
+    </div>
+  </div>
+
+  <div class="card accent-lav">
+    <h2>💡 Handige herinnering</h2>
+    <ul style="padding-left:18px; line-height:2; font-size:0.9rem; color:var(--muted)">
+      <li>Op <strong>donderdag</strong> is het jouw rustdag 🌿</li>
+      <li>Leg je tas de avond van tevoren klaar</li>
+      <li>Zet je telefoon op stil voor het slapen</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════ RECEPTEN ══════════ -->
+<section class="section" id="recepten">
+  <div class="page-header">
+    <div class="emoji">🍽️</div>
+    <h1>Koken & Bakken</h1>
+    <p>Milou's favoriete gerechten</p>
+  </div>
+
+  <div class="card accent-yellow">
+    <h2>🌟 Mijn favoriete gerechten</h2>
+    <div class="recipe-grid" id="receptGrid">
+      <!-- gevuld via JS -->
+    </div>
+    <div class="recipe-detail" id="receptDetail"></div>
+  </div>
+
+  <div class="card accent-pink">
+    <h2>🍪 Koekjes bakken — Basisrecept</h2>
+    <p style="font-size:0.85rem; color:var(--muted); margin-bottom:12px">Knapperig van buiten, zacht van binnen</p>
+    <ul style="padding-left:18px; font-size:0.88rem; line-height:1.9; color:var(--text)">
+      <li>125g zachte boter</li>
+      <li>150g suiker</li>
+      <li>1 ei</li>
+      <li>1 tl vanille-extract</li>
+      <li>200g bloem</li>
+      <li>½ tl bakpoeder</li>
+      <li>Snufje zout</li>
+    </ul>
+    <div class="stappen" style="margin-top:14px; font-size:0.88rem; line-height:2; color:var(--text); border-top:1px solid #f0e0f0; padding-top:12px">
+      <strong>Zo maak je ze:</strong><br>
+      1️⃣ Verwarm de oven op 180°C<br>
+      2️⃣ Mix boter en suiker tot het luchtig is<br>
+      3️⃣ Voeg het ei en vanille toe<br>
+      4️⃣ Meng er de bloem, bakpoeder en zout door<br>
+      5️⃣ Vorm balletjes en leg op bakpapier<br>
+      6️⃣ Bak 10-12 minuten tot lichtgoud 🍪
+    </div>
+  </div>
+
+  <div class="card accent-mint">
+    <h2>🥒 Milou's Komkommersalade</h2>
+    <p style="font-size:0.85rem; color:var(--muted); margin-bottom:12px">Jouw eigen recept!</p>
+    <ul style="padding-left:18px; font-size:0.88rem; line-height:1.9;">
+      <li>1 komkommer</li>
+      <li>Scheut olijfolie</li>
+      <li>Beetje azijn of citroensap</li>
+      <li>Zout en peper</li>
+      <li>Optioneel: verse dille of munt</li>
+    </ul>
+    <p style="margin-top:10px; font-size:0.82rem; color:var(--muted)">✏️ <em>Pas dit recept aan naar jouw eigen smaak!</em></p>
+  </div>
+</section>
+
+<!-- ══════════ BLACKPINK ══════════ -->
+<section class="section" id="blackpink">
+  <div class="page-header">
+    <div class="emoji">🎵</div>
+    <h1>BLACKPINK</h1>
+    <p>In your area! 🖤💗</p>
+  </div>
+
+  <!-- MEMBER CARDS met foto -->
+  <div class="card accent-pink">
+    <h2>👩‍🎤 De vier leden</h2>
+    <div class="bp-members-big">
+
+      <a href="https://www.youtube.com/results?search_query=Jisoo+BLACKPINK" target="_blank" class="bp-big-card bp-jisoo">
+        <div class="bp-avatar" style="background:linear-gradient(160deg,#ffb6c1,#ff8fab,#c9184a)">
+          <div class="bp-avatar-letter">JS</div>
+          <div class="bp-avatar-deco">🌸🌸🌸</div>
+        </div>
+        <div class="bp-big-overlay">
+          <div class="bp-big-name">🌸 Jisoo</div>
+          <div class="bp-big-role">Vocalist & Visual</div>
+          <div class="bp-big-info">30 jaar 🎂 3 jan · 🇰🇷</div>
+        </div>
+      </a>
+
+      <a href="https://www.youtube.com/results?search_query=Jennie+BLACKPINK" target="_blank" class="bp-big-card bp-jennie">
+        <div class="bp-avatar" style="background:linear-gradient(160deg,#ffe066,#f4a261,#e76f51)">
+          <div class="bp-avatar-letter">JN</div>
+          <div class="bp-avatar-deco">👑✨👑</div>
+        </div>
+        <div class="bp-big-overlay">
+          <div class="bp-big-name">👑 Jennie</div>
+          <div class="bp-big-role">Rapper & Vocalist</div>
+          <div class="bp-big-info">29 jaar 🎂 16 jan · 🇰🇷</div>
+        </div>
+      </a>
+
+      <a href="https://www.youtube.com/results?search_query=Rose+BLACKPINK" target="_blank" class="bp-big-card bp-rose">
+        <div class="bp-avatar" style="background:linear-gradient(160deg,#a8d8ea,#74c0fc,#4dabf7)">
+          <div class="bp-avatar-letter">RO</div>
+          <div class="bp-avatar-deco">🌹🎵🌹</div>
+        </div>
+        <div class="bp-big-overlay">
+          <div class="bp-big-name">🌹 Rosé</div>
+          <div class="bp-big-role">Vocalist & Danser</div>
+          <div class="bp-big-info">28 jaar 🎂 11 feb · 🇳🇿</div>
+        </div>
+      </a>
+
+      <a href="https://www.youtube.com/results?search_query=Lisa+BLACKPINK" target="_blank" class="bp-big-card bp-lisa">
+        <div class="bp-avatar" style="background:linear-gradient(160deg,#b7e4c7,#74c69d,#40916c)">
+          <div class="bp-avatar-letter">LI</div>
+          <div class="bp-avatar-deco">⚡💚⚡</div>
+        </div>
+        <div class="bp-big-overlay">
+          <div class="bp-big-name">⚡ Lisa</div>
+          <div class="bp-big-role">Rapper & Hoofddanser</div>
+          <div class="bp-big-info">27 jaar 🎂 27 mrt · 🇹🇭</div>
+        </div>
+      </a>
+
+    </div>
+    <p style="font-size:0.78rem;color:var(--muted);text-align:center;margin-top:10px">Tik op een lid om naar YouTube te gaan 🎵</p>
+  </div>
+
+  <!-- VERJAARDAGEN TELLER -->
+  <div class="card accent-lav">
+    <h2>🎂 Volgende verjaardag</h2>
+    <div id="bdayCard" style="text-align:center;padding:10px 0"></div>
+  </div>
+
+  <!-- YOUTUBE VIDEO's -->
+  <div class="card accent-sky">
+    <h2>▶️ Bekijk & dans mee!</h2>
+    <p style="font-size:0.83rem;color:var(--muted);margin-bottom:14px">Tik op een video om hem op YouTube te openen 📱</p>
+    <div class="yt-grid">
+      <a href="https://www.youtube.com/watch?v=IHNzOHi8sJs" target="_blank" class="yt-card">
+        <img src="https://img.youtube.com/vi/IHNzOHi8sJs/mqdefault.jpg" alt="DDU-DU DDU-DU">
+        <div class="yt-play">▶</div>
+        <div class="yt-label">DDU-DU DDU-DU 🔥</div>
+      </a>
+      <a href="https://www.youtube.com/watch?v=ioNng23DkIM" target="_blank" class="yt-card">
+        <img src="https://img.youtube.com/vi/ioNng23DkIM/mqdefault.jpg" alt="How You Like That">
+        <div class="yt-play">▶</div>
+        <div class="yt-label">How You Like That 💕</div>
+      </a>
+      <a href="https://www.youtube.com/watch?v=e-ORhEE9VVg" target="_blank" class="yt-card">
+        <img src="https://img.youtube.com/vi/e-ORhEE9VVg/mqdefault.jpg" alt="Pink Venom">
+        <div class="yt-play">▶</div>
+        <div class="yt-label">Pink Venom 🖤</div>
+      </a>
+      <a href="https://www.youtube.com/watch?v=dyXnBRQCQEU" target="_blank" class="yt-card">
+        <img src="https://img.youtube.com/vi/dyXnBRQCQEU/mqdefault.jpg" alt="LOVESICK GIRLS">
+        <div class="yt-play">▶</div>
+        <div class="yt-label">LOVESICK GIRLS 🌹</div>
+      </a>
+      <a href="https://www.youtube.com/watch?v=rCkFCJiJBcA" target="_blank" class="yt-card">
+        <img src="https://img.youtube.com/vi/rCkFCJiJBcA/mqdefault.jpg" alt="Shut Down">
+        <div class="yt-play">▶</div>
+        <div class="yt-label">Shut Down ⚡</div>
+      </a>
+      <a href="https://www.youtube.com/watch?v=2VSSHBuJOZs" target="_blank" class="yt-card">
+        <img src="https://img.youtube.com/vi/2VSSHBuJOZs/mqdefault.jpg" alt="SOLO Jennie">
+        <div class="yt-play">▶</div>
+        <div class="yt-label">SOLO – Jennie 👑</div>
+      </a>
+      <a href="https://www.youtube.com/watch?v=wKysONrSmew" target="_blank" class="yt-card">
+        <img src="https://img.youtube.com/vi/wKysONrSmew/mqdefault.jpg" alt="On The Ground Rosé">
+        <div class="yt-play">▶</div>
+        <div class="yt-label">On The Ground – Rosé 🌹</div>
+      </a>
+      <a href="https://www.youtube.com/watch?v=NvBhqKGTwGI" target="_blank" class="yt-card">
+        <img src="https://img.youtube.com/vi/NvBhqKGTwGI/mqdefault.jpg" alt="MONEY Lisa">
+        <div class="yt-play">▶</div>
+        <div class="yt-label">MONEY – Lisa ⚡</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- DANSVIDEO's -->
+  <div class="card accent-pink" style="border-top-color:#c9b8f0">
+    <h2>💃 Leer de dans mee!</h2>
+    <p style="font-size:0.83rem;color:var(--muted);margin-bottom:14px">Dans-tutorial video's — tik om te openen in YouTube</p>
+    <div class="yt-grid">
+      <a href="https://www.youtube.com/results?search_query=DDU-DU+DDU-DU+dance+tutorial+easy" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner">
+          <div style="font-size:2rem">💃</div>
+          <div class="yt-label">DDU-DU tutorial</div>
+          <div class="yt-sub">Stap voor stap</div>
+        </div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=How+You+Like+That+dance+tutorial+easy" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner">
+          <div style="font-size:2rem">🕺</div>
+          <div class="yt-label">How You Like That</div>
+          <div class="yt-sub">Stap voor stap</div>
+        </div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=Pink+Venom+dance+tutorial" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner">
+          <div style="font-size:2rem">🖤</div>
+          <div class="yt-label">Pink Venom tutorial</div>
+          <div class="yt-sub">Stap voor stap</div>
+        </div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=BLACKPINK+dance+tutorial+beginners" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner">
+          <div style="font-size:2rem">🌟</div>
+          <div class="yt-label">Meer tutorials</div>
+          <div class="yt-sub">Voor beginners</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- WEETJES -->
+  <div class="card accent-lav">
+    <h2>✨ Leuke weetjes</h2>
+    <div class="bp-funfacts">
+      <div class="bp-fact">🎶 BLACKPINK debuteerde op <strong>8 augustus 2016</strong> bij YG Entertainment — ze bestaan nu al bijna 9 jaar!</div>
+      <div class="bp-fact">🌍 Hun YouTube-kanaal heeft meer dan <strong>90 miljoen abonnees</strong> — een van de grootste ter wereld.</div>
+      <div class="bp-fact">💪 Lisa werd gekozen uit meer dan <strong>4.000 auditiedeelnemers</strong> toen ze slechts 14 jaar oud was.</div>
+      <div class="bp-fact">🐶 Jisoo heeft twee schattige hondjes: <strong>Dalgom</strong> (een witte Maltees) en <strong>Snowball</strong>.</div>
+      <div class="bp-fact">🎸 Rosé speelt gitaar én piano — ze laat dat regelmatig zien op haar Instagram.</div>
+      <div class="bp-fact">🏆 Jennie was de <strong>eerste soliste</strong> van de groep en haar hit "SOLO" heeft miljarden streams.</div>
+      <div class="bp-fact">🎤 Jisoo bracht in 2023 haar solosingle <strong>"FLOWER"</strong> uit — bekijk de prachtige MV op YouTube!</div>
+      <div class="bp-fact">🌸 BLACKPINK is de <strong>eerste K-pop groep</strong> die headlinde op het Coachella festival in Amerika.</div>
+    </div>
+  </div>
+
+  <!-- SOCIALS LINKS -->
+  <div class="card accent-yellow">
+    <h2>📱 Volg BLACKPINK</h2>
+    <div class="social-links">
+      <a href="https://www.youtube.com/@BLACKPINK" target="_blank" class="social-btn" style="background:#ff0000">
+        <span>▶</span> YouTube
+      </a>
+      <a href="https://www.instagram.com/blackpinkofficial/" target="_blank" class="social-btn" style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)">
+        <span>📸</span> Instagram
+      </a>
+      <a href="https://www.youtube.com/results?search_query=BLACKPINK+2025" target="_blank" class="social-btn" style="background:#1a1a2e">
+        <span>🔍</span> Nieuws 2025
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ CREATIEF ══════════ -->
+<section class="section" id="creatief">
+  <div class="page-header">
+    <div class="emoji">🎨</div>
+    <h1>Creatieve Hoek</h1>
+    <p>Tekenen, verven en meer inspiratie!</p>
+  </div>
+
+  <!-- TEKENEN MET YOUTUBE LINKS -->
+  <div class="card accent-yellow">
+    <h2>✏️ Leer tekenen via YouTube</h2>
+    <p style="font-size:0.83rem;color:var(--muted);margin-bottom:14px">Tik op een tutorial om hem te openen 📱</p>
+    <div class="yt-grid">
+      <a href="https://www.youtube.com/results?search_query=how+to+draw+cute+anime+girl+easy+step+by+step" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner" style="background:linear-gradient(135deg,#fff8e0,#ffe49a)">
+          <div style="font-size:2rem">🌸</div>
+          <div class="yt-label">Schattig anime meisje</div>
+          <div class="yt-sub">Stap voor stap</div>
+        </div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=how+to+draw+BLACKPINK+chibi+easy" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner" style="background:linear-gradient(135deg,#fff0f5,#f9c9d8)">
+          <div style="font-size:2rem">🎤</div>
+          <div class="yt-label">BLACKPINK tekenen</div>
+          <div class="yt-sub">Chibi stijl</div>
+        </div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=easy+drawing+tutorials+for+kids+flowers" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner" style="background:linear-gradient(135deg,#f0fff8,#a8e6cf)">
+          <div style="font-size:2rem">🌺</div>
+          <div class="yt-label">Bloemen tekenen</div>
+          <div class="yt-sub">Makkelijk & mooi</div>
+        </div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=draw+so+cute+easy" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner" style="background:linear-gradient(135deg,#f0ecff,#c9b8f0)">
+          <div style="font-size:2rem">🦄</div>
+          <div class="yt-label">Draw So Cute</div>
+          <div class="yt-sub">Schattige stijl</div>
+        </div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=how+to+draw+eyes+anime+easy" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner" style="background:linear-gradient(135deg,#e8f8f0,#a8d8f0)">
+          <div style="font-size:2rem">👁️</div>
+          <div class="yt-label">Ogen tekenen</div>
+          <div class="yt-sub">Anime stijl</div>
+        </div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=easy+mandala+drawing+for+beginners" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner" style="background:linear-gradient(135deg,#fff8e0,#ffd580)">
+          <div style="font-size:2rem">🌀</div>
+          <div class="yt-label">Mandala tekenen</div>
+          <div class="yt-sub">Rustgevend & mooi</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- INSPIRATIE APPS -->
+  <div class="card accent-pink">
+    <h2>📱 Handige apps & websites</h2>
+    <div class="link-lijst">
+      <a href="https://www.pinterest.com/search/pins/?q=cute+drawing+ideas+for+girls" target="_blank" class="link-rij" style="border-left-color:#e60023">
+        <div class="link-icon">📌</div>
+        <div>
+          <div class="link-titel">Pinterest — Teken-ideeën</div>
+          <div class="link-sub">Eindeloos veel inspiratie voor meisjes</div>
+        </div>
+        <div class="link-arrow">→</div>
+      </a>
+      <a href="https://www.youtube.com/@DrawSoCute" target="_blank" class="link-rij" style="border-left-color:#ff0000">
+        <div class="link-icon">▶️</div>
+        <div>
+          <div class="link-titel">Draw So Cute — YouTube</div>
+          <div class="link-sub">Schattige teken-tutorials</div>
+        </div>
+        <div class="link-arrow">→</div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=art+for+kids+hub+easy" target="_blank" class="link-rij" style="border-left-color:#ff6b35">
+        <div class="link-icon">🎨</div>
+        <div>
+          <div class="link-titel">Art for Kids Hub</div>
+          <div class="link-sub">Stap-voor-stap tekenlessen</div>
+        </div>
+        <div class="link-arrow">→</div>
+      </a>
+      <a href="https://sketchpad.app" target="_blank" class="link-rij" style="border-left-color:#a8e6cf">
+        <div class="link-icon">✏️</div>
+        <div>
+          <div class="link-titel">Sketchpad.app</div>
+          <div class="link-sub">Digitaal tekenen in Safari</div>
+        </div>
+        <div class="link-arrow">→</div>
+      </a>
+      <a href="https://www.coloringpages101.com/pages/anime/" target="_blank" class="link-rij" style="border-left-color:#c9b8f0">
+        <div class="link-icon">🖍️</div>
+        <div>
+          <div class="link-titel">Anime kleurplaten</div>
+          <div class="link-sub">Gratis afdrukken & inkleuren</div>
+        </div>
+        <div class="link-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- KLEUREN -->
+  <div class="card accent-mint">
+    <h2>🎨 Kleurencombinaties</h2>
+    <p style="font-size:0.83rem;color:var(--muted);margin-bottom:14px">Tik op een kleur om de code te kopiëren</p>
+    <p style="font-size:0.82rem;font-weight:700;margin-bottom:8px">🌸 Pastel droomwereld</p>
+    <div class="kleur-grid">
+      <div class="kleur-dot" style="background:#f7a8c4" onclick="kopieer('#f7a8c4')"></div>
+      <div class="kleur-dot" style="background:#c9b8f0" onclick="kopieer('#c9b8f0')"></div>
+      <div class="kleur-dot" style="background:#a8e6cf" onclick="kopieer('#a8e6cf')"></div>
+      <div class="kleur-dot" style="background:#ffe49a" onclick="kopieer('#ffe49a')"></div>
+      <div class="kleur-dot" style="background:#a8d8f0" onclick="kopieer('#a8d8f0')"></div>
+    </div>
+    <p style="font-size:0.82rem;font-weight:700;margin:14px 0 8px">🖤💗 BLACKPINK stijl</p>
+    <div class="kleur-grid">
+      <div class="kleur-dot" style="background:#1a1a1a" onclick="kopieer('#1a1a1a')"></div>
+      <div class="kleur-dot" style="background:#ff69b4" onclick="kopieer('#ff69b4')"></div>
+      <div class="kleur-dot" style="background:#fff;border:1px solid #eee" onclick="kopieer('#ffffff')"></div>
+      <div class="kleur-dot" style="background:#c0392b" onclick="kopieer('#c0392b')"></div>
+      <div class="kleur-dot" style="background:#ffd700" onclick="kopieer('#ffd700')"></div>
+    </div>
+    <a href="https://coolors.co/generate" target="_blank" style="display:inline-block;margin-top:14px;font-size:0.83rem;font-weight:700;color:#5a9a7a;text-decoration:none">
+      🌈 Zelf kleuren genereren op Coolors →
+    </a>
+    <p id="kopie-feedback" style="font-size:0.8rem;color:var(--mint);margin-top:8px;min-height:20px;font-weight:700"></p>
+  </div>
+
+  <!-- VERF TUTORIALS -->
+  <div class="card accent-lav">
+    <h2>🖌️ Verven — tutorials & tips</h2>
+    <div class="yt-grid" style="margin-bottom:14px">
+      <a href="https://www.youtube.com/results?search_query=easy+watercolor+painting+for+beginners+flowers" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner" style="background:linear-gradient(135deg,#e8f0ff,#a8d8f0)">
+          <div style="font-size:2rem">💧</div>
+          <div class="yt-label">Waterverf bloemen</div>
+          <div class="yt-sub">Makkelijk voor beginners</div>
+        </div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=acrylic+pour+painting+easy+rainbow" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner" style="background:linear-gradient(135deg,#fff0f5,#ffe49a)">
+          <div style="font-size:2rem">🌈</div>
+          <div class="yt-label">Giet-schilderen</div>
+          <div class="yt-sub">Supercool resultaat!</div>
+        </div>
+      </a>
+    </div>
+    <ul class="creative-list">
+      <li><span class="ci-emoji">💧</span><div><strong>Waterverf:</strong> werk van licht naar donker. Nat papier = zachtere randen.</div></li>
+      <li><span class="ci-emoji">🖌️</span><div><strong>Acrylverf:</strong> droogt snel! Poets kwast direct schoon met water.</div></li>
+      <li><span class="ci-emoji">🌈</span><div><strong>Mengen:</strong> blauw + geel = groen, rood + blauw = paars, rood + geel = oranje.</div></li>
+      <li><span class="ci-emoji">⬜</span><div><strong>Wit toevoegen</strong> maakt elke kleur lekker pastelvrolijk.</div></li>
+    </ul>
+  </div>
+
+  <!-- BAKKEN CREATIEF -->
+  <div class="card accent-sky">
+    <h2>🍪 Creatief bakken — video-ideeën</h2>
+    <div class="yt-grid">
+      <a href="https://www.youtube.com/results?search_query=schattige+koekjes+versieren+kinderen" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner" style="background:linear-gradient(135deg,#fff8e0,#ffe4a0)">
+          <div style="font-size:2rem">🍪</div>
+          <div class="yt-label">Koekjes versieren</div>
+          <div class="yt-sub">Schattige vormpjes</div>
+        </div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=pancake+art+easy+for+kids" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner" style="background:linear-gradient(135deg,#f0fff8,#c8f0e0)">
+          <div style="font-size:2rem">🥞</div>
+          <div class="yt-label">Pancake art</div>
+          <div class="yt-sub">Figuurpannenkoeken</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ RUST ══════════ -->
+<section class="section" id="rust">
+  <div class="page-header">
+    <div class="emoji">💚</div>
+    <h1>Even Uitblazen</h1>
+    <p>Een rustig plekje voor jou</p>
+  </div>
+
+  <div class="card accent-mint">
+    <h2>🫁 Adem mee</h2>
+    <div class="adem-box">
+      <div class="adem-circle" id="ademCircle">🌿</div>
+      <div id="adem-tekst">Druk op start om te beginnen</div>
+      <button id="adem-btn" onclick="startAdem()">Start ▶</button>
+    </div>
+    <p style="font-size:0.82rem; color:var(--muted); text-align:center">
+      Diep ademhalen helpt als je je onrustig voelt. Doe dit 3 keer achter elkaar.
+    </p>
+  </div>
+
+  <div class="card accent-lav">
+    <h2>💌 Een bericht voor jou</h2>
+    <div class="positief-kaart">
+      <div class="pk-tekst" id="pk-bericht">Laden...</div>
+      <div class="pk-sub" id="pk-sub"></div>
+    </div>
+    <button id="nieuw-bericht-btn" onclick="nieuwBericht()">🌸 Ander berichtje</button>
+  </div>
+
+  <div class="card accent-yellow">
+    <h2>🛡️ Over SHEIN — wat je moet weten</h2>
+    <div class="geruststelling">
+      <strong>Het is begrijpelijk dat je je zorgen maakt.</strong> Je hebt nieuws gehoord over SHEIN-spullen, en het is slim dat je goed op jezelf let.
+    </div>
+    <div class="geruststelling">
+      🔬 <strong>Wat wetenschappers zeggen:</strong> Bij kleding gaat het om stoffen die in sommige producten meer aanwezig waren dan de regels toestaan. Dat klinkt eng, maar even dragen of bij je hebben betekent <em>niet</em> dat je ziek wordt.
+    </div>
+    <div class="geruststelling">
+      💪 <strong>Wat helpt:</strong> Als jij je ergens zorgen over maakt, mag je dat altijd zeggen. Je hoeft het niet alleen te dragen. Praat erover met mama of papa.
+    </div>
+    <div class="geruststelling">
+      🌱 <strong>Jij bent sterk.</strong> Zorgen hebben is normaal. Maar jij bent gezond, geliefd en er zijn mensen om je heen die voor je zorgen.
+    </div>
+  </div>
+
+  <div class="card accent-sky">
+    <h2>😌 Dingen die helpen als je je span voelt</h2>
+    <ul class="creative-list">
+      <li><span class="ci-emoji">🎵</span><div>Zet je favoriete BLACKPINK nummer op en zing mee</div></li>
+      <li><span class="ci-emoji">✏️</span><div>Teken iets — je hand beweegt, je hoofd rust</div></li>
+      <li><span class="ci-emoji">🚶</span><div>Beweeg even — ook naar de keuken lopen helpt</div></li>
+      <li><span class="ci-emoji">💬</span><div>Vertel mama of papa hoe je je voelt</div></li>
+      <li><span class="ci-emoji">🛁</span><div>Een warm bad of douche = echt rustgevend</div></li>
+      <li><span class="ci-emoji">📖</span><div>Lees een boek of kijk iets leuks</div></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════ ROBLOX ══════════ -->
+<section class="section" id="roblox">
+  <div class="page-header">
+    <div class="emoji">🎮</div>
+    <h1>Roblox</h1>
+    <p>Games, codes & gratis items!</p>
+  </div>
+
+  <!-- PROMO CODES - handmatig bijwerken -->
+  <div style="background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);border-radius:var(--radius);padding:22px;margin-bottom:18px">
+    <h2 style="color:white;margin-bottom:6px">🎁 Gratis promo codes</h2>
+    <!-- ✏️ BIJWERKEN: verwijder verlopen codes en voeg nieuwe toe -->
+    <p style="color:rgba(255,255,255,0.6);font-size:0.78rem;margin-bottom:14px">Laatst bijgewerkt: maart 2025 · Tik de code in bij <strong style="color:white">roblox.com/promocodes</strong></p>
+    <div class="promo-grid" id="promoCodes">
+      <!-- codes worden via JS ingevuld -->
+    </div>
+    <a href="https://www.roblox.com/promocodes" target="_blank" class="roblox-link-btn" style="margin-top:14px">
+      🎁 Codes inwisselen op Roblox.com →
+    </a>
+  </div>
+
+  <!-- ACTUELE EVENTS -->
+  <div style="background:linear-gradient(135deg,#0f3460,#533483);border-radius:var(--radius);padding:22px;margin-bottom:18px">
+    <h2 style="color:white;margin-bottom:6px">🌟 Actuele Events & Updates</h2>
+    <!-- ✏️ BIJWERKEN: pas events aan als er nieuwe zijn -->
+    <p style="color:rgba(255,255,255,0.6);font-size:0.78rem;margin-bottom:14px">Controleer regelmatig voor nieuwe events!</p>
+    <div class="event-lijst" id="robloxEvents">
+      <!-- events worden via JS ingevuld -->
+    </div>
+    <a href="https://www.youtube.com/results?search_query=roblox+events+2025+free+items" target="_blank" class="roblox-link-btn" style="margin-top:14px">
+      📺 Bekijk event video's op YouTube →
+    </a>
+  </div>
+
+  <!-- GRATIS ITEMS TIPS -->
+  <div style="background:linear-gradient(135deg,#16213e,#1a3a2a);border-radius:var(--radius);padding:22px;margin-bottom:18px">
+    <h2 style="color:white;margin-bottom:14px">💎 Gratis items scoren</h2>
+    <div class="link-lijst-dark">
+      <a href="https://www.roblox.com/catalog?Category=1&salesTypeFilter=1" target="_blank" class="link-rij-dark">
+        <div class="link-icon">🆓</div>
+        <div><div class="link-titel-dark">Gratis catalog items</div><div class="link-sub-dark">Alle gratis avatar-items op Roblox</div></div>
+        <div class="link-arrow-dark">→</div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=roblox+free+items+avatar+2025" target="_blank" class="link-rij-dark">
+        <div class="link-icon">▶️</div>
+        <div><div class="link-titel-dark">Gratis items via YouTube</div><div class="link-sub-dark">Actuele gratis items video's</div></div>
+        <div class="link-arrow-dark">→</div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=roblox+dress+to+impress+codes+2025" target="_blank" class="link-rij-dark">
+        <div class="link-icon">👗</div>
+        <div><div class="link-titel-dark">Dress to Impress codes</div><div class="link-sub-dark">Nieuwe outfit codes</div></div>
+        <div class="link-arrow-dark">→</div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=adopt+me+codes+2025+free+pets" target="_blank" class="link-rij-dark">
+        <div class="link-icon">🐾</div>
+        <div><div class="link-titel-dark">Adopt Me! codes</div><div class="link-sub-dark">Gratis huisdieren & items</div></div>
+        <div class="link-arrow-dark">→</div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=royale+high+codes+2025" target="_blank" class="link-rij-dark">
+        <div class="link-icon">👸</div>
+        <div><div class="link-titel-dark">Royale High codes</div><div class="link-sub-dark">Gratis diamanten & items</div></div>
+        <div class="link-arrow-dark">→</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- POPULAIRE GAMES -->
+  <div class="roblox-card">
+    <h2>🕹️ Populaire games om te spelen</h2>
+    <div class="link-lijst-dark" style="margin-top:8px">
+      <a href="https://www.roblox.com/games/920587237/Adopt-Me" target="_blank" class="link-rij-dark">
+        <div class="link-icon">🏠</div>
+        <div><div class="link-titel-dark">Adopt Me!</div><div class="link-sub-dark">Huisdieren & huizen</div></div>
+        <div class="link-arrow-dark">→</div>
+      </a>
+      <a href="https://www.roblox.com/games/15532962292/Dress-to-Impress" target="_blank" class="link-rij-dark">
+        <div class="link-icon">👗</div>
+        <div><div class="link-titel-dark">Dress to Impress</div><div class="link-sub-dark">Outfits stylen & scoren</div></div>
+        <div class="link-arrow-dark">→</div>
+      </a>
+      <a href="https://www.roblox.com/games/735030788/Royale-High" target="_blank" class="link-rij-dark">
+        <div class="link-icon">🌺</div>
+        <div><div class="link-titel-dark">Royale High</div><div class="link-sub-dark">Prinsessen & school</div></div>
+        <div class="link-arrow-dark">→</div>
+      </a>
+      <a href="https://www.roblox.com/games/6284583030/Theme-Park-Tycoon-2" target="_blank" class="link-rij-dark">
+        <div class="link-icon">🎢</div>
+        <div><div class="link-titel-dark">Theme Park Tycoon 2</div><div class="link-sub-dark">Bouw je eigen pretpark</div></div>
+        <div class="link-arrow-dark">→</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="card accent-mint">
+    <h2>💡 Handige tips</h2>
+    <ul class="creative-list">
+      <li><span class="ci-emoji">🔒</span><div><strong>Veiligheid eerst</strong> — zet chats op "vrienden alleen" in de instellingen.</div></li>
+      <li><span class="ci-emoji">🔔</span><div><strong>Blijf up-to-date</strong> — volg <a href="https://www.youtube.com/results?search_query=roblox+nieuws+2025" target="_blank" style="color:var(--pink);font-weight:700">Roblox nieuws op YouTube</a> voor nieuwe events.</div></li>
+      <li><span class="ci-emoji">💰</span><div><strong>Gratis is ook leuk</strong> — gebruik promo codes en gratis catalog items!</div></li>
+      <li><span class="ci-emoji">⏰</span><div><strong>Speeltijd</strong> — zet een timer, dan vergeet je de tijd niet.</div></li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<script>
+// ── NAVIGATIE ──
+function toon(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function navBtn(id) {
+  return [...document.querySelectorAll('nav button')]
+    .find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${id}'`));
+}
+
+// ── SCHEMA: DAG GRID ──
+// ✏️ PAS HIER DE NAMEN VAN DE JUFFEN AAN
+const SCHEMA = [
+  { dag: 'Maandag',   juf: 'Juf Romy & Marijke', rust: false },
+  { dag: 'Dinsdag',   juf: 'Juf Marijke',       rust: false },
+  { dag: 'Woensdag',  juf: 'Juf Marijke',       rust: false },
+  { dag: 'Donderdag', juf: 'Rustdag 🌿',        rust: true  },
+  { dag: 'Vrijdag',   juf: 'Juf Romy',          rust: false },
+];
+
+const dagNamen = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'];
+const vandaag = dagNamen[new Date().getDay()];
+
+const grid = document.getElementById('dagGrid');
+SCHEMA.forEach(item => {
+  const isVandaag = item.dag === vandaag;
+  const div = document.createElement('div');
+  div.className = 'day-row' + (item.rust ? ' rest' : '') + (isVandaag ? ' today' : '');
+  div.innerHTML = `
+    <span class="dr-day">${item.dag}${isVandaag ? '<span class="vandaag-badge">vandaag</span>' : ''}</span>
+    <span class="dr-juf">${item.juf}</span>
+    ${item.rust ? '<span class="dr-badge">Rustdag</span>' : ''}
+  `;
+  grid.appendChild(div);
+});
+
+// ── RECEPTEN ──
+const RECEPTEN = [
+  { emoji:'🍛', naam:'Kip tandoori' },
+  { emoji:'🥡', naam:'Beef Shanghai' },
+  { emoji:'🍝', naam:'Spaghetti' },
+  { emoji:'🌯', naam:'Kipwraps' },
+  { emoji:'🍚', naam:'Oosterse kip met rijst' },
+  { emoji:'🥙', naam:'Köfte' },
+  { emoji:'🍗', naam:'Kip in braadzak' },
+  { emoji:'🥘', naam:'Bloemkoolschotel' },
+  { emoji:'🥒', naam:'Komkommersalade' },
+  { emoji:'🥩', naam:'Vlees & gebakken aardappels' },
+  { emoji:'🥔', naam:'Gepofte aardappel' },
+  { emoji:'🌽', naam:'Maïskolf' },
+  { emoji:'🍕', naam:'Pizza' },
+  { emoji:'🍔', naam:'Broodje hamburger' },
+  { emoji:'🌮', naam:'Taco' },
+  { emoji:'🥔', naam:'Aardappel met jus' },
+  { emoji:'🥞', naam:'Pannenkoeken' },
+  { emoji:'🍣', naam:'Komkommer sushi' },
+  { emoji:'🧅', naam:'Uiensoep' },
+  { emoji:'🍲', naam:'Lasagne' },
+];
+// Normaliseer namen voor opzoeken in RECEPTEN_DATA
+function zoekRecept(naam) {
+  if (RECEPTEN_DATA[naam]) return RECEPTEN_DATA[naam];
+  const key = Object.keys(RECEPTEN_DATA).find(k => naam.toLowerCase().includes(k.toLowerCase().split(' ')[0]));
+  return key ? RECEPTEN_DATA[key] : null;
+}
+
+const RECEPTEN_DATA = {
+  'Kip tandoori': {
+    emoji: '🍛', tijd: '30 min', land: '🇮🇳 India',
+    badge: 'Knorr Wereldgerecht',
+    intro: 'Kruidige kip in romige tomatensaus met rijst en frisse raita. Gebruik het Knorr pakket of maak het zelf!',
+    ingredienten: [
+      '225 g kipfilet, in blokjes',
+      '1 ui, grof gesnipperd',
+      '1 komkommer',
+      '150 g peen julienne',
+      '150 ml magere yoghurt',
+      '100 g crème fraîche light',
+      'Knorr Kip Tandoori pakket (rijstmix, sausmix, specerijenmix, raita sausmix)',
+      '2 el + 1 el olie',
+    ],
+    stappen: [
+      'Meng de specerijenmix met 2 el olie. Marineer de kipblokjes hierin ca. 10 minuten.',
+      'Kook de rijstmix in ruim kokend water in ca. 14 min. gaar en giet af.',
+      'Rasp de komkommer grof. Meng de yoghurt met de raita sausmix en schep de peen julienne en komkommer erdoor. Dit is de raita.',
+      'Verhit 1 el olie in een koekenpan. Bak de kipblokjes goudbruin en gaar. Voeg de ui toe en bak ca. 2 min. mee.',
+      'Voeg 300 ml water en de sausmix toe. Roer goed door, breng aan de kook en laat ca. 1 min. zachtjes koken.',
+      'Voeg de crème fraîche toe en verwarm nog ca. 1 min. mee.',
+      'Serveer de kip, de raita en de rijst apart van elkaar. Lekker met naanbrood erbij! 🫓',
+    ]
+  },
+  'Beef Shanghai': {
+    emoji: '🥡', tijd: '40 min', land: '🇨🇳 China',
+    badge: 'Knorr Wereldgerecht',
+    intro: 'Chinese gehaktballetjes met mie, champignons, prei en taugé in een kruidige saus.',
+    ingredienten: [
+      '225 g mager rundergehakt',
+      '250 g champignons, in vieren',
+      '1 ui, fijn gesnipperd',
+      '125 g taugé',
+      '3 bosuien, in smalle ringen',
+      '1 prei, in halve ringen',
+      'Knorr Beef Shanghai pakket (mie, sausmix, kruidenmix, kruidige olie)',
+      'Olie om in te bakken',
+    ],
+    stappen: [
+      'Meng de kruidenmix met het gehakt. Draai er ca. 15 kleine gehaktballetjes van.',
+      'Snipper de ui fijn. Snij de champignons in vieren. Snij de prei in halve ringen en bosui in smalle ringen.',
+      'Kook de mie volgens de aanwijzingen op het pak en houd warm.',
+      'Verhit olie in een wok of koekenpan. Bak de gehaktballetjes goudbruin en gaar. Haal ze uit de pan.',
+      'Bak in dezelfde pan de ui en champignons ca. 3 min. Voeg de prei toe en bak nog 2 min. mee.',
+      'Voeg 350 ml water en de sausmix toe. Roer goed door en breng aan de kook. Voeg de gehaktballetjes terug en laat ca. 3 min. zachtjes doorkoken.',
+      'Voeg de taugé en bosui toe en warm nog 1 min. mee. Besprenkel met de kruidige olie.',
+      'Serveer de balletjes met saus over de mie. Lekker met sesamzaadjes erover! 🌿',
+    ]
+  },
+  'Köfte': {
+    emoji: '🥙', tijd: '35 min', land: '🇬🇷 Griekenland',
+    badge: 'Knorr Wereldgerecht',
+    intro: 'Griekse gehaktrolletjes in pittige tomatensaus met rijst, courgette en tomaten.',
+    ingredienten: [
+      '225 g mager rundergehakt',
+      '5 tomaten, in blokjes',
+      '1 courgette, in halve plakken',
+      'Knorr Griekse Kofta pakket (rijstmix, sausmix, kruidenmix)',
+      'Olie om in te bakken',
+    ],
+    stappen: [
+      'Meng het gehakt met de kruidenmix. Draai hier 6 rolletjes van.',
+      'Snij de courgette in halve plakken en de tomaten in blokjes.',
+      'Kook de rijstmix in ruim kokend water in ca. 14 min. gaar en giet af.',
+      'Verhit 1 el olie in een koekenpan. Bak de gehaktrolletjes rondom bruin en gaar.',
+      'Voeg de courgette toe en bak ca. 3 min. mee. Voeg daarna de tomaten toe en bak nog ca. 1 min. mee.',
+      'Voeg de sausmix en 200 ml water toe. Breng al roerend aan de kook en laat ca. 3 min. zachtjes doorkoken.',
+      'Serveer de kofta met de saus en de rijst apart. Lekker met tzatziki erbij! 🫙',
+    ]
+  },
+  'Spaghetti': {
+    emoji: '🍝', tijd: '25 min', land: '🇮🇹 Italië',
+    intro: 'Klassieke spaghetti bolognese — een familiefavoriet!',
+    ingredienten: [
+      '250 g spaghetti',
+      '300 g rundergehakt',
+      '1 ui, gesnipperd',
+      '2 teentjes knoflook',
+      '1 blik gepelde tomaten (400g)',
+      '2 el tomatenpuree',
+      'Snufje oregano en basilicum',
+      'Zout, peper, olie',
+      'Geraspte kaas (optioneel)',
+    ],
+    stappen: [
+      'Verhit olie in een pan en bak de ui ca. 3 min. glazig. Voeg de knoflook toe en bak 1 min. mee.',
+      'Voeg het gehakt toe en bak rul en bruin.',
+      'Roer de tomatenpuree erdoor. Voeg de gepelde tomaten toe en prak ze grof.',
+      'Breng op smaak met oregano, basilicum, zout en peper. Laat ca. 15 min. zachtjes pruttelen.',
+      'Kook ondertussen de spaghetti gaar volgens de verpakking. Giet af.',
+      'Serveer de saus over de spaghetti. Doe er geraspte kaas over als je wilt! 🧀',
+    ]
+  },
+  'Kipwraps': {
+    emoji: '🌯', tijd: '20 min', land: '🌍 Wereld',
+    intro: 'Snel en lekker — kip in een wrap met frisse groenten.',
+    ingredienten: [
+      '2 kipfilets',
+      '4 wraps',
+      'Sla, komkommer, tomaat',
+      '4 el crème fraîche of mayonaise',
+      'Paprikapoeder, zout, peper',
+      'Beetje olie',
+    ],
+    stappen: [
+      'Snij de kipfilet in reepjes. Bestrooi met paprikapoeder, zout en peper.',
+      'Bak de kip in een koekenpan met wat olie ca. 8 min. gaar. Laat even afkoelen.',
+      'Beleg elke wrap met een lepel crème fraîche of mayo.',
+      'Leg sla, komkommer en tomaat op de wrap.',
+      'Verdeel de kipreepjes over de wraps en rol ze strak op.',
+      'Snij ze eventueel doormidden. Eet smakelijk! 🥗',
+    ]
+  },
+  'Oosterse kip met rijst': {
+    emoji: '🍚', tijd: '30 min', land: '🌏 Azië',
+    intro: 'Kruidige kip met rijst en zoet-pittige saus — heerlijk voor doordeweeks!',
+    ingredienten: [
+      '300 g kipfilet, in reepjes',
+      '200 g rijst',
+      '1 ui, gesnipperd',
+      '2 el sojasaus',
+      '1 el honing',
+      '1 teentje knoflook',
+      'Beetje gember (poeder of vers)',
+      'Olie',
+    ],
+    stappen: [
+      'Kook de rijst gaar volgens de verpakking.',
+      'Meng de sojasaus, honing, knoflook en gember in een kommetje voor de saus.',
+      'Verhit olie in een wok of koekenpan. Bak de ui ca. 2 min.',
+      'Voeg de kipfiletreepjes toe en bak ca. 6 min. gaar.',
+      'Schenk de saus erbij en roer goed door. Laat ca. 2 min. meekoken tot de saus iets dikker is.',
+      'Serveer over de rijst. Lekker met een groene salade erbij! 🥬',
+    ]
+  },
+  'Kip in braadzak': {
+    emoji: '🍗', tijd: '60 min', land: '🏠 Huisgemaakt',
+    intro: 'Sappige kip met groenten uit de oven — de braadzak houdt alles lekker vochtig.',
+    ingredienten: [
+      '1 heel kip of kipstukken',
+      '3 aardappelen, in blokjes',
+      '2 wortelen, in plakjes',
+      '1 ui, in partjes',
+      'Zout, peper, paprikapoeder',
+      'Tijm of rozemarijn',
+      '1 braadzak (uit de supermarkt)',
+    ],
+    stappen: [
+      'Verwarm de oven op 180°C.',
+      'Wrijf de kip in met zout, peper en paprikapoeder.',
+      'Doe de kip samen met de aardappelen, wortelen, ui en kruiden in de braadzak.',
+      'Sluit de braadzak goed af en leg in een ovenschaal.',
+      'Prik een paar kleine gaatjes in de bovenkant van de zak.',
+      'Bak ca. 50-60 minuten in de oven tot de kip gaar is.',
+      'Open de zak voorzichtig (stoom!). Serveer direct. 🌿',
+    ]
+  },
+  'Bloemkoolschotel': {
+    emoji: '🥘', tijd: '35 min', land: '🏠 Huisgemaakt',
+    intro: 'Romige ovenschotel met bloemkool, gehakt en kaassaus.',
+    ingredienten: [
+      '1 bloemkool, in roosjes',
+      '300 g rundergehakt',
+      '1 ui, gesnipperd',
+      '200 ml kookroom',
+      '100 g geraspte kaas',
+      'Zout, peper, nootmuskaat',
+      'Olie',
+    ],
+    stappen: [
+      'Verwarm de oven op 200°C.',
+      'Kook de bloemkoolroosjes ca. 8 min. in gezouten water. Giet af.',
+      'Bak het gehakt met de ui in olie rul en gaar. Breng op smaak.',
+      'Doe de bloemkool en het gehakt in een ovenschaal.',
+      'Schenk de kookroom erover en strooi de kaas over de bovenkant.',
+      'Bak ca. 20 min. in de oven tot de kaas goudbruin is. Lekker! 🧀',
+    ]
+  },
+  'Komkommersalade': {
+    emoji: '🥒', tijd: '10 min', land: '🏠 Milou\'s recept',
+    intro: 'Milou\'s eigen komkommersalade! Fris, simpel en lekker.',
+    ingredienten: [
+      '1 komkommer',
+      'Scheut olijfolie',
+      'Beetje witte azijn of citroensap',
+      'Zout en peper naar smaak',
+      'Optioneel: verse dille, munt of bieslook',
+    ],
+    stappen: [
+      'Was de komkommer en snij hem in dunne plakjes of blokjes.',
+      'Doe de komkommer in een schaal.',
+      'Besprenkel met een scheut olijfolie en een beetje azijn of citroensap.',
+      'Breng op smaak met zout en peper.',
+      'Voeg vers kruid toe als je wilt. Meng alles goed en serveer direct. 🌿',
+    ]
+  },
+  'Vlees & gebakken aardappels': {
+    emoji: '🥩', tijd: '35 min', land: '🏠 Huisgemaakt',
+    intro: 'Krokante gebakken aardappels met een lekker stukje vlees.',
+    ingredienten: [
+      '4 aardappelen, in blokjes',
+      '2 biefstukjes of varkenskoteletten',
+      '1 ui, in ringen',
+      'Zout, peper, paprikapoeder',
+      'Olie of boter',
+    ],
+    stappen: [
+      'Kook de aardappelblokjes ca. 8 min. voor in gezouten water. Giet af en laat even stomen.',
+      'Verhit olie in een koekenpan op hoog vuur. Bak de aardappels krokant goudbruin. Breng op smaak.',
+      'Bak in een andere pan het vlees op hoog vuur ca. 3 min. per kant (afhankelijk van dikte).',
+      'Bak de uiringen mee tot ze glazig zijn.',
+      'Laat het vlees even rusten onder aluminiumfolie voor je het aansnijdt.',
+      'Serveer het vlees met de gebakken aardappels en ui. 🧅',
+    ]
+  },
+  'Gepofte aardappel': {
+    emoji: '🥔', tijd: '60 min', land: '🏠 Huisgemaakt',
+    intro: 'Lekker simpel — een aardappel uit de oven met een romige vulling.',
+    ingredienten: [
+      '2 grote aardappelen',
+      '100 g crème fraîche of zure room',
+      'Bieslook, fijngesneden',
+      'Zout en peper',
+      'Optioneel: geraspte kaas of spekjes',
+    ],
+    stappen: [
+      'Verwarm de oven op 200°C.',
+      'Was de aardappelen goed. Prik er een paar keer in met een vork.',
+      'Leg op de ovenrooster en bak ca. 50-60 minuten tot ze zacht zijn (prik er met een mes in om te controleren).',
+      'Snij de aardappelen open en maak ze los met een vork.',
+      'Klop de crème fraîche op en voeg bieslook, zout en peper toe.',
+      'Lepel de vulling in de aardappel. Doe er geraspte kaas over als je wilt! 🧀',
+    ]
+  },
+  'Maïskolf': {
+    emoji: '🌽', tijd: '15 min', land: '🌍 Wereld',
+    intro: 'Simpel, zomers en heerlijk — maïskolf uit de pan of van de barbecue.',
+    ingredienten: [
+      '2 maïskolven (vers of diepvries)',
+      'Boter',
+      'Zout',
+      'Optioneel: beetje paprikapoeder of limoen',
+    ],
+    stappen: [
+      'Kook de maïskolven in een grote pan water ca. 10 min. gaar.',
+      'Giet af en dep droog.',
+      'Besmeer met een klontje boter en bestrooi met zout.',
+      'Optioneel: doe er een beetje paprikapoeder over of een schijfje limoen erbij.',
+      'Eet ze meteen warm! 🌽',
+    ]
+  },
+  'Pizza': {
+    emoji: '🍕', tijd: '30 min', land: '🇮🇹 Italië',
+    intro: 'Zelf pizza maken is superleuk! Kies je eigen beleg.',
+    ingredienten: [
+      '1 kant-en-klaar pizzabodem (of zelf maken)',
+      '3 el tomatensaus of ketchup',
+      '100 g geraspte mozzarella',
+      'Beleg naar keuze: ham, paprika, champignons, olijven',
+      'Oregano',
+    ],
+    stappen: [
+      'Verwarm de oven op 220°C.',
+      'Leg de pizzabodem op bakpapier op een bakplaat.',
+      'Smeer de tomatensaus gelijkmatig uit over de bodem.',
+      'Verdeel de kaas en het beleg erover.',
+      'Bestrooi met oregano.',
+      'Bak ca. 10-12 min. tot de kaas bubbelt en goudbruin is. Smakelijk! 🍕',
+    ]
+  },
+  'Broodje hamburger': {
+    emoji: '🍔', tijd: '20 min', land: '🇺🇸 Amerika',
+    intro: 'Zelf hamburgers bakken is veel lekkerder dan uit een fastfoodketen!',
+    ingredienten: [
+      '250 g rundergehakt',
+      '2 hamburgerbroodjes',
+      'Sla, tomaat, augurk, ui',
+      'Ketchup en/of mayonaise',
+      'Zout en peper',
+    ],
+    stappen: [
+      'Meng het gehakt met zout en peper. Verdeel in 2 gelijke ballen en druk plat.',
+      'Verhit een koekenpan op hoog vuur. Bak de burgers ca. 3-4 min. per kant.',
+      'Toast de broodjes kort in de pan of broodrooster.',
+      'Beleg de onderste helft met sla en tomaat.',
+      'Leg de burger erop. Voeg augurk en ui toe.',
+      'Besprenkel met ketchup en/of mayo. Leg de bovenkant erop. 🍔',
+    ]
+  },
+  'Taco': {
+    emoji: '🌮', tijd: '25 min', land: '🇲🇽 Mexico',
+    intro: 'Gezellige tacos — iedereen bouwt zijn eigen!',
+    ingredienten: [
+      '250 g rundergehakt of kipgehakt',
+      '4-6 taco-schelpen (uit de supermarkt)',
+      'Sla, tomaat, geraspte kaas',
+      '1 tl komijn en paprikapoeder',
+      'Zout, peper',
+      'Crème fraîche of guacamole',
+    ],
+    stappen: [
+      'Bak het gehakt in een pan rul en gaar. Voeg komijn, paprikapoeder, zout en peper toe.',
+      'Verwarm de taco-schelpen even in de oven (ca. 5 min. op 180°C).',
+      'Zet alle vullingen op tafel zodat iedereen zijn eigen taco kan bouwen!',
+      'Vul de schelpen met gehakt, sla, tomaat en kaas.',
+      'Doe er een lepel crème fraîche bovenop. 🌮',
+    ]
+  },
+  'Aardappel met jus': {
+    emoji: '🥔', tijd: '40 min', land: '🇳🇱 Nederland',
+    intro: 'Een echte Nederlandse klassieker — aardappelen met jus.',
+    ingredienten: [
+      '4 grote aardappelen, geschild en in stukken',
+      '1 pakje juspoeder (of zelfgemaakte jus)',
+      'Boter',
+      'Zout',
+    ],
+    stappen: [
+      'Kook de aardappelen in gezouten water ca. 20 min. gaar.',
+      'Maak ondertussen de jus: volg de aanwijzingen op het pakje juspoeder.',
+      'Giet de aardappelen af en stamp ze kort aan (of serveer ze heel).',
+      'Doe er een klontje boter over.',
+      'Schenk de jus erover. Lekker met een groentje erbij! 🥕',
+    ]
+  },
+  'Pannenkoeken': {
+    emoji: '🥞', tijd: '30 min', land: '🇳🇱 Nederland',
+    intro: 'Dikke, zachte pannenkoeken — voor bij het avondeten of als traktatie!',
+    ingredienten: [
+      '200 g bloem',
+      '2 eieren',
+      '400 ml melk',
+      'Snufje zout',
+      'Boter om in te bakken',
+      'Stroop, suiker of hartig beleg naar keuze',
+    ],
+    stappen: [
+      'Meng de bloem, eieren, melk en zout tot een glad beslag. Klop goed door.',
+      'Laat het beslag ca. 10 min. rusten.',
+      'Smelt een klein klontje boter in een koekenpan op middelhoog vuur.',
+      'Schep een soeplepel beslag in de pan en spreid het uit.',
+      'Bak ca. 2 min. tot de bovenkant droog ziet. Draai om en bak nog 1 min.',
+      'Herhaal tot al het beslag op is. Serveer met stroop, poedersuiker of hartig beleg! 🍯',
+    ]
+  },
+  'Komkommer sushi': {
+    emoji: '🍣', tijd: '30 min', land: '🇯🇵 Japan',
+    intro: 'Zelf sushi rollen met komkommer is makkelijker dan je denkt!',
+    ingredienten: [
+      '150 g sushirijst',
+      '2 el rijstazijn',
+      '1 tl suiker, snufje zout',
+      '½ komkommer, in lange dunne reepjes',
+      '2 noribladen (zeewier)',
+      'Sojasaus om in te dippen',
+      'Bamboematje (of plastic folie)',
+    ],
+    stappen: [
+      'Kook de sushirijst gaar. Meng warm met rijstazijn, suiker en zout. Laat afkoelen.',
+      'Leg een noriblad op het bamboematje of een stuk plastic folie.',
+      'Verdeel de rijst in een gelijkmatige laag over het noriblad — laat 1 cm vrij aan de bovenkant.',
+      'Leg de komkommerreepjes op de rijst.',
+      'Rol de sushi strak op met behulp van het matje.',
+      'Snij in plakjes met een scherp nat mes. Dip in sojasaus! 🎋',
+    ]
+  },
+  'Uiensoep': {
+    emoji: '🧅', tijd: '45 min', land: '🇫🇷 Frankrijk',
+    intro: 'Warme, zoete Franse uiensoep — perfect voor een koude avond.',
+    ingredienten: [
+      '4 grote uien, in halve ringen',
+      '1 l runderbouillon',
+      '2 el boter',
+      '1 tl suiker',
+      'Snufje tijm',
+      'Zout en peper',
+      'Optioneel: stokbrood met kaas erop',
+    ],
+    stappen: [
+      'Smelt de boter in een grote pan. Voeg de uiringen toe.',
+      'Bak de uien op laag vuur ca. 25-30 min. langzaam gaar en lichtbruin — roer af en toe.',
+      'Voeg de suiker en tijm toe. Bak nog 5 min. mee.',
+      'Voeg de bouillon toe. Breng aan de kook en laat ca. 10 min. pruttelen.',
+      'Breng op smaak met zout en peper.',
+      'Optioneel: leg een schijf stokbrood met geraspte kaas in de soep en gratineer kort onder de grill. 🥖',
+    ]
+  },
+  'Lasagne': {
+    emoji: '🍲', tijd: '60 min', land: '🇮🇹 Italië',
+    intro: 'Laagje voor laagje — zelfgemaakte lasagne is geweldig!',
+    ingredienten: [
+      '8-10 lasagnebladen',
+      '300 g rundergehakt',
+      '1 ui, 2 teentjes knoflook',
+      '1 blik gepelde tomaten + 2 el tomatenpuree',
+      '500 ml béchamelsaus (pak of zelf: boter, bloem, melk)',
+      '100 g geraspte mozzarella of kaas',
+      'Zout, peper, oregano',
+    ],
+    stappen: [
+      'Verwarm de oven op 190°C.',
+      'Bak de ui en knoflook glazig. Voeg het gehakt toe en bak rul.',
+      'Voeg tomatenpuree en gepelde tomaten toe. Breng op smaak met oregano, zout en peper. Laat 10 min. pruttelen.',
+      'Maak de béchamelsaus (of verwarm de kant-en-klare saus).',
+      'Vet een ovenschaal in. Begin met een laagje vleessaus, dan lasagnebladen, dan béchamel. Herhaal.',
+      'Eindig met béchamelsaus. Strooi de kaas erover.',
+      'Bak ca. 35-40 min. in de oven tot goudbruin en bubbelig. Laat 5 min. rusten voor je snijdt! 🧀',
+    ]
+  },
+};
+
+let actief = null;
+const receptGrid = document.getElementById('receptGrid');
+const receptDetail = document.getElementById('receptDetail');
+
+RECEPTEN.forEach((r, i) => {
+  const data = RECEPTEN_DATA[r.naam] || RECEPTEN_DATA[r.naam.split(' ')[0]];
+  const div = document.createElement('div');
+  div.className = 'recipe-pill';
+  div.innerHTML = `<span>${r.emoji}</span><span>${r.naam}</span>`;
+  div.onclick = () => {
+    if (actief === i) { receptDetail.classList.remove('open'); actief = null; return; }
+    actief = i;
+    const d = zoekRecept(r.naam);
+    if (!d) {
+      receptDetail.innerHTML = `<h3>${r.emoji} ${r.naam}</h3><p style="color:var(--muted);font-size:0.85rem">Recept volgt nog!</p>`;
+    } else {
+      const badges = d.badge ? `<span style="background:var(--pink2);color:#9a4060;font-size:0.72rem;font-weight:800;padding:2px 10px;border-radius:20px;margin-left:6px">${d.badge}</span>` : '';
+      receptDetail.innerHTML = `
+        <h3>${d.emoji} ${r.naam} ${badges}</h3>
+        <div style="display:flex;gap:10px;margin:8px 0 12px;flex-wrap:wrap">
+          <span style="font-size:0.8rem;color:var(--muted)">⏱️ ${d.tijd}</span>
+          <span style="font-size:0.8rem;color:var(--muted)">${d.land}</span>
+        </div>
+        <p style="font-size:0.87rem;color:var(--text);margin-bottom:12px;font-style:italic">${d.intro}</p>
+        <strong style="font-size:0.85rem">🛒 Nodig:</strong>
+        <ul style="padding-left:18px;font-size:0.85rem;line-height:1.9;color:var(--text);margin:6px 0 14px">
+          ${d.ingredienten.map(i => `<li>${i}</li>`).join('')}
+        </ul>
+        <strong style="font-size:0.85rem">👩‍🍳 Zo maak je het:</strong>
+        <ol style="padding-left:18px;font-size:0.85rem;line-height:2;color:var(--text);margin-top:6px">
+          ${d.stappen.map(s => `<li>${s}</li>`).join('')}
+        </ol>
+      `;
+    }
+    receptDetail.classList.add('open');
+  };
+  receptGrid.appendChild(div);
+});
+
+// ── POSITIEVE BERICHTEN ──
+const BERICHTEN = [
+  { tekst: "Jij bent moediger dan je denkt, sterker dan je voelt, en slimmer dan je gelooft.", sub: "En dat is echt zo 💚" },
+  { tekst: "Het is oké om soms niet lekker in je vel te zitten. Dat hoort bij het leven.", sub: "Je hoeft niet altijd sterk te zijn 🌸" },
+  { tekst: "Je mag fouten maken. Zo leer je. Fouten zijn geen mislukkingen.", sub: "Ze zijn gewoon stappen 🌱" },
+  { tekst: "Jouw creativiteit is een gave. Blijf tekenen, bakken en zingen!", sub: "De wereld heeft jou nodig 🎨" },
+  { tekst: "Zorgen voelen groot, maar ze gaan ook weer weg. Altijd.", sub: "En er zijn mensen die van je houden 💕" },
+  { tekst: "Jij doet het heel goed. Echt.", sub: "Vergeet dat niet 🌟" },
+  { tekst: "Elke dag naar school gaan is dapper. Zeker als het moeilijk voelt.", sub: "Trots op je 💪" },
+  { tekst: "Als je rustdag nodig hebt, neem die dan. Rust is geen zwakte.", sub: "Donderdag is er voor jou 🌿" },
+];
+
+function nieuwBericht() {
+  const r = BERICHTEN[Math.floor(Math.random() * BERICHTEN.length)];
+  document.getElementById('pk-bericht').textContent = r.tekst;
+  document.getElementById('pk-sub').textContent = r.sub;
+}
+nieuwBericht();
+
+// ── ADEMHALING ──
+let ademBezig = false, ademTimer = null;
+function startAdem() {
+  if (ademBezig) {
+    clearTimeout(ademTimer);
+    ademBezig = false;
+    document.getElementById('adem-btn').textContent = 'Start ▶';
+    document.getElementById('adem-tekst').textContent = 'Druk op start om te beginnen';
+    document.getElementById('ademCircle').className = 'adem-circle';
+    return;
+  }
+  ademBezig = true;
+  document.getElementById('adem-btn').textContent = 'Stop ■';
+  function cyclus() {
+    if (!ademBezig) return;
+    document.getElementById('adem-tekst').textContent = 'Adem in... 🌬️';
+    document.getElementById('ademCircle').classList.add('grow');
+    document.getElementById('ademCircle').classList.remove('shrink');
+    ademTimer = setTimeout(() => {
+      if (!ademBezig) return;
+      document.getElementById('adem-tekst').textContent = 'Vasthouden... 🌿';
+      ademTimer = setTimeout(() => {
+        if (!ademBezig) return;
+        document.getElementById('adem-tekst').textContent = 'Adem uit... 😮‍💨';
+        document.getElementById('ademCircle').classList.remove('grow');
+        document.getElementById('ademCircle').classList.add('shrink');
+        ademTimer = setTimeout(cyclus, 4000);
+      }, 2000);
+    }, 4000);
+  }
+  cyclus();
+}
+
+// ── VERJAARDAG TELLER ──
+const LEDEN = [
+  { naam: 'Jisoo 🌸',  dag: 3,  maand: 1  },
+  { naam: 'Jennie 👑', dag: 16, maand: 1  },
+  { naam: 'Rosé 🌹',   dag: 11, maand: 2  },
+  { naam: 'Lisa ⚡',   dag: 27, maand: 3  },
+];
+function volgendeVerjaardag() {
+  const nu = new Date();
+  let min = null, minDagen = 999;
+  LEDEN.forEach(l => {
+    let d = new Date(nu.getFullYear(), l.maand - 1, l.dag);
+    if (d < nu) d = new Date(nu.getFullYear() + 1, l.maand - 1, l.dag);
+    const diff = Math.ceil((d - nu) / 86400000);
+    if (diff < minDagen) { minDagen = diff; min = { ...l, dagen: diff, datum: d }; }
+  });
+  const el = document.getElementById('bdayCard');
+  if (!el) return;
+  const maanden = ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+  el.innerHTML = `
+    <div style="font-size:2.5rem;margin-bottom:6px">🎂</div>
+    <div style="font-weight:900;font-size:1.2rem;color:var(--text)">${min.naam}</div>
+    <div style="color:var(--muted);font-size:0.85rem;margin:4px 0">${min.dag} ${maanden[min.maand-1]}</div>
+    <div style="font-family:'Pacifico',cursive;font-size:1.6rem;color:var(--pink);margin-top:8px">
+      ${min.dagen === 0 ? '🎉 Vandaag!' : `nog ${min.dagen} dagen`}
+    </div>
+    <div style="margin-top:12px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap">
+      ${LEDEN.map(l => {
+        let d = new Date(nu.getFullYear(), l.maand-1, l.dag);
+        if (d < nu) d = new Date(nu.getFullYear()+1, l.maand-1, l.dag);
+        const dg = Math.ceil((d-nu)/86400000);
+        return `<span style="background:var(--bg);border-radius:10px;padding:6px 10px;font-size:0.75rem;font-weight:700">
+          ${l.naam.split(' ')[1]} ${dg===0?'🎉 Vandaag':dg+'d'}
+        </span>`;
+      }).join('')}
+    </div>
+  `;
+}
+volgendeVerjaardag();
+
+// ── ROBLOX PROMO CODES ──
+// ✏️ BIJWERKEN: verwijder verlopen codes, voeg nieuwe toe
+const PROMO_CODES = [
+  { code: 'SPIDERCOLA',    reward: '🕷️ Spider Cola item',          actief: true  },
+  { code: 'TWEETROBLOX',   reward: '🐦 Gratis Tweet item',          actief: true  },
+  { code: 'ROBLOXEDU2021', reward: '🎓 Educatie item',              actief: false },
+  { code: 'AMAZONFRIEND22',reward: '🤝 Amazon Friend avatar item',  actief: true  },
+];
+
+const promoEl = document.getElementById('promoCodes');
+if (promoEl) {
+  PROMO_CODES.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'promo-item' + (c.actief ? '' : ' promo-verlopen');
+    div.innerHTML = `
+      <div>
+        <div class="promo-code">${c.code}</div>
+        <div class="promo-reward">${c.reward}</div>
+      </div>
+      <span class="promo-copy">${c.actief ? '📋 Kopieer' : '❌ Verlopen'}</span>
+    `;
+    if (c.actief) {
+      div.onclick = () => {
+        navigator.clipboard.writeText(c.code).catch(()=>{});
+        div.querySelector('.promo-copy').textContent = '✅ Gekopieerd!';
+        setTimeout(()=> div.querySelector('.promo-copy').textContent = '📋 Kopieer', 2000);
+      };
+    }
+    promoEl.appendChild(div);
+  });
+}
+
+// ── ROBLOX EVENTS ──
+// ✏️ BIJWERKEN: voeg nieuwe events toe, verwijder oude
+const ROBLOX_EVENTS = [
+  { emoji:'🌸', naam:'Egg Hunt 2025', info:'Verzamel paaseieren door heel Roblox — gratis prijzen!', badge:'actief', badgeClass:'badge-actief' },
+  { emoji:'🎨', naam:'Dress to Impress update', info:'Nieuwe kleding en accessories — check de game!', badge:'nieuw', badgeClass:'badge-nieuw' },
+  { emoji:'🏠', naam:'Adopt Me! Lente update', info:'Nieuwe lente huisdieren beschikbaar', badge:'actief', badgeClass:'badge-actief' },
+  { emoji:'🌟', naam:'Roblox Birthday Event', info:'Elk jaar in september — gratis items voor iedereen!', badge:'binnenkort', badgeClass:'badge-binnenkort' },
+];
+
+const eventsEl = document.getElementById('robloxEvents');
+if (eventsEl) {
+  ROBLOX_EVENTS.forEach(e => {
+    const div = document.createElement('div');
+    div.className = 'event-item';
+    div.innerHTML = `
+      <div class="event-emoji">${e.emoji}</div>
+      <div style="flex:1">
+        <div class="event-naam">${e.naam}</div>
+        <div class="event-info">${e.info}</div>
+      </div>
+      <span class="event-badge ${e.badgeClass}">${e.badge}</span>
+    `;
+    eventsEl.appendChild(div);
+  });
+}
+
+// ── KLEUR KOPIËREN ──
+function kopieer(kleur) {
+  navigator.clipboard.writeText(kleur).catch(() => {});
+  const el = document.getElementById('kopie-feedback');
+  if (el) { el.textContent = `Gekopieerd: ${kleur} ✓`; setTimeout(() => el.textContent = '', 2000); }
+}
+</script>
+</body>
+</html>
