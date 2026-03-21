@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>💗 BLACKPINK Fashion Star</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pink:   #ff4da6;
+  --pink2:  #ff85c2;
+  --dark:   #0d0015;
+  --dark2:  #1a0030;
+  --gold:   #ffd700;
+  --white:  #fff0f8;
+  --purple: #8b00ff;
+  --radius: 16px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--dark);
+  color: var(--white);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── STERREN ACHTERGROND ── */
+.sterren {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse at 20% 20%, #2d003a 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 80%, #00103a 0%, transparent 50%),
+              var(--dark);
+}
+.ster {
+  position: absolute; background: white; border-radius: 50%;
+  animation: twinkle 2s infinite alternate;
+}
+@keyframes twinkle { from { opacity: 0.2; } to { opacity: 1; } }
+
+/* ── HEADER ── */
+header {
+  position: relative; z-index: 10;
+  background: linear-gradient(135deg, #1a0030, #2d0050);
+  border-bottom: 2px solid var(--pink);
+  padding: 12px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 4px 20px rgba(255,77,166,0.3);
+}
+.header-logo {
+  font-family: 'Pacifico', cursive;
+  font-size: 1.2rem;
+  background: linear-gradient(135deg, var(--pink), var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.header-stats { display: flex; gap: 12px; align-items: center; }
+.stat-badge {
+  background: rgba(255,77,166,0.2); border: 1px solid var(--pink);
+  border-radius: 50px; padding: 4px 12px;
+  font-size: 0.85rem; font-weight: 800;
+  display: flex; align-items: center; gap: 4px;
+}
+.back-btn {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 50px; padding: 6px 14px; color: white;
+  font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 0.82rem;
+  cursor: pointer; text-decoration: none;
+}
+
+/* ── MAIN LAYOUT ── */
+.game-container {
+  position: relative; z-index: 5;
+  max-width: 500px; margin: 0 auto;
+  padding: 16px;
+}
+
+/* ── SCHERM SYSTEEM ── */
+.scherm { display: none; }
+.scherm.actief { display: block; animation: fadeIn .3s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+/* ── START SCHERM ── */
+.start-hero {
+  text-align: center; padding: 32px 16px;
+}
+.start-hero h1 {
+  font-family: 'Pacifico', cursive;
+  font-size: 2.2rem; line-height: 1.2;
+  background: linear-gradient(135deg, var(--pink), var(--gold), var(--pink2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+}
+.start-hero p { color: rgba(255,255,255,0.7); font-size: 0.95rem; margin-bottom: 24px; }
+
+.level-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; margin-bottom: 24px;
+}
+.level-card {
+  background: linear-gradient(135deg, rgba(255,77,166,0.15), rgba(139,0,255,0.15));
+  border: 1.5px solid rgba(255,77,166,0.4);
+  border-radius: var(--radius); padding: 16px 12px;
+  cursor: pointer; transition: all .2s; text-align: center;
+}
+.level-card:hover, .level-card:active { transform: scale(1.04); border-color: var(--pink); background: rgba(255,77,166,0.25); }
+.level-card.vergrendeld { opacity: 0.45; cursor: not-allowed; }
+.level-card .lc-emoji { font-size: 2rem; margin-bottom: 6px; }
+.level-card .lc-naam  { font-weight: 900; font-size: 0.9rem; }
+.level-card .lc-stars { color: var(--gold); font-size: 0.85rem; margin-top: 4px; }
+.level-card .lc-lock  { font-size: 1.2rem; }
+
+.highscore-kaart {
+  background: rgba(255,215,0,0.1); border: 1.5px solid var(--gold);
+  border-radius: var(--radius); padding: 14px;
+  text-align: center; margin-bottom: 16px;
+}
+.highscore-kaart h3 { font-size: 0.85rem; color: var(--gold); margin-bottom: 8px; }
+.hs-rij { display: flex; justify-content: space-between; font-size: 0.82rem; color: rgba(255,255,255,0.8); padding: 3px 0; }
+
+/* ── GAME SCHERM ── */
+.game-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 14px;
+}
+.game-titel { font-weight: 900; font-size: 1rem; }
+.timer-balk {
+  width: 100%; height: 8px; background: rgba(255,255,255,0.1);
+  border-radius: 4px; margin-bottom: 14px; overflow: hidden;
+}
+.timer-vul {
+  height: 100%; background: linear-gradient(90deg, var(--pink), var(--gold));
+  border-radius: 4px; transition: width .5s linear;
+}
+
+/* ── AVATAR ── */
+.avatar-area {
+  background: linear-gradient(160deg, #1a0030, #0d0015);
+  border: 2px solid rgba(255,77,166,0.3);
+  border-radius: var(--radius);
+  padding: 16px; text-align: center;
+  margin-bottom: 14px; position: relative;
+  min-height: 280px;
+}
+.avatar-wrap {
+  display: inline-block; position: relative;
+  width: 160px; height: 240px;
+}
+.avatar-laag {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 8rem; line-height: 1;
+  transition: all .3s;
+}
+.avatar-score-pop {
+  position: absolute; top: 10px; right: 10px;
+  font-family: 'Pacifico', cursive; font-size: 1.4rem; color: var(--gold);
+  pointer-events: none; opacity: 0;
+  transition: all .5s;
+}
+.avatar-score-pop.toon { opacity: 1; transform: translateY(-20px); }
+
+/* ── DOEL KAART ── */
+.doel-kaart {
+  background: rgba(255,77,166,0.1); border: 1.5px solid rgba(255,77,166,0.4);
+  border-radius: var(--radius); padding: 12px 14px;
+  margin-bottom: 12px;
+}
+.doel-kaart h3 { font-size: 0.78rem; color: var(--pink2); font-weight: 800; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+.doel-items { display: flex; gap: 8px; flex-wrap: wrap; }
+.doel-item {
+  background: rgba(255,255,255,0.08); border-radius: 10px;
+  padding: 6px 12px; font-size: 0.85rem; font-weight: 700;
+  border: 1.5px solid rgba(255,255,255,0.1);
+  transition: all .2s;
+}
+.doel-item.behaald { background: rgba(0,200,100,0.2); border-color: #00c864; color: #00ff80; }
+.doel-item.gemist  { background: rgba(255,50,50,0.2); border-color: #ff3232; color: #ff8080; }
+
+/* ── KLEDING GRID ── */
+.categorie-tabs {
+  display: flex; gap: 6px; overflow-x: auto; margin-bottom: 10px;
+  scrollbar-width: none;
+}
+.categorie-tabs::-webkit-scrollbar { display: none; }
+.cat-tab {
+  background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.15);
+  border-radius: 50px; padding: 6px 14px; white-space: nowrap;
+  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.8rem;
+  cursor: pointer; color: rgba(255,255,255,0.7); transition: all .15s;
+  flex-shrink: 0;
+}
+.cat-tab.actief { background: var(--pink); border-color: var(--pink); color: white; }
+
+.kleding-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 8px; margin-bottom: 14px;
+}
+.kleding-item {
+  background: rgba(255,255,255,0.06); border: 2px solid rgba(255,255,255,0.1);
+  border-radius: 12px; padding: 8px 4px; text-align: center;
+  cursor: pointer; transition: all .15s; position: relative;
+}
+.kleding-item:active { transform: scale(0.92); }
+.kleding-item.geselecteerd { border-color: var(--pink); background: rgba(255,77,166,0.2); }
+.kleding-item.doel-match { border-color: var(--gold); box-shadow: 0 0 10px rgba(255,215,0,0.4); }
+.kleding-item .ki-emoji { font-size: 1.8rem; display: block; }
+.kleding-item .ki-naam  { font-size: 0.62rem; color: rgba(255,255,255,0.6); margin-top: 2px; }
+.kleding-item .ki-prijs { font-size: 0.65rem; color: var(--gold); font-weight: 800; }
+.kleding-item.vergrendeld { opacity: 0.4; }
+.kleding-item .ki-lock { position: absolute; top: 4px; right: 4px; font-size: 0.7rem; }
+
+/* ── KNOPPEN ── */
+.btn-primair {
+  width: 100%; padding: 14px; border: none; border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  color: white; font-family: 'Nunito', sans-serif; font-weight: 900;
+  font-size: 1rem; cursor: pointer; transition: all .2s;
+  box-shadow: 0 4px 16px rgba(255,77,166,0.4);
+  margin-top: 8px;
+}
+.btn-primair:active { transform: scale(0.97); }
+.btn-secundair {
+  width: 100%; padding: 11px; border: 1.5px solid rgba(255,255,255,0.3);
+  border-radius: var(--radius); background: transparent;
+  color: white; font-family: 'Nunito', sans-serif; font-weight: 800;
+  font-size: 0.9rem; cursor: pointer; margin-top: 8px;
+}
+
+/* ── RESULTAAT SCHERM ── */
+.resultaat-hero { text-align: center; padding: 24px 16px; }
+.resultaat-hero .res-emoji { font-size: 4rem; margin-bottom: 12px; }
+.resultaat-hero h2 { font-family: 'Pacifico', cursive; font-size: 1.8rem; margin-bottom: 6px;
+  background: linear-gradient(135deg, var(--gold), var(--pink));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.score-groot {
+  font-family: 'Pacifico', cursive; font-size: 3rem; color: var(--gold);
+  text-shadow: 0 0 20px rgba(255,215,0,0.5); margin: 12px 0;
+}
+.sterren-rij { font-size: 2.5rem; margin: 8px 0; letter-spacing: 4px; }
+.score-breakdown {
+  background: rgba(255,255,255,0.05); border-radius: var(--radius);
+  padding: 14px; margin: 16px 0; text-align: left;
+}
+.sb-rij { display: flex; justify-content: space-between; padding: 5px 0;
+  font-size: 0.88rem; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.sb-rij:last-child { border-bottom: none; font-weight: 900; color: var(--gold); }
+
+/* ── UNLOCK POPUP ── */
+.unlock-popup {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100; opacity: 0; pointer-events: none; transition: opacity .3s;
+}
+.unlock-popup.toon { opacity: 1; pointer-events: all; }
+.unlock-kaart {
+  background: linear-gradient(135deg, #1a0030, #2d0050);
+  border: 2px solid var(--gold); border-radius: 24px;
+  padding: 32px 24px; text-align: center; max-width: 300px;
+  animation: popIn .4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes popIn { from { transform: scale(0.5); } to { transform: scale(1); } }
+.unlock-kaart .uk-emoji { font-size: 4rem; margin-bottom: 12px; }
+.unlock-kaart h3 { font-family: 'Pacifico', cursive; font-size: 1.4rem; color: var(--gold); margin-bottom: 6px; }
+.unlock-kaart p  { font-size: 0.88rem; color: rgba(255,255,255,0.7); margin-bottom: 20px; }
+
+/* ── CONFETTI ── */
+.confetti-stuk {
+  position: fixed; pointer-events: none; z-index: 200;
+  width: 10px; height: 10px; border-radius: 2px;
+  animation: confettiFall 2s ease-in forwards;
+}
+@keyframes confettiFall {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ── COINS ANIMATIE ── */
+.coin-pop {
+  position: fixed; font-size: 1.5rem; pointer-events: none; z-index: 200;
+  animation: coinFly .8s ease-out forwards;
+}
+@keyframes coinFly {
+  0%   { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-80px) scale(1.5); opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="sterren" id="sterrenBg"></div>
+
+<header>
+  <a href="index.html" class="back-btn">← Terug</a>
+  <span class="header-logo">Fashion Star 💗</span>
+  <div class="header-stats">
+    <div class="stat-badge">💰 <span id="hdr-coins">0</span></div>
+    <div class="stat-badge">⭐ <span id="hdr-level">1</span></div>
+  </div>
+</header>
+
+<div class="game-container">
+
+  <!-- ══ START SCHERM ══ -->
+  <div class="scherm actief" id="scherm-start">
+    <div class="start-hero">
+      <div style="font-size:3rem;margin-bottom:8px">🌸💗🖤</div>
+      <h1>BLACKPINK<br>Fashion Star</h1>
+      <p>Style de BLACKPINK-look en verdien sterren!</p>
+    </div>
+
+    <div class="highscore-kaart">
+      <h3>🏆 Jouw highscores</h3>
+      <div id="hs-lijst"><div style="color:rgba(255,255,255,0.4);font-size:0.82rem">Nog geen scores — speel een level!</div></div>
+    </div>
+
+    <div style="font-weight:900;font-size:0.85rem;color:var(--pink2);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">Kies een level</div>
+    <div class="level-grid" id="level-grid"></div>
+
+    <button class="btn-secundair" onclick="toonInstructies()">❓ Hoe speel ik?</button>
+  </div>
+
+  <!-- ══ GAME SCHERM ══ -->
+  <div class="scherm" id="scherm-game">
+    <div class="game-header">
+      <div class="game-titel" id="game-level-naam"></div>
+      <div class="stat-badge">💰 <span id="game-coins">0</span></div>
+    </div>
+
+    <div class="timer-balk"><div class="timer-vul" id="timer-vul"></div></div>
+
+    <div class="avatar-area">
+      <div class="avatar-wrap" id="avatar-wrap">
+        <div class="avatar-laag" id="av-body"  style="z-index:1">🧍‍♀️</div>
+        <div class="avatar-laag" id="av-outfit" style="z-index:2;font-size:6rem"></div>
+        <div class="avatar-laag" id="av-haar"   style="z-index:3;font-size:5rem;top:-20px"></div>
+        <div class="avatar-laag" id="av-acc"    style="z-index:4;font-size:3rem;top:10px;right:-10px"></div>
+        <div class="avatar-laag" id="av-schoenen" style="z-index:4;font-size:2.5rem;bottom:0;top:auto"></div>
+      </div>
+      <div class="avatar-score-pop" id="score-pop">+100!</div>
+    </div>
+
+    <div class="doel-kaart">
+      <h3>🎯 Stijl van dit level</h3>
+      <div class="doel-items" id="doel-items"></div>
+    </div>
+
+    <div class="categorie-tabs" id="cat-tabs"></div>
+    <div class="kleding-grid" id="kleding-grid"></div>
+
+    <button class="btn-primair" onclick="controleerOutfit()">✨ Catwalk! Beoordeel mijn look</button>
+    <button class="btn-secundair" onclick="naarStart()">← Terug naar menu</button>
+  </div>
+
+  <!-- ══ RESULTAAT SCHERM ══ -->
+  <div class="scherm" id="scherm-resultaat">
+    <div class="resultaat-hero">
+      <div class="res-emoji" id="res-emoji">🌟</div>
+      <h2 id="res-titel">Geweldig!</h2>
+      <div class="score-groot" id="res-score">0</div>
+      <div class="sterren-rij" id="res-sterren"></div>
+    </div>
+    <div class="score-breakdown" id="score-breakdown"></div>
+    <div id="unlock-melding" style="display:none;background:rgba(255,215,0,0.1);border:1.5px solid var(--gold);border-radius:var(--radius);padding:12px 14px;margin-bottom:12px;text-align:center;font-size:0.88rem"></div>
+    <button class="btn-primair" onclick="speelOpnieuw()">🔄 Opnieuw</button>
+    <button class="btn-primair" onclick="volgendLevel()" id="volgende-btn" style="background:linear-gradient(135deg,#00aa44,#007733)">▶ Volgend level</button>
+    <button class="btn-secundair" onclick="naarStart()">← Menu</button>
+  </div>
+
+</div>
+
+<!-- Unlock popup -->
+<div class="unlock-popup" id="unlock-popup">
+  <div class="unlock-kaart">
+    <div class="uk-emoji" id="uk-emoji">🎉</div>
+    <h3 id="uk-titel">Nieuw item!</h3>
+    <p id="uk-tekst">Je hebt een nieuw item ontgrendeld!</p>
+    <button class="btn-primair" onclick="sluitUnlock()" style="margin-top:0">🌸 Super!</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  GAME DATA
+// ══════════════════════════════════════════════════
+
+const LEVELS = [
+  {
+    id: 1, naam: 'Jisoo — Flower', emoji: '🌸',
+    omschrijving: 'Kies een zachte, femme look in roze en wit',
+    tijd: 60, doelScore: 300,
+    stijl: { kleuren: ['roze','wit','rood'], items: ['jurk','lang haar','bloem acc','hakken'] },
+    doel: [
+      { label: '🌸 Roze outfit', categorie: 'outfit', tags: ['roze'] },
+      { label: '👄 Rode lippen', categorie: 'acc', tags: ['lippenstift'] },
+      { label: '💇 Lang haar', categorie: 'haar', tags: ['lang'] },
+    ]
+  },
+  {
+    id: 2, naam: 'Jennie — Solo', emoji: '👑',
+    omschrijving: 'Chanel-stijl: chic, zwart en goud',
+    tijd: 55, doelScore: 400,
+    stijl: { kleuren: ['zwart','goud','wit'], items: ['blazer','bob haar','ketting','pumps'] },
+    doel: [
+      { label: '🖤 Zwarte outfit', categorie: 'outfit', tags: ['zwart'] },
+      { label: '✂️ Bob kapsel', categorie: 'haar', tags: ['bob'] },
+      { label: '💛 Goud accessoire', categorie: 'acc', tags: ['goud'] },
+    ]
+  },
+  {
+    id: 3, naam: 'Rosé — On The Ground', emoji: '🌹',
+    omschrijving: 'Bohemien met gitaar-vibes — roze en zilver',
+    tijd: 50, doelScore: 500,
+    stijl: { kleuren: ['roze','zilver','wit'], items: ['rok','golf haar','oorbellen','laarzen'] },
+    doel: [
+      { label: '🎸 Roze & zilver', categorie: 'outfit', tags: ['zilver','roze'] },
+      { label: '🌊 Golf haar', categorie: 'haar', tags: ['golf'] },
+      { label: '👢 Laarzen', categorie: 'schoenen', tags: ['laarzen'] },
+    ]
+  },
+  {
+    id: 4, naam: 'Lisa — Money', emoji: '⚡',
+    omschrijving: 'Street style queen — gedurfd en kleurrijk',
+    tijd: 45, doelScore: 600,
+    stijl: { kleuren: ['geel','zwart','neon'], items: ['streetwear','vlechten','cap','sneakers'] },
+    doel: [
+      { label: '💛 Streetwear', categorie: 'outfit', tags: ['street','geel'] },
+      { label: '👟 Sneakers', categorie: 'schoenen', tags: ['sneakers'] },
+      { label: '🧢 Cap', categorie: 'acc', tags: ['cap'] },
+    ]
+  },
+  {
+    id: 5, naam: 'BLACKPINK — Pink Venom', emoji: '🖤💗',
+    omschrijving: 'Groepslook: roze + zwart = perfecte combinatie',
+    tijd: 40, doelScore: 750,
+    stijl: { kleuren: ['roze','zwart'], items: ['roze+zwart outfit','lang haar','statement acc','boots'] },
+    doel: [
+      { label: '🖤💗 Roze & zwart', categorie: 'outfit', tags: ['roze','zwart'] },
+      { label: '💜 Statement haar', categorie: 'haar', tags: ['lang','paars'] },
+      { label: '🥾 Boots', categorie: 'schoenen', tags: ['boots','laarzen'] },
+    ]
+  },
+  {
+    id: 6, naam: 'K-pop Idol', emoji: '🌟',
+    omschrijving: 'Jij mag alles kiezen — wees de meest stijlvolle idol!',
+    tijd: 35, doelScore: 900,
+    stijl: { kleuren: ['alles'], items: ['eigen keuze'] },
+    doel: [
+      { label: '✨ 3 categorieën', categorie: 'any', tags: [] },
+      { label: '⭐ Combo bonus', categorie: 'combo', tags: [] },
+    ]
+  },
+];
+
+const KLEDING = {
+  outfit: [
+    { id:'o1', emoji:'👗', naam:'Roze jurk',     tags:['roze'], prijs:0,   unlock:1 },
+    { id:'o2', emoji:'🥻', naam:'Rode kimono',   tags:['rood'], prijs:0,   unlock:1 },
+    { id:'o3', emoji:'🩱', naam:'Zwart bodysuit', tags:['zwart'], prijs:80, unlock:1 },
+    { id:'o4', emoji:'👘', naam:'Zilver jurk',   tags:['zilver'], prijs:120, unlock:2 },
+    { id:'o5', emoji:'🩳', naam:'Geel streetwear',tags:['street','geel'], prijs:100, unlock:3 },
+    { id:'o6', emoji:'🥋', naam:'Zwarte blazer', tags:['zwart'], prijs:150, unlock:2 },
+    { id:'o7', emoji:'👙', naam:'Roze crop top', tags:['roze'], prijs:0,   unlock:1 },
+    { id:'o8', emoji:'🎽', naam:'Neon outfit',   tags:['neon','street'], prijs:200, unlock:4 },
+    { id:'o9', emoji:'💃', naam:'Glitter zwart', tags:['zwart','zilver'], prijs:250, unlock:4 },
+    { id:'o10',emoji:'🩴', naam:'Roze & zwart',  tags:['roze','zwart'], prijs:300, unlock:5 },
+  ],
+  haar: [
+    { id:'h1', emoji:'👩', naam:'Lang haar',     tags:['lang'], prijs:0,   unlock:1 },
+    { id:'h2', emoji:'👱‍♀️', naam:'Blond lang',  tags:['lang','blond'], prijs:50, unlock:1 },
+    { id:'h3', emoji:'👩‍🦰', naam:'Rood haar',   tags:['lang','rood'], prijs:80, unlock:2 },
+    { id:'h4', emoji:'👩‍🦱', naam:'Golf haar',   tags:['golf'], prijs:100, unlock:2 },
+    { id:'h5', emoji:'💇‍♀️', naam:'Bob kapsel',  tags:['bob'], prijs:120, unlock:2 },
+    { id:'h6', emoji:'👩‍🦳', naam:'Zilver haar', tags:['zilver','lang'], prijs:150, unlock:3 },
+    { id:'h7', emoji:'🧑‍🦱', naam:'Vlechten',    tags:['vlechten'], prijs:180, unlock:3 },
+    { id:'h8', emoji:'💜', naam:'Paars haar',    tags:['lang','paars'], prijs:220, unlock:4 },
+  ],
+  acc: [
+    { id:'a1', emoji:'💄', naam:'Rode lippenstift', tags:['lippenstift','rood'], prijs:0, unlock:1 },
+    { id:'a2', emoji:'💍', naam:'Gouden ring',     tags:['goud'], prijs:60,  unlock:1 },
+    { id:'a3', emoji:'🌸', naam:'Bloem accessoire', tags:['bloem'], prijs:40, unlock:1 },
+    { id:'a4', emoji:'📿', naam:'Gouden ketting',  tags:['goud','ketting'], prijs:100, unlock:2 },
+    { id:'a5', emoji:'🧢', naam:'Cap',             tags:['cap'], prijs:80,  unlock:3 },
+    { id:'a6', emoji:'👓', naam:'Zonnebril',       tags:['bril'], prijs:90,  unlock:2 },
+    { id:'a7', emoji:'🎀', naam:'Roze strik',      tags:['roze','strik'], prijs:50, unlock:1 },
+    { id:'a8', emoji:'⛓️', naam:'Zilveren ketting', tags:['zilver','ketting'], prijs:140, unlock:3 },
+  ],
+  schoenen: [
+    { id:'s1', emoji:'👠', naam:'Roze hakken',    tags:['hakken','roze'], prijs:0,  unlock:1 },
+    { id:'s2', emoji:'👡', naam:'Gouden pumps',   tags:['pumps','goud'], prijs:80, unlock:2 },
+    { id:'s3', emoji:'👢', naam:'Laarzen',        tags:['laarzen','boots'], prijs:120, unlock:2 },
+    { id:'s4', emoji:'👟', naam:'Witte sneakers', tags:['sneakers','wit'], prijs:100, unlock:3 },
+    { id:'s5', emoji:'🥾', naam:'Zwarte boots',   tags:['boots','zwart'], prijs:160, unlock:4 },
+    { id:'s6', emoji:'🩰', naam:'Ballet flats',   tags:['roze'], prijs:60, unlock:1 },
+  ],
+};
+
+// ══════════════════════════════════════════════════
+//  GAME STATE
+// ══════════════════════════════════════════════════
+let state = {
+  coins: 0,
+  bereiktLevel: 1,
+  huidigLevel: 1,
+  highscores: {},
+  ontgrendeld: ['o1','o2','o7','h1','h2','a1','a2','a3','a7','s1','s6'],
+  outfit: { outfit: null, haar: null, acc: null, schoenen: null },
+  timer: null, tijdOver: 60, timerLoop: null,
+  actieveCat: 'outfit',
+};
+
+function laadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem('bp_fashion_state') || '{}');
+    if (s.coins !== undefined) state.coins = s.coins;
+    if (s.bereiktLevel)  state.bereiktLevel = s.bereiktLevel;
+    if (s.highscores)    state.highscores   = s.highscores;
+    if (s.ontgrendeld)   state.ontgrendeld  = s.ontgrendeld;
+  } catch(e) {}
+}
+function slaState() {
+  localStorage.setItem('bp_fashion_state', JSON.stringify({
+    coins: state.coins,
+    bereiktLevel: state.bereiktLevel,
+    highscores: state.highscores,
+    ontgrendeld: state.ontgrendeld,
+  }));
+}
+
+// ══════════════════════════════════════════════════
+//  STERREN ACHTERGROND
+// ══════════════════════════════════════════════════
+function maakSterren() {
+  const bg = document.getElementById('sterrenBg');
+  for (let i = 0; i < 60; i++) {
+    const s = document.createElement('div');
+    s.className = 'ster';
+    const size = Math.random() * 3 + 1;
+    s.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${1.5+Math.random()*2}s`;
+    bg.appendChild(s);
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  SCHERM NAVIGATIE
+// ══════════════════════════════════════════════════
+function toonScherm(id) {
+  document.querySelectorAll('.scherm').forEach(s => s.classList.remove('actief'));
+  document.getElementById('scherm-'+id).classList.add('actief');
+}
+
+// ══════════════════════════════════════════════════
+//  START SCHERM
+// ══════════════════════════════════════════════════
+function renderStart() {
+  document.getElementById('hdr-coins').textContent = state.coins;
+  document.getElementById('hdr-level').textContent = state.bereiktLevel;
+
+  // Highscores
+  const hsl = document.getElementById('hs-lijst');
+  const scores = Object.entries(state.highscores).sort((a,b)=>b[1].score-a[1].score);
+  if (scores.length === 0) {
+    hsl.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-size:0.82rem">Nog geen scores — speel een level!</div>';
+  } else {
+    hsl.innerHTML = scores.slice(0,5).map(([lid,d]) => {
+      const lvl = LEVELS.find(l => l.id == lid);
+      return `<div class="hs-rij"><span>${lvl?.emoji||'⭐'} ${lvl?.naam||'Level '+lid}</span><span>${d.sterren}⭐ ${d.score}pt</span></div>`;
+    }).join('');
+  }
+
+  // Level grid
+  const lg = document.getElementById('level-grid');
+  lg.innerHTML = LEVELS.map(l => {
+    const hs = state.highscores[l.id];
+    const sterren = hs ? hs.sterren : 0;
+    const vergrendeld = l.id > state.bereiktLevel;
+    return `<div class="level-card${vergrendeld?' vergrendeld':''}" onclick="${vergrendeld?'':'startLevel('+l.id+')'}">
+      <div class="lc-emoji">${vergrendeld ? '<span class="lc-lock">🔒</span>' : l.emoji}</div>
+      <div class="lc-naam">${l.naam}</div>
+      <div class="lc-stars">${vergrendeld ? '???' : (sterren > 0 ? '⭐'.repeat(sterren)+'☆'.repeat(3-sterren) : '☆☆☆')}</div>
+    </div>`;
+  }).join('');
+}
+
+function naarStart() {
+  if (state.timerLoop) { clearInterval(state.timerLoop); state.timerLoop = null; }
+  state.outfit = { outfit: null, haar: null, acc: null, schoenen: null };
+  renderStart();
+  toonScherm('start');
+}
+
+// ══════════════════════════════════════════════════
+//  GAME STARTEN
+// ══════════════════════════════════════════════════
+function startLevel(levelId) {
+  state.huidigLevel = levelId;
+  state.outfit = { outfit: null, haar: null, acc: null, schoenen: null };
+  state.actieveCat = 'outfit';
+
+  const lvl = LEVELS.find(l => l.id === levelId);
+  document.getElementById('game-level-naam').textContent = `${lvl.emoji} ${lvl.naam}`;
+  document.getElementById('game-coins').textContent = state.coins;
+
+  // Timer
+  state.tijdOver = lvl.tijd;
+  updateTimer();
+  if (state.timerLoop) clearInterval(state.timerLoop);
+  state.timerLoop = setInterval(() => {
+    state.tijdOver--;
+    updateTimer();
+    if (state.tijdOver <= 0) {
+      clearInterval(state.timerLoop);
+      controleerOutfit();
+    }
+  }, 1000);
+
+  renderDoelItems(lvl);
+  renderAvatar();
+  renderCategorieTabs();
+  renderKledingGrid();
+  toonScherm('game');
+}
+
+function updateTimer() {
+  const lvl = LEVELS.find(l => l.id === state.huidigLevel);
+  const pct = (state.tijdOver / lvl.tijd) * 100;
+  const vul = document.getElementById('timer-vul');
+  if (vul) {
+    vul.style.width = pct + '%';
+    vul.style.background = pct > 50 ? 'linear-gradient(90deg,#ff4da6,#ffd700)' :
+                            pct > 25 ? 'linear-gradient(90deg,#ff8c00,#ffd700)' :
+                                        'linear-gradient(90deg,#ff0000,#ff8c00)';
+  }
+}
+
+function renderDoelItems(lvl) {
+  const c = document.getElementById('doel-items');
+  c.innerHTML = lvl.doel.map(d => `<div class="doel-item" data-cat="${d.categorie}" data-tags='${JSON.stringify(d.tags)}'>${d.label}</div>`).join('');
+}
+
+// ══════════════════════════════════════════════════
+//  AVATAR RENDER
+// ══════════════════════════════════════════════════
+function renderAvatar() {
+  const cats = ['outfit','haar','acc','schoenen'];
+  const lagen = { outfit:'av-outfit', haar:'av-haar', acc:'av-acc', schoenen:'av-schoenen' };
+  cats.forEach(cat => {
+    const el = document.getElementById(lagen[cat]);
+    if (!el) return;
+    if (state.outfit[cat]) {
+      const item = Object.values(KLEDING).flat().find(k => k.id === state.outfit[cat]);
+      el.textContent = item ? item.emoji : '';
+    } else {
+      el.textContent = '';
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════
+//  CATEGORIETABS & KLEDING GRID
+// ══════════════════════════════════════════════════
+const CAT_LABELS = { outfit:'👗 Outfit', haar:'💇 Haar', acc:'💍 Acc.', schoenen:'👠 Schoenen' };
+
+function renderCategorieTabs() {
+  const c = document.getElementById('cat-tabs');
+  c.innerHTML = Object.entries(CAT_LABELS).map(([id, label]) =>
+    `<button class="cat-tab${state.actieveCat===id?' actief':''}" onclick="setCat('${id}')">${label}</button>`
+  ).join('');
+}
+
+function setCat(cat) {
+  state.actieveCat = cat;
+  renderCategorieTabs();
+  renderKledingGrid();
+}
+
+function renderKledingGrid() {
+  const lvl = LEVELS.find(l => l.id === state.huidigLevel);
+  const items = KLEDING[state.actieveCat] || [];
+  const c = document.getElementById('kleding-grid');
+
+  c.innerHTML = items.map(item => {
+    const ontgrendeld = state.ontgrendeld.includes(item.id);
+    const geselecteerd = state.outfit[state.actieveCat] === item.id;
+    // Check if item matches doel
+    const doelMatch = lvl.doel.some(d =>
+      d.categorie === state.actieveCat &&
+      d.tags.some(t => item.tags.includes(t))
+    );
+    return `<div class="kleding-item${geselecteerd?' geselecteerd':''}${doelMatch&&ontgrendeld?' doel-match':''}${!ontgrendeld?' vergrendeld':''}"
+      onclick="${ontgrendeld?`kiesItem('${item.id}')`:`koopItem('${item.id}')`}">
+      ${!ontgrendeld ? '<span class="ki-lock">🔒</span>' : ''}
+      <span class="ki-emoji">${item.emoji}</span>
+      <div class="ki-naam">${item.naam}</div>
+      ${!ontgrendeld ? `<div class="ki-prijs">💰${item.prijs}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function kiesItem(id) {
+  const cat = state.actieveCat;
+  state.outfit[cat] = state.outfit[cat] === id ? null : id;
+  renderAvatar();
+  renderKledingGrid();
+  // Update doel visueel
+  updateDoelVisueel();
+}
+
+function koopItem(id) {
+  const item = Object.values(KLEDING).flat().find(k => k.id === id);
+  if (!item) return;
+  if (state.coins < item.prijs) {
+    toonCoinPop('❌ Te weinig coins!', false);
+    return;
+  }
+  state.coins -= item.prijs;
+  state.ontgrendeld.push(id);
+  document.getElementById('game-coins').textContent = state.coins;
+  slaState();
+  renderKledingGrid();
+  toonUnlockPopup(item.emoji, `${item.naam} ontgrendeld!`, 'Ga er stijlvol mee aan de slag! 💅');
+}
+
+function updateDoelVisueel() {
+  const lvl = LEVELS.find(l => l.id === state.huidigLevel);
+  document.querySelectorAll('.doel-item').forEach(el => {
+    const cat  = el.dataset.cat;
+    const tags = JSON.parse(el.dataset.tags || '[]');
+    el.classList.remove('behaald','gemist');
+    if (cat === 'any' || cat === 'combo') return;
+    if (state.outfit[cat]) {
+      const gekozen = Object.values(KLEDING).flat().find(k => k.id === state.outfit[cat]);
+      if (gekozen && tags.some(t => gekozen.tags.includes(t))) {
+        el.classList.add('behaald');
+      }
+    }
+  });
+}
+
+// ══════════════════════════════════════════════════
+//  OUTFIT BEOORDELEN
+// ══════════════════════════════════════════════════
+function controleerOutfit() {
+  if (state.timerLoop) { clearInterval(state.timerLoop); state.timerLoop = null; }
+  const lvl = LEVELS.find(l => l.id === state.huidigLevel);
+  let score = 0, breakdown = [], aantalKleding = 0;
+  const BONUS_TIJD = Math.max(0, state.tijdOver);
+
+  // Tel hoeveel kledingstukken gedragen worden
+  Object.values(state.outfit).forEach(id => { if (id) aantalKleding++; });
+
+  // Basisscores per item
+  if (aantalKleding > 0) {
+    score += aantalKleding * 25;
+    breakdown.push({ label: `👗 ${aantalKleding} kledingstukken`, punten: aantalKleding * 25 });
+  }
+
+  // Doel bonus
+  let doelBehaald = 0;
+  lvl.doel.forEach(doel => {
+    if (doel.categorie === 'any') {
+      if (aantalKleding >= 3) { doelBehaald++; score += 100; breakdown.push({ label: '✨ 3 categorieën bonus', punten: 100 }); }
+      return;
+    }
+    if (doel.categorie === 'combo') {
+      if (aantalKleding >= 4) { doelBehaald++; score += 150; breakdown.push({ label: '🌟 Volledige combo!', punten: 150 }); }
+      return;
+    }
+    const gekozen = state.outfit[doel.categorie];
+    if (gekozen) {
+      const item = Object.values(KLEDING).flat().find(k => k.id === gekozen);
+      if (item && doel.tags.some(t => item.tags.includes(t))) {
+        doelBehaald++; score += 150;
+        breakdown.push({ label: `${doel.label} ✅`, punten: 150 });
+      }
+    }
+  });
+
+  // Tijdbonus
+  if (BONUS_TIJD > 0 && aantalKleding > 0) {
+    const tijdBonus = Math.floor(BONUS_TIJD * 2);
+    score += tijdBonus;
+    breakdown.push({ label: `⏱️ Tijdbonus (${BONUS_TIJD}s)`, punten: tijdBonus });
+  }
+
+  // Outfit match combo bonus
+  if (doelBehaald === lvl.doel.length && aantalKleding >= 3) {
+    score += 200;
+    breakdown.push({ label: '🏆 Perfecte stijl!', punten: 200 });
+  }
+
+  // Coins verdienen
+  const verdiend = Math.floor(score / 5);
+  state.coins += verdiend;
+  breakdown.push({ label: `💰 Verdiend`, punten: verdiend + ' coins' });
+
+  // Sterren berekenen
+  const sterren = score >= lvl.doelScore * 1.2 ? 3 :
+                  score >= lvl.doelScore       ? 2 :
+                  score >= lvl.doelScore * 0.5  ? 1 : 0;
+
+  // Highscore opslaan
+  const huidigeHs = state.highscores[lvl.id];
+  const isNieuwRecord = !huidigeHs || score > huidigeHs.score;
+  if (isNieuwRecord) {
+    state.highscores[lvl.id] = { score, sterren };
+  }
+
+  // Level unlocken
+  let nieuwLevelUnlocked = false;
+  if (sterren >= 1 && lvl.id >= state.bereiktLevel && lvl.id < LEVELS.length) {
+    state.bereiktLevel = lvl.id + 1;
+    nieuwLevelUnlocked = true;
+  }
+
+  slaState();
+  toonResultaat(score, sterren, breakdown, verdiend, isNieuwRecord, nieuwLevelUnlocked, lvl);
+}
+
+// ══════════════════════════════════════════════════
+//  RESULTAAT TONEN
+// ══════════════════════════════════════════════════
+function toonResultaat(score, sterren, breakdown, verdiend, isRecord, nieuwLevel, lvl) {
+  const TITELS = [
+    ['😅', 'Oeps!', 'Probeer het nog eens!'],
+    ['👍', 'Goed begin!', 'Je komt er! Oefen nog een keer.'],
+    ['🌟', 'Geweldig!', 'Jij hebt stijl!'],
+    ['💗', 'Fashion Star!', 'Je bent een echte K-pop ster!'],
+  ];
+  const [emoji, titel] = TITELS[sterren];
+
+  document.getElementById('res-emoji').textContent = emoji;
+  document.getElementById('res-titel').textContent = titel;
+  document.getElementById('res-score').textContent = score + ' pt';
+  document.getElementById('res-sterren').textContent = '⭐'.repeat(sterren) + '☆'.repeat(3-sterren);
+
+  const bd = document.getElementById('score-breakdown');
+  bd.innerHTML = breakdown.map((r, i) =>
+    `<div class="sb-rij${i===breakdown.length-1?' ':''}">`+
+    `<span>${r.label}</span><span style="color:var(--gold);font-weight:800">+${r.punten}</span></div>`
+  ).join('') + `<div class="sb-rij"><span>Totaal</span><span>${score} punten</span></div>`;
+
+  // Unlock melding
+  const um = document.getElementById('unlock-melding');
+  if (nieuwLevel) {
+    um.style.display = 'block';
+    um.innerHTML = `🎉 <strong>Level ${lvl.id + 1} ontgrendeld!</strong><br>Je bent klaar voor de volgende uitdaging!`;
+  } else if (isRecord) {
+    um.style.display = 'block';
+    um.innerHTML = `🏆 <strong>Nieuw persoonlijk record!</strong> ${score} punten!`;
+  } else {
+    um.style.display = 'none';
+  }
+
+  // Volgende level knop
+  const vb = document.getElementById('volgende-btn');
+  vb.style.display = (lvl.id < LEVELS.length && state.bereiktLevel > lvl.id) ? 'block' : 'none';
+
+  document.getElementById('hdr-coins').textContent = state.coins;
+
+  if (sterren >= 2) maakConfetti();
+  toonScherm('resultaat');
+}
+
+function speelOpnieuw() { startLevel(state.huidigLevel); }
+function volgendLevel()  { startLevel(state.huidigLevel + 1); }
+
+// ══════════════════════════════════════════════════
+//  UI HELPERS
+// ══════════════════════════════════════════════════
+function toonUnlockPopup(emoji, titel, tekst) {
+  document.getElementById('uk-emoji').textContent = emoji;
+  document.getElementById('uk-titel').textContent = titel;
+  document.getElementById('uk-tekst').textContent = tekst;
+  document.getElementById('unlock-popup').classList.add('toon');
+}
+function sluitUnlock() {
+  document.getElementById('unlock-popup').classList.remove('toon');
+}
+
+function toonCoinPop(tekst, positief = true) {
+  const el = document.createElement('div');
+  el.className = 'coin-pop';
+  el.textContent = tekst;
+  el.style.cssText = `left:${Math.random()*60+20}%;top:60%;color:${positief?'var(--gold)':'#ff4444'}`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 900);
+}
+
+function maakConfetti() {
+  const kleuren = ['#ff4da6','#ffd700','#8b00ff','#00ffaa','#ff85c2','#fff'];
+  for (let i = 0; i < 50; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti-stuk';
+    c.style.cssText = `left:${Math.random()*100}%;top:-20px;background:${kleuren[Math.floor(Math.random()*kleuren.length)]};animation-delay:${Math.random()*1}s;animation-duration:${1.5+Math.random()*1}s;transform:rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 3000);
+  }
+}
+
+function toonInstructies() {
+  toonUnlockPopup(
+    '💗',
+    'Hoe speel je?',
+    '1. Kies een level\n2. Kijk naar het stijldoel\n3. Kies de juiste outfit, haar, acc en schoenen\n4. Klik "Catwalk!" voor je score!\n\nTip: gouden rand = past bij het doel! 💅'
+  );
+}
+
+// ══════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════
+laadState();
+maakSterren();
+renderStart();
+</script>
+</body>
+</html>
