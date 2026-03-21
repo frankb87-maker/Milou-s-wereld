@@ -5,11 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Milou's Wereld 🌸</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
-<!-- EmailJS voor wekelijkse stemmingsmail -->
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<!-- EmailJS voor wekelijkse stemmingsmail — async zodat het de pagina nooit blokkeert -->
 <script>
-  // ✏️ Vervang 'JOUW_PUBLIC_KEY' met jouw EmailJS Public Key
-  emailjs.init('WTRRhFmease4280Ro');
+  // EmailJS veilig laden — als het mislukt werkt de rest van de app gewoon door
+  function laadEmailJS() {
+    try {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+      s.onload = () => {
+        try { emailjs.init('WTRRhFmease4280Ro'); } catch(e) {}
+      };
+      s.onerror = () => { console.log('EmailJS niet geladen — geen probleem, app werkt gewoon.'); };
+      document.head.appendChild(s);
+    } catch(e) {}
+  }
+  // Laad EmailJS pas NA het laden van de pagina zodat het niets blokkeert
+  window.addEventListener('load', laadEmailJS);
 </script>
 <style>
   :root {
@@ -1555,7 +1566,11 @@ function verstuurWeekmail(weekData) {
     totaal:       totaalStemmingen,
   };
 
-  // Stuur naar beide adressen
+  // Stuur naar beide adressen — alleen als EmailJS geladen is
+  if (typeof emailjs === 'undefined') {
+    console.log('EmailJS nog niet geladen, mail wordt niet verstuurd.');
+    return;
+  }
   emailjs.send(
     'service_po4zbha',
     'template_bilthjo',
