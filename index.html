@@ -1216,14 +1216,24 @@
     <p>Een rustig plekje speciaal voor jou</p>
   </div>
 
-  <!-- DAGELIJKS BERICHTJE -->
+  <!-- DAGELIJKS BERICHTJE — AI powered -->
   <div class="card accent-lav">
     <h2>💌 Berichtje voor jou</h2>
     <div class="positief-kaart">
       <div class="pk-tekst" id="pk-bericht">🌸</div>
       <div class="pk-sub" id="pk-sub"></div>
     </div>
-    <button id="nieuw-bericht-btn" onclick="nieuwBericht()">🌸 Ander berichtje</button>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button id="nieuw-bericht-btn" onclick="nieuwBericht()" style="flex:1">🌸 Ander berichtje</button>
+      <button onclick="genereerNieuweBerichtjes()" id="ai-bericht-btn"
+        style="flex:1;background:linear-gradient(135deg,#c9b8f0,#a89de0);border:none;cursor:pointer;
+        font-family:'Nunito',sans-serif;font-weight:800;padding:12px;border-radius:14px;
+        font-size:0.88rem;color:white;transition:opacity .2s"
+        title="Genereer nieuwe berichtjes met AI">
+        ✨ Nieuwe berichtjes
+      </button>
+    </div>
+    <p id="ai-bericht-status" style="font-size:0.75rem;color:var(--muted);text-align:center;margin-top:6px;min-height:16px"></p>
   </div>
 
   <!-- ADEMHALING -->
@@ -2364,6 +2374,85 @@ function volgendeVerjaardag() {
 }
 volgendeVerjaardag();
 
+// ════════════════════════════════════════════════════════
+//  🤖 AI — AUTOMATISCHE BERICHTJES & QUOTES VIA CLAUDE
+// ════════════════════════════════════════════════════════
+
+async function genereerNieuweBerichtjes() {
+  const btn = document.getElementById('ai-bericht-btn');
+  const status = document.getElementById('ai-bericht-status');
+  if (btn) { btn.textContent = '⏳ Bezig...'; btn.disabled = true; }
+  if (status) status.textContent = 'Nieuwe berichtjes worden gemaakt... even geduld 🌸';
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: `Genereer 8 unieke, warme en bemoedigende berichtjes in het Nederlands voor Milou, een meisje van 11 jaar.
+Ze houdt van BLACKPINK, Roblox, tekenen en koken. Ze gaat soms met spanning naar school en heeft soms zorgen.
+De berichtjes moeten haar opbeuren, geruststellen en een goed gevoel geven.
+Geef ook 7 inspirerende dagquotes voor haar.
+
+Antwoord ALLEEN in dit JSON formaat, geen uitleg erbuiten:
+{
+  "berichtjes": [
+    {"tekst": "berichtje hier", "sub": "korte ondertitel met emoji"},
+    ...
+  ],
+  "quotes": [
+    "quote 1 met emoji",
+    ...
+  ]
+}`
+        }]
+      })
+    });
+
+    const data = await response.json();
+    const tekst = data.content[0].text;
+    const clean = tekst.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    // Sla op in localStorage
+    if (parsed.berichtjes && parsed.berichtjes.length > 0) {
+      localStorage.setItem('milou_ai_berichtjes', JSON.stringify(parsed.berichtjes));
+      localStorage.setItem('milou_ai_quotes', JSON.stringify(parsed.quotes));
+      localStorage.setItem('milou_ai_datum', new Date().toISOString());
+
+      if (status) status.textContent = `✅ ${parsed.berichtjes.length} nieuwe berichtjes + ${parsed.quotes.length} quotes opgeslagen!`;
+
+      // Toon meteen een nieuw berichtje
+      nieuwBericht();
+
+      // Update ook de dagquote
+      const quoteEl = document.getElementById('dagquote');
+      if (quoteEl && parsed.quotes.length > 0) {
+        quoteEl.textContent = parsed.quotes[new Date().getDay() % parsed.quotes.length];
+      }
+    }
+  } catch(e) {
+    if (status) status.textContent = '❌ Niet gelukt. Probeer het later nog eens.';
+    console.error('AI fout:', e);
+  }
+
+  if (btn) { btn.textContent = '✨ Nieuwe berichtjes'; btn.disabled = false; }
+  setTimeout(() => { if (status) status.textContent = ''; }, 4000);
+}
+
+// Controleer wekelijks of er nieuwe AI berichtjes gegenereerd moeten worden
+function checkAIUpdate() {
+  const datum = localStorage.getItem('milou_ai_datum');
+  if (!datum) return; // Eerste keer handmatig via knop
+  const dagen = (new Date() - new Date(datum)) / (1000 * 60 * 60 * 24);
+  if (dagen >= 7) genereerNieuweBerichtjes(); // Automatisch na 7 dagen
+}
+checkAIUpdate();
+
 // ── KLEUR KOPIËREN ──
 function kopieer(kleur) {
   navigator.clipboard.writeText(kleur).catch(() => {});
@@ -2372,7 +2461,7 @@ function kopieer(kleur) {
 }
 
 // ── POSITIEVE BERICHTEN ──
-// Hier als fallback zodat het altijd werkt, ook als data.js nog laadt
+// Gebruikt AI-berichtjes als die beschikbaar zijn, anders de fallback
 const BERICHTEN_FALLBACK = [
   { tekst: "Jij bent moediger dan je denkt, sterker dan je voelt, en slimmer dan je gelooft.", sub: "En dat is echt zo 💚" },
   { tekst: "Het is oké om soms niet lekker in je vel te zitten. Dat hoort bij het leven.", sub: "Je hoeft niet altijd sterk te zijn 🌸" },
@@ -2387,27 +2476,50 @@ const BERICHTEN_FALLBACK = [
 ];
 
 function nieuwBericht() {
-  // Gebruik BERICHTEN uit data.js als die geladen is, anders de fallback
-  const lijst = (typeof BERICHTEN !== 'undefined' && BERICHTEN.length) ? BERICHTEN : BERICHTEN_FALLBACK;
+  // Probeer AI berichtjes eerst, dan data.js, dan fallback
+  let lijst = BERICHTEN_FALLBACK;
+  try {
+    const aiRaw = localStorage.getItem('milou_ai_berichtjes');
+    if (aiRaw) {
+      const aiLijst = JSON.parse(aiRaw);
+      if (aiLijst && aiLijst.length > 0) lijst = aiLijst;
+    } else if (typeof BERICHTEN !== 'undefined' && BERICHTEN.length) {
+      lijst = BERICHTEN;
+    }
+  } catch(e) {}
+
   const r = lijst[Math.floor(Math.random() * lijst.length)];
   const el1 = document.getElementById('pk-bericht');
   const el2 = document.getElementById('pk-sub');
   if (el1) el1.textContent = r.tekst;
-  if (el2) el2.textContent = r.sub;
+  if (el2) el2.textContent = r.sub || '';
 }
 
-// Laad meteen het eerste bericht — werkt altijd dankzij fallback
+// Laad meteen het eerste bericht
 nieuwBericht();
 </script>
 
 <!-- 📦 Data bestand — pas data.js aan voor updates, niet dit bestand! -->
 <script src="data.js"></script>
 <script>
-  // Dagquote op home — laad nadat data.js geladen is
+  // Dagquote — gebruikt AI quotes als beschikbaar, anders DAGQUOTES uit data.js
   const quoteEl = document.getElementById('dagquote');
-  if (quoteEl && typeof DAGQUOTES !== 'undefined') {
+  if (quoteEl) {
     const dagNr = new Date().getDay();
-    quoteEl.textContent = DAGQUOTES[dagNr % DAGQUOTES.length];
+    try {
+      const aiQuotesRaw = localStorage.getItem('milou_ai_quotes');
+      if (aiQuotesRaw) {
+        const aiQuotes = JSON.parse(aiQuotesRaw);
+        if (aiQuotes && aiQuotes.length > 0) {
+          quoteEl.textContent = aiQuotes[dagNr % aiQuotes.length];
+        } else { throw new Error('leeg'); }
+      } else { throw new Error('geen ai quotes'); }
+    } catch(e) {
+      // Fallback naar data.js quotes
+      if (typeof DAGQUOTES !== 'undefined' && DAGQUOTES.length) {
+        quoteEl.textContent = DAGQUOTES[dagNr % DAGQUOTES.length];
+      }
+    }
   }
 </script>
 </body>
