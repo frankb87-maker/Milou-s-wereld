@@ -1323,12 +1323,7 @@ const uurNu = new Date().getHours();
 const groet = uurNu < 12 ? 'Goedemorgen' : uurNu < 18 ? 'Goedemiddag' : 'Goedenavond';
 const dagTekstEl = document.getElementById('hero-dag-tekst');
 if (dagTekstEl) dagTekstEl.textContent = `${groet}, het is ${dagNu} 🌸`;
-
-const quoteEl = document.getElementById('dagquote');
-if (quoteEl) {
-  const dagNr = new Date().getDay();
-  quoteEl.textContent = DAGQUOTES[dagNr % DAGQUOTES.length];
-}
+// dagquote wordt geladen vanuit data.js
 
 const STEMMING_REACTIES = {
   '😊': ['Wat fijn! Geniet ervan! 🌟', 'Super! Jij straalt vandaag! ✨'],
@@ -1873,25 +1868,6 @@ RECEPTEN.forEach((r) => {
   receptGrid.appendChild(detail);
 });
 
-// ── POSITIEVE BERICHTEN ──
-const BERICHTEN = [
-  { tekst: "Jij bent moediger dan je denkt, sterker dan je voelt, en slimmer dan je gelooft.", sub: "En dat is echt zo 💚" },
-  { tekst: "Het is oké om soms niet lekker in je vel te zitten. Dat hoort bij het leven.", sub: "Je hoeft niet altijd sterk te zijn 🌸" },
-  { tekst: "Je mag fouten maken. Zo leer je. Fouten zijn geen mislukkingen.", sub: "Ze zijn gewoon stappen 🌱" },
-  { tekst: "Jouw creativiteit is een gave. Blijf tekenen, bakken en zingen!", sub: "De wereld heeft jou nodig 🎨" },
-  { tekst: "Zorgen voelen groot, maar ze gaan ook weer weg. Altijd.", sub: "En er zijn mensen die van je houden 💕" },
-  { tekst: "Jij doet het heel goed. Echt.", sub: "Vergeet dat niet 🌟" },
-  { tekst: "Elke dag naar school gaan is dapper. Zeker als het moeilijk voelt.", sub: "Trots op je 💪" },
-  { tekst: "Als je rustdag nodig hebt, neem die dan. Rust is geen zwakte.", sub: "Donderdag is er voor jou 🌿" },
-];
-
-function nieuwBericht() {
-  const r = BERICHTEN[Math.floor(Math.random() * BERICHTEN.length)];
-  document.getElementById('pk-bericht').textContent = r.tekst;
-  document.getElementById('pk-sub').textContent = r.sub;
-}
-nieuwBericht();
-
 // ── ADEMHALING ──
 let ademBezig = false, ademTimer = null;
 function startAdem() {
@@ -1965,103 +1941,25 @@ function volgendeVerjaardag() {
 }
 volgendeVerjaardag();
 
-// ── Y2K OUTFIT CODES Brookhaven ──
-// ✏️ BIJWERKEN: voeg nieuwe Y2K codes toe of verwijder verlopen
-const Y2K_CODES = [
-  { code: '6969788928', omschrijving: '👗 Y2K crop top roze', actief: true },
-  { code: '7082803949', omschrijving: '🩺 Y2K baggy jeans blauw', actief: true },
-  { code: '6256525985', omschrijving: '✨ Y2K glitter shirt zilver', actief: true },
-  { code: '5627819740', omschrijving: '🎀 Y2K butterfly top', actief: true },
-  { code: '7085704912', omschrijving: '🖤 Y2K zwart wit outfit', actief: true },
-];
-
-const y2kEl = document.getElementById('y2kCodes');
-if (y2kEl) {
-  Y2K_CODES.forEach(c => {
-    const div = document.createElement('div');
-    div.className = 'promo-item' + (c.actief ? '' : ' promo-verlopen');
-    div.innerHTML = `
-      <div style="flex:1">
-        <div class="promo-code">${c.code}</div>
-        <div class="promo-reward">${c.omschrijving}</div>
-      </div>
-      <span class="promo-copy">${c.actief ? '📋 Kopieer' : '❌ Verlopen'}</span>
-    `;
-    if (c.actief) {
-      div.onclick = () => {
-        navigator.clipboard.writeText(c.code).catch(()=>{});
-        div.querySelector('.promo-copy').textContent = '✅ Gekopieerd!';
-        setTimeout(()=> div.querySelector('.promo-copy').textContent = '📋 Kopieer', 2000);
-      };
-    }
-    y2kEl.appendChild(div);
-  });
-}
-
-// ── ROBLOX PROMO CODES ──
-// ✏️ BIJWERKEN: verwijder verlopen codes, voeg nieuwe toe
-const PROMO_CODES = [
-  { code: 'SPIDERCOLA',    reward: '🕷️ Spider Cola item',          actief: true  },
-  { code: 'TWEETROBLOX',   reward: '🐦 Gratis Tweet item',          actief: true  },
-  { code: 'ROBLOXEDU2021', reward: '🎓 Educatie item',              actief: false },
-  { code: 'AMAZONFRIEND22',reward: '🤝 Amazon Friend avatar item',  actief: true  },
-];
-
-const promoEl = document.getElementById('promoCodes');
-if (promoEl) {
-  PROMO_CODES.forEach(c => {
-    const div = document.createElement('div');
-    div.className = 'promo-item' + (c.actief ? '' : ' promo-verlopen');
-    div.innerHTML = `
-      <div>
-        <div class="promo-code">${c.code}</div>
-        <div class="promo-reward">${c.reward}</div>
-      </div>
-      <span class="promo-copy">${c.actief ? '📋 Kopieer' : '❌ Verlopen'}</span>
-    `;
-    if (c.actief) {
-      div.onclick = () => {
-        navigator.clipboard.writeText(c.code).catch(()=>{});
-        div.querySelector('.promo-copy').textContent = '✅ Gekopieerd!';
-        setTimeout(()=> div.querySelector('.promo-copy').textContent = '📋 Kopieer', 2000);
-      };
-    }
-    promoEl.appendChild(div);
-  });
-}
-
-// ── ROBLOX EVENTS ──
-// ✏️ BIJWERKEN: voeg nieuwe events toe, verwijder oude
-const ROBLOX_EVENTS = [
-  { emoji:'🌸', naam:'Egg Hunt 2025', info:'Verzamel paaseieren door heel Roblox — gratis prijzen!', badge:'actief', badgeClass:'badge-actief' },
-  { emoji:'🎨', naam:'Dress to Impress update', info:'Nieuwe kleding en accessories — check de game!', badge:'nieuw', badgeClass:'badge-nieuw' },
-  { emoji:'🏠', naam:'Adopt Me! Lente update', info:'Nieuwe lente huisdieren beschikbaar', badge:'actief', badgeClass:'badge-actief' },
-  { emoji:'🌟', naam:'Roblox Birthday Event', info:'Elk jaar in september — gratis items voor iedereen!', badge:'binnenkort', badgeClass:'badge-binnenkort' },
-];
-
-const eventsEl = document.getElementById('robloxEvents');
-if (eventsEl) {
-  ROBLOX_EVENTS.forEach(e => {
-    const div = document.createElement('div');
-    div.className = 'event-item';
-    div.innerHTML = `
-      <div class="event-emoji">${e.emoji}</div>
-      <div style="flex:1">
-        <div class="event-naam">${e.naam}</div>
-        <div class="event-info">${e.info}</div>
-      </div>
-      <span class="event-badge ${e.badgeClass}">${e.badge}</span>
-    `;
-    eventsEl.appendChild(div);
-  });
-}
-
 // ── KLEUR KOPIËREN ──
 function kopieer(kleur) {
   navigator.clipboard.writeText(kleur).catch(() => {});
   const el = document.getElementById('kopie-feedback');
   if (el) { el.textContent = `Gekopieerd: ${kleur} ✓`; setTimeout(() => el.textContent = '', 2000); }
 }
+
+// ── POSITIEVE BERICHTEN (geladen vanuit data.js) ──
+function nieuwBericht() {
+  if (typeof BERICHTEN === 'undefined') return;
+  const r = BERICHTEN[Math.floor(Math.random() * BERICHTEN.length)];
+  const el1 = document.getElementById('pk-bericht');
+  const el2 = document.getElementById('pk-sub');
+  if (el1) el1.textContent = r.tekst;
+  if (el2) el2.textContent = r.sub;
+}
 </script>
+
+<!-- 📦 Data bestand — pas data.js aan voor updates, niet dit bestand! -->
+<script src="data.js"></script>
 </body>
 </html>
