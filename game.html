@@ -143,15 +143,8 @@ header {
   margin-bottom: 14px; position: relative;
   min-height: 280px;
 }
-.avatar-wrap {
-  display: inline-block; position: relative;
-  width: 160px; height: 240px;
-}
-.avatar-laag {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 8rem; line-height: 1;
-  transition: all .3s;
+#avatarCanvas {
+  border-radius: 12px;
 }
 .avatar-score-pop {
   position: absolute; top: 10px; right: 10px;
@@ -331,14 +324,8 @@ header {
 
     <div class="timer-balk"><div class="timer-vul" id="timer-vul"></div></div>
 
-    <div class="avatar-area">
-      <div class="avatar-wrap" id="avatar-wrap">
-        <div class="avatar-laag" id="av-body"  style="z-index:1">🧍‍♀️</div>
-        <div class="avatar-laag" id="av-outfit" style="z-index:2;font-size:6rem"></div>
-        <div class="avatar-laag" id="av-haar"   style="z-index:3;font-size:5rem;top:-20px"></div>
-        <div class="avatar-laag" id="av-acc"    style="z-index:4;font-size:3rem;top:10px;right:-10px"></div>
-        <div class="avatar-laag" id="av-schoenen" style="z-index:4;font-size:2.5rem;bottom:0;top:auto"></div>
-      </div>
+    <div class="avatar-area" style="display:flex;align-items:center;justify-content:center;min-height:300px;position:relative">
+      <canvas id="avatarCanvas" style="display:block;max-width:100%;"></canvas>
       <div class="avatar-score-pop" id="score-pop">+100!</div>
     </div>
 
@@ -643,19 +630,94 @@ function renderDoelItems(lvl) {
 // ══════════════════════════════════════════════════
 //  AVATAR RENDER
 // ══════════════════════════════════════════════════
+//  CANVAS AVATAR
+// ══════════════════════════════════════════════════
 function renderAvatar() {
-  const cats = ['outfit','haar','acc','schoenen'];
-  const lagen = { outfit:'av-outfit', haar:'av-haar', acc:'av-acc', schoenen:'av-schoenen' };
-  cats.forEach(cat => {
-    const el = document.getElementById(lagen[cat]);
-    if (!el) return;
-    if (state.outfit[cat]) {
-      const item = Object.values(KLEDING).flat().find(k => k.id === state.outfit[cat]);
-      el.textContent = item ? item.emoji : '';
+  const canvas = document.getElementById('avatarCanvas');
+  if (!canvas) return;
+  const W = 200, H = 320;
+  canvas.width = W; canvas.height = H;
+  const c = canvas.getContext('2d');
+  c.clearRect(0, 0, W, H);
+
+  const outfit   = state.outfit.outfit   ? Object.values(KLEDING).flat().find(k=>k.id===state.outfit.outfit)   : null;
+  const haar     = state.outfit.haar     ? Object.values(KLEDING).flat().find(k=>k.id===state.outfit.haar)     : null;
+  const acc      = state.outfit.acc      ? Object.values(KLEDING).flat().find(k=>k.id===state.outfit.acc)      : null;
+  const schoenen = state.outfit.schoenen ? Object.values(KLEDING).flat().find(k=>k.id===state.outfit.schoenen) : null;
+
+  // Achtergrond podium
+  const podG = c.createRadialGradient(W/2,H,0,W/2,H,W*0.7);
+  podG.addColorStop(0,'rgba(255,77,166,0.15)'); podG.addColorStop(1,'transparent');
+  c.fillStyle = podG; c.fillRect(0,0,W,H);
+  // Podium ellips
+  c.fillStyle = 'rgba(255,77,166,0.12)';
+  c.beginPath(); c.ellipse(W/2, H-10, 55, 14, 0, 0, Math.PI*2); c.fill();
+
+  // Helper: teken emoji op juiste positie en SCHAAL
+  function em(emoji, x, y, size) {
+    c.font = size + 'px serif';
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+    c.fillText(emoji, x, y);
+  }
+
+  // ── 1. SCHOENEN (onderaan, klein) ──
+  if (schoenen) {
+    em(schoenen.emoji, W/2, H - 28, 36);
+  } else {
+    em('👟', W/2, H - 28, 32);
+  }
+
+  // ── 2. LICHAAM / OUTFIT ──
+  if (outfit) {
+    em(outfit.emoji, W/2, H - 130, 110);
+  } else {
+    // Basis lichaam
+    em('🧍‍♀️', W/2, H - 120, 130);
+  }
+
+  // ── 3. HAAR (boven het hoofd) ──
+  if (haar) {
+    em(haar.emoji, W/2, H - 242, 80);
+  }
+
+  // ── 4. ACCESSOIRES (op juiste plek) ──
+  if (acc) {
+    const id = acc.id;
+    if (id === 'a1') {
+      // Lippenstift → op mondpositie (klein, op gezicht)
+      em('💄', W/2 + 14, H - 218, 22);
+    } else if (id === 'a2') {
+      // Ring → op vinger (rechterhand, klein)
+      em('💍', W/2 + 44, H - 145, 18);
+    } else if (id === 'a3') {
+      // Bloem → in haar
+      em('🌸', W/2 + 30, H - 258, 24);
+    } else if (id === 'a4') {
+      // Ketting → om hals
+      em('📿', W/2, H - 195, 28);
+    } else if (id === 'a5') {
+      // Cap → op hoofd
+      em('🧢', W/2, H - 265, 48);
+    } else if (id === 'a6') {
+      // Zonnebril → op ogen
+      em('👓', W/2, H - 228, 30);
+    } else if (id === 'a7') {
+      // Strik → in haar
+      em('🎀', W/2 - 28, H - 262, 26);
+    } else if (id === 'a8') {
+      // Zilveren ketting → om hals
+      em('⛓️', W/2, H - 195, 26);
     } else {
-      el.textContent = '';
+      em(acc.emoji, W/2 + 40, H - 160, 22);
     }
-  });
+  }
+
+  // Glans spotlight
+  const spotG = c.createRadialGradient(W/2,0,0,W/2,0,H*0.7);
+  spotG.addColorStop(0,'rgba(255,255,255,0.04)');
+  spotG.addColorStop(1,'transparent');
+  c.fillStyle = spotG; c.fillRect(0,0,W,H);
 }
 
 // ══════════════════════════════════════════════════
