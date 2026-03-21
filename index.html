@@ -1721,7 +1721,6 @@ function updateKlok() {
   const nuMinuten = uur * 60 + nu.getMinutes();
 
   const isSchooldag = dag >= 1 && dag <= 5;  // ma t/m vr
-  const isZaterdag  = dag === 6;
 
   if (isRustdag) {
     // Donderdag = rustdag
