@@ -230,6 +230,16 @@
   }
   .kleur-dot:hover { transform: scale(1.15); }
 
+  /* ─── RUST THEMA GRID ─── */
+  .rust-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .rust-tile {
+    border-radius: 16px; padding: 16px 14px; transition: transform .2s;
+  }
+  .rust-tile:hover { transform: translateY(-2px); }
+  .rt-emoji { font-size: 1.8rem; margin-bottom: 6px; }
+  .rt-titel { font-weight: 900; font-size: 0.88rem; color: var(--text); margin-bottom: 4px; }
+  .rt-tekst { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+
   /* ─── LIVE KLOK ─── */
   .klok-card {
     background: linear-gradient(135deg, #2d1b4e, #1a1a3e, #0d2137);
@@ -1151,30 +1161,90 @@
   <div class="page-header">
     <div class="emoji">💚</div>
     <h1>Even Uitblazen</h1>
-    <p>Een rustig plekje voor jou</p>
+    <p>Een rustig plekje speciaal voor jou</p>
   </div>
 
-  <div class="card accent-mint">
-    <h2>🫁 Adem mee</h2>
-    <div class="adem-box">
-      <div class="adem-circle" id="ademCircle">🌿</div>
-      <div id="adem-tekst">Druk op start om te beginnen</div>
-      <button id="adem-btn" onclick="startAdem()">Start ▶</button>
-    </div>
-    <p style="font-size:0.82rem; color:var(--muted); text-align:center">
-      Diep ademhalen helpt als je je onrustig voelt. Doe dit 3 keer achter elkaar.
-    </p>
-  </div>
-
+  <!-- DAGELIJKS BERICHTJE -->
   <div class="card accent-lav">
-    <h2>💌 Een bericht voor jou</h2>
+    <h2>💌 Berichtje voor jou</h2>
     <div class="positief-kaart">
-      <div class="pk-tekst" id="pk-bericht">Laden...</div>
+      <div class="pk-tekst" id="pk-bericht">🌸</div>
       <div class="pk-sub" id="pk-sub"></div>
     </div>
     <button id="nieuw-bericht-btn" onclick="nieuwBericht()">🌸 Ander berichtje</button>
   </div>
 
+  <!-- ADEMHALING -->
+  <div class="card accent-mint">
+    <h2>🫁 Adem mee — kalmer worden</h2>
+    <div class="adem-box">
+      <div class="adem-circle" id="ademCircle">🌿</div>
+      <div id="adem-tekst">Druk op start om te beginnen</div>
+      <button id="adem-btn" onclick="startAdem()">Start ▶</button>
+    </div>
+    <p style="font-size:0.82rem;color:var(--muted);text-align:center">
+      Diep ademhalen helpt als je je onrustig voelt. Doe dit 3 keer achter elkaar.
+    </p>
+  </div>
+
+  <!-- RUST THEMA'S -->
+  <div class="card accent-sky">
+    <h2>😌 Wat helpt als je je gespannen voelt?</h2>
+    <p style="font-size:0.83rem;color:var(--muted);margin-bottom:14px">Kies iets wat bij jou past op dat moment:</p>
+    <div class="rust-grid">
+
+      <div class="rust-tile" style="background:linear-gradient(135deg,#fff0f5,#ffd6e7)">
+        <div class="rt-emoji">🎵</div>
+        <div class="rt-titel">Muziek & zingen</div>
+        <div class="rt-tekst">Zet je favoriete BLACKPINK nummer op en zing of dans mee. Muziek helpt echt!</div>
+      </div>
+
+      <div class="rust-tile" style="background:linear-gradient(135deg,#f0fff8,#c8f0e0)">
+        <div class="rt-emoji">🌿</div>
+        <div class="rt-titel">Frisse lucht</div>
+        <div class="rt-tekst">Ga even naar buiten of open een raam. Frisse lucht kalmeert je hoofd.</div>
+      </div>
+
+      <div class="rust-tile" style="background:linear-gradient(135deg,#fff8e0,#ffe4a0)">
+        <div class="rt-emoji">🎨</div>
+        <div class="rt-titel">Tekenen of kleuren</div>
+        <div class="rt-tekst">Je hand beweegt, je hoofd rust. Teken iets kleins — een bloem, een ster, wat dan ook.</div>
+      </div>
+
+      <div class="rust-tile" style="background:linear-gradient(135deg,#f0ecff,#d4c5f9)">
+        <div class="rt-emoji">🚿</div>
+        <div class="rt-titel">Warme douche</div>
+        <div class="rt-tekst">Een warme douche kalmeert je lichaam en hoofd. Bij opa en oma kun je ook lekker in bad! 🛁</div>
+      </div>
+
+      <div class="rust-tile" style="background:linear-gradient(135deg,#e8f8f0,#b2e8d0)">
+        <div class="rt-emoji">💬</div>
+        <div class="rt-titel">Praten helpt</div>
+        <div class="rt-tekst">Vertel mama of papa hoe je je voelt. Je hoeft het niet alleen te dragen.</div>
+      </div>
+
+      <div class="rust-tile" style="background:linear-gradient(135deg,#fff0f8,#f9c9e0)">
+        <div class="rt-emoji">🧸</div>
+        <div class="rt-titel">Knuffelen</div>
+        <div class="rt-tekst">Een knuffel van iemand die van je houdt — of gewoon je lievelingsknuffel vasthouden.</div>
+      </div>
+
+      <div class="rust-tile" style="background:linear-gradient(135deg,#f0f8ff,#c0d8f0)">
+        <div class="rt-emoji">📺</div>
+        <div class="rt-titel">Iets leuks kijken</div>
+        <div class="rt-tekst">Zet iets fijns op — een serie, BLACKPINK video's, of iets grappigs. Afleiding helpt ook.</div>
+      </div>
+
+      <div class="rust-tile" style="background:linear-gradient(135deg,#fffbe0,#ffeea0)">
+        <div class="rt-emoji">🍪</div>
+        <div class="rt-titel">Iets lekkers maken</div>
+        <div class="rt-tekst">Bak koekjes of maak een drankje. Bezig zijn in de keuken geeft je hoofd rust.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- OVER SHEIN -->
   <div class="card accent-yellow">
     <h2>🛡️ Over SHEIN — wat je moet weten</h2>
     <div class="geruststelling">
@@ -1184,24 +1254,13 @@
       🔬 <strong>Wat wetenschappers zeggen:</strong> Bij kleding gaat het om stoffen die in sommige producten meer aanwezig waren dan de regels toestaan. Dat klinkt eng, maar even dragen of bij je hebben betekent <em>niet</em> dat je ziek wordt.
     </div>
     <div class="geruststelling">
-      💪 <strong>Wat helpt:</strong> Als jij je ergens zorgen over maakt, mag je dat altijd zeggen. Je hoeft het niet alleen te dragen. Praat erover met mama of papa.
+      💪 <strong>Wat helpt:</strong> Als je je ergens zorgen over maakt, mag je dat altijd zeggen. Je hoeft het niet alleen te dragen. Praat erover met mama of papa.
     </div>
     <div class="geruststelling">
       🌱 <strong>Jij bent sterk.</strong> Zorgen hebben is normaal. Maar jij bent gezond, geliefd en er zijn mensen om je heen die voor je zorgen.
     </div>
   </div>
 
-  <div class="card accent-sky">
-    <h2>😌 Dingen die helpen als je je span voelt</h2>
-    <ul class="creative-list">
-      <li><span class="ci-emoji">🎵</span><div>Zet je favoriete BLACKPINK nummer op en zing mee</div></li>
-      <li><span class="ci-emoji">✏️</span><div>Teken iets — je hand beweegt, je hoofd rust</div></li>
-      <li><span class="ci-emoji">🚶</span><div>Beweeg even — ook naar de keuken lopen helpt</div></li>
-      <li><span class="ci-emoji">💬</span><div>Vertel mama of papa hoe je je voelt</div></li>
-      <li><span class="ci-emoji">🛁</span><div>Een warm bad of douche = echt rustgevend</div></li>
-      <li><span class="ci-emoji">📖</span><div>Lees een boek of kijk iets leuks</div></li>
-    </ul>
-  </div>
 </section>
 
 <!-- ══════════ ROBLOX ══════════ -->
@@ -2146,8 +2205,9 @@ function kopieer(kleur) {
 }
 
 // ── POSITIEVE BERICHTEN (geladen vanuit data.js) ──
+// Definitie hier zodat de knop hem altijd kan aanroepen
 function nieuwBericht() {
-  if (typeof BERICHTEN === 'undefined') return;
+  if (typeof BERICHTEN === 'undefined' || !BERICHTEN.length) return;
   const r = BERICHTEN[Math.floor(Math.random() * BERICHTEN.length)];
   const el1 = document.getElementById('pk-bericht');
   const el2 = document.getElementById('pk-sub');
@@ -2158,5 +2218,9 @@ function nieuwBericht() {
 
 <!-- 📦 Data bestand — pas data.js aan voor updates, niet dit bestand! -->
 <script src="data.js"></script>
+<script>
+  // Laad het eerste berichtje nádat data.js geladen is
+  nieuwBericht();
+</script>
 </body>
 </html>
