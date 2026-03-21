@@ -230,7 +230,43 @@
   }
   .kleur-dot:hover { transform: scale(1.15); }
 
-  /* ─── RUST PAGINA ─── */
+  /* ─── LIVE KLOK ─── */
+  .klok-card {
+    background: linear-gradient(135deg, #2d1b4e, #1a1a3e, #0d2137);
+    border-radius: 24px; padding: 28px 20px;
+    text-align: center; margin-bottom: 14px;
+    box-shadow: 0 8px 32px rgba(60,20,100,0.3);
+  }
+  .klok-tijd {
+    font-family: 'Nunito', monospace;
+    font-size: 3.8rem; font-weight: 900;
+    color: white; letter-spacing: 2px;
+    line-height: 1; margin-bottom: 6px;
+    text-shadow: 0 0 20px rgba(200,160,255,0.5);
+  }
+  .klok-datum {
+    font-size: 1rem; font-weight: 700;
+    color: rgba(255,255,255,0.75); margin-bottom: 10px;
+  }
+  .klok-dag-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: white; font-weight: 800; font-size: 0.85rem;
+    padding: 5px 16px; border-radius: 50px;
+    backdrop-filter: blur(4px);
+  }
+
+  /* ─── SLIMME MELDING ─── */
+  .slim-card {
+    border-radius: 18px; padding: 16px 18px;
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 14px;
+    font-weight: 700;
+  }
+  .slim-emoji { font-size: 2.2rem; flex-shrink: 0; }
+  .slim-titel { font-size: 1rem; font-weight: 900; color: var(--text); }
+  .slim-sub   { font-size: 0.82rem; color: var(--muted); margin-top: 2px; line-height: 1.5; }
   .adem-box {
     text-align: center;
     padding: 28px 20px;
@@ -591,6 +627,22 @@
     <div class="emoji">🗓️</div>
     <h1>Mijn Schema</h1>
     <p>Rust begint met weten wat er komt</p>
+  </div>
+
+  <!-- LIVE KLOK & DAG -->
+  <div class="klok-card" id="klokCard">
+    <div class="klok-tijd" id="klokTijd">--:--</div>
+    <div class="klok-datum" id="klokDatum">laden...</div>
+    <div class="klok-dag-badge" id="klokDagBadge"></div>
+  </div>
+
+  <!-- SLIMME MELDING — past zich aan op dag/tijd -->
+  <div class="slim-card" id="slimCard">
+    <div class="slim-emoji" id="slimEmoji">⏳</div>
+    <div>
+      <div class="slim-titel" id="slimTitel">Even laden...</div>
+      <div class="slim-sub" id="slimSub"></div>
+    </div>
   </div>
 
   <div class="card accent-pink">
@@ -1379,6 +1431,151 @@ SCHEMA.forEach(item => {
   `;
   grid.appendChild(div);
 });
+
+// ── LIVE KLOK & SLIMME MELDING ──
+const MAANDEN   = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+const WEEKDAGEN = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'];
+
+function updateKlok() {
+  const nu    = new Date();
+  const uur   = nu.getHours();
+  const min   = String(nu.getMinutes()).padStart(2,'0');
+  const sec   = String(nu.getSeconds()).padStart(2,'0');
+  const dag   = nu.getDay();        // 0=zo, 1=ma ... 6=za
+  const datum = nu.getDate();
+  const maand = MAANDEN[nu.getMonth()];
+  const jaar  = nu.getFullYear();
+  const dagNaam = WEEKDAGEN[dag];
+
+  // Klok
+  const tijdEl = document.getElementById('klokTijd');
+  const datumEl = document.getElementById('klokDatum');
+  const badgeEl = document.getElementById('klokDagBadge');
+  if (tijdEl)  tijdEl.textContent  = `${String(uur).padStart(2,'0')}:${min}:${sec}`;
+  if (datumEl) datumEl.textContent = `${dagNaam} ${datum} ${maand} ${jaar}`;
+
+  // Badge kleur per dag
+  const isWeekend  = dag === 0 || dag === 6;
+  const isVrijdag  = dag === 5;
+  const isZaterdag = dag === 6;
+  const isRustdag  = dag === 4; // donderdag
+  let badgeTekst = dagNaam;
+  if (isRustdag)          badgeTekst = '🌿 Rustdag!';
+  else if (isVrijdag)     badgeTekst = '🎉 Weekend begint!';
+  else if (isZaterdag)    badgeTekst = '🌟 Zaterdag!';
+  else if (dag === 0)     badgeTekst = '😴 Zondag';
+  if (badgeEl) badgeEl.textContent = badgeTekst;
+
+  // ── Slimme melding — per dag én tijdstip ──
+  const slimCard  = document.getElementById('slimCard');
+  const slimEmoji = document.getElementById('slimEmoji');
+  const slimTitel = document.getElementById('slimTitel');
+  const slimSub   = document.getElementById('slimSub');
+  if (!slimCard) return;
+
+  let emoji = '🌸', titel = '', sub = '', kleur = '#fff8fb';
+
+  // Slaaptijd logica
+  const bedtijdWerkdag = 19 * 60 + 30;  // 19:30
+  const bedtijdWeekend = 22 * 60;        // 22:00
+  const opstaaanTijd   = 7 * 60;         // 07:00
+  const nuMinuten = uur * 60 + nu.getMinutes();
+
+  const isSchooldag = dag >= 1 && dag <= 4;  // ma t/m do
+  const isWeekendNacht = isVrijdag || isZaterdag;
+
+  if (isRustdag) {
+    // Donderdag = rustdag
+    if (uur < 7) {
+      emoji = '😴'; titel = 'Nog even slapen!';
+      sub = 'Je wekker gaat om 07:00 uur.'; kleur = '#eee6ff';
+    } else if (uur < 12) {
+      emoji = '🌿'; titel = 'Goedemorgen! Het is jouw rustdag 🎉';
+      sub = 'Geen school vandaag. Geniet ervan!'; kleur = '#f0fff8';
+    } else if (uur < 17) {
+      emoji = '🎨'; titel = 'Rustdag middag ☀️';
+      sub = 'Doe iets leuks — tekenen, bakken of gewoon niets!'; kleur = '#fffbe0';
+    } else if (nuMinuten < bedtijdWerkdag) {
+      emoji = '🌙'; titel = `Bijna bedtijd! Om 19:30 uur naar bed.`;
+      sub = `Nog ${bedtijdWerkdag - nuMinuten} minuten. Leg je tas alvast klaar voor morgen!`; kleur = '#eee6ff';
+    } else {
+      emoji = '🌙'; titel = 'Het is bedtijd! 😴';
+      sub = 'Slaap lekker. Morgen is het vrijdag!'; kleur = '#e8e0ff';
+    }
+  } else if (isSchooldag) {
+    if (nuMinuten < opstaaanTijd) {
+      emoji = '😴'; titel = 'Nog even slapen!';
+      sub = 'Je wekker gaat om 07:00 uur.'; kleur = '#eee6ff';
+    } else if (uur < 8) {
+      emoji = '🎒'; titel = 'Goedemorgen! Tijd om op te staan.';
+      sub = 'Vergeet je tas niet. Fijne schooldag!'; kleur = '#fff8e0';
+    } else if (uur < 12) {
+      emoji = '✏️'; titel = 'Nu op school!';
+      sub = `Vandaag: ${SCHEMA.find(s=>s.dag===dagNaam)?.juf || 'juf op school'}`; kleur = '#fff0f5';
+    } else if (uur < 14) {
+      emoji = '🥪'; titel = 'Lunchtijd!';
+      sub = 'Even uitrusten en eten.'; kleur = '#f0fff8';
+    } else if (uur < 16) {
+      emoji = '📚'; titel = 'Middag op school';
+      sub = 'Bijna klaar voor vandaag!'; kleur = '#fff0f5';
+    } else if (uur < 18) {
+      emoji = '🏠'; titel = 'Thuis! Lekker uitrusten.';
+      sub = 'Huiswerk eerst, dan lekker spelen!'; kleur = '#f0fff8';
+    } else if (nuMinuten < bedtijdWerkdag) {
+      const over = bedtijdWerkdag - nuMinuten;
+      emoji = '🌙'; titel = `Nog ${over} minuten tot bedtijd (19:30).`;
+      sub = 'Leg je spullen al klaar voor morgen!'; kleur = '#eee6ff';
+    } else {
+      emoji = '🌙'; titel = 'Het is bedtijd! 😴';
+      sub = 'Telefoon uit, lekker slapen. Morgen is een nieuwe dag 🌸'; kleur = '#e8e0ff';
+    }
+  } else if (isVrijdag) {
+    if (uur < 7) {
+      emoji = '😴'; titel = 'Nog even slapen!'; sub = 'Wekker om 07:00.'; kleur = '#eee6ff';
+    } else if (uur < 16) {
+      emoji = '🎉'; titel = 'Vrijdag! Weekend begint vanavond 🥳';
+      sub = `Vandaag: ${SCHEMA.find(s=>s.dag==='Vrijdag')?.juf || 'Juf Romy'}`; kleur = '#fff8e0';
+    } else if (nuMinuten < bedtijdWeekend) {
+      const over = bedtijdWeekend - nuMinuten;
+      emoji = '🌟'; titel = `Vrijdagavond 🎉 Nog ${over} min tot bedtijd (22:00).`;
+      sub = 'Geniet van je vrije avond!'; kleur = '#fff0f0';
+    } else {
+      emoji = '🌙'; titel = 'Bedtijd! (22:00) 😴';
+      sub = 'Morgen mag je uitslapen. Slaap lekker!'; kleur = '#e8e0ff';
+    }
+  } else if (isZaterdag) {
+    if (nuMinuten < bedtijdWeekend) {
+      emoji = '🎮'; titel = 'Zaterdag! Lekker vrij 🌈';
+      sub = 'Spelen, tekenen, BLACKPINK — doe wat je leuk vindt!'; kleur = '#f0f8ff';
+    } else {
+      emoji = '🌙'; titel = 'Bedtijd! (22:00) 😴';
+      sub = 'Morgen opstaan om 07:00. Slaap lekker!'; kleur = '#e8e0ff';
+    }
+  } else {
+    // Zondag
+    if (nuMinuten < opstaaanTijd) {
+      emoji = '😴'; titel = 'Nog even slapen!'; sub = 'Wekker om 07:00.'; kleur = '#eee6ff';
+    } else if (uur < 18) {
+      emoji = '☀️'; titel = 'Zondag!';
+      sub = 'Geniet van de dag. Vanavond vroeg naar bed — morgen is het maandag!'; kleur = '#fff8e0';
+    } else if (nuMinuten < bedtijdWerkdag) {
+      const over = bedtijdWerkdag - nuMinuten;
+      emoji = '🌙'; titel = `Bijna bedtijd! Nog ${over} minuten.`;
+      sub = 'Leg je tas alvast klaar voor morgen.'; kleur = '#eee6ff';
+    } else {
+      emoji = '🌙'; titel = 'Bedtijd! (19:30) 😴';
+      sub = 'Morgen begint de week weer. Slaap lekker 🌸'; kleur = '#e8e0ff';
+    }
+  }
+
+  slimCard.style.background = kleur;
+  slimEmoji.textContent = emoji;
+  slimTitel.textContent  = titel;
+  slimSub.textContent    = sub;
+}
+
+updateKlok();
+setInterval(updateKlok, 1000); // update elke seconde
 
 // ── RECEPTEN ──
 const RECEPTEN = [
