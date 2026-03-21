@@ -588,11 +588,11 @@
       <div class="hero-widget" id="stemming-widget">
         <div class="hw-label">Hoe voel jij je vandaag?</div>
         <div class="hw-stemmingen">
-          <button onclick="kiesStemming('😊','Super!')" class="hw-btn">😊</button>
-          <button onclick="kiesStemming('🥰','Liefdevol!')" class="hw-btn">🥰</button>
-          <button onclick="kiesStemming('😐','Gewoon')" class="hw-btn">😐</button>
-          <button onclick="kiesStemming('😴','Moe')" class="hw-btn">😴</button>
-          <button onclick="kiesStemming('😢','Niet zo fijn')" class="hw-btn">😢</button>
+          <button onclick="kiesStemming(event,'😊','Super!')" class="hw-btn">😊</button>
+          <button onclick="kiesStemming(event,'🥰','Liefdevol!')" class="hw-btn">🥰</button>
+          <button onclick="kiesStemming(event,'😐','Gewoon')" class="hw-btn">😐</button>
+          <button onclick="kiesStemming(event,'😴','Moe')" class="hw-btn">😴</button>
+          <button onclick="kiesStemming(event,'😢','Niet zo fijn')" class="hw-btn">😢</button>
         </div>
         <div id="stemming-reactie" style="min-height:20px;font-size:0.85rem;font-weight:700;color:rgba(255,255,255,0.9);margin-top:6px"></div>
       </div>
@@ -1603,9 +1603,9 @@ const STEMMING_REACTIES = {
   '😢': ['Dat is oké. Slechte dagen horen erbij. Je bent niet alleen 💕', 'Ik hoor je. Misschien helpt een knuffel of muziek? 🎵'],
 };
 
-function kiesStemming(emoji, label) {
+function kiesStemming(e, emoji, label) {
   document.querySelectorAll('.hw-btn').forEach(b => b.classList.remove('gekozen'));
-  event.target.classList.add('gekozen');
+  if (e && e.currentTarget) e.currentTarget.classList.add('gekozen');
 
   // Sla op
   slaStemmingOp(emoji, label);
@@ -1743,15 +1743,17 @@ function updateKlok() {
       emoji = '📚'; titel = 'Middag op school';
       sub = 'Bijna klaar voor vandaag!'; kleur = '#fff0f5';
     } else if (uur < 18) {
-      emoji = '🏠'; titel = 'Thuis! Lekker uitrusten.';
-      sub = 'Huiswerk eerst, dan lekker spelen!'; kleur = '#f0fff8';
+      emoji = isVrijdag ? '🎉' : '🏠';
+      titel  = isVrijdag ? 'School is klaar! Fijn weekend! 🎉' : 'Thuis! Lekker uitrusten.';
+      sub    = isVrijdag ? 'Morgen mag je lekker uitslapen!' : 'Huiswerk eerst, dan lekker spelen!';
+      kleur  = isVrijdag ? '#fff8e0' : '#f0fff8';
     } else if (nuMinuten < bedtijdWerkdag) {
       const over = bedtijdWerkdag - nuMinuten;
       emoji = '🌙'; titel = `Nog ${over} minuten tot bedtijd (19:30).`;
-      sub = 'Leg je spullen al klaar voor morgen!'; kleur = '#eee6ff';
+      sub = isVrijdag ? 'Morgen mag je uitslapen! Slaap lekker 🌸' : 'Leg je spullen al klaar voor morgen!'; kleur = '#eee6ff';
     } else {
       emoji = '🌙'; titel = 'Het is bedtijd! 😴';
-      sub = 'Telefoon uit, lekker slapen. Morgen is een nieuwe dag 🌸'; kleur = '#e8e0ff';
+      sub = isVrijdag ? 'Slaap lekker. Morgen mag je uitslapen! 🌸' : 'Telefoon uit, lekker slapen. Morgen is een nieuwe dag 🌸'; kleur = '#e8e0ff';
     }
   } else if (isZaterdag) {
     if (nuMinuten < bedtijdWeekend) {
