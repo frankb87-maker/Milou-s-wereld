@@ -715,11 +715,46 @@
   </div>
 
   <div class="card accent-lav">
-    <h2>💡 Handige herinnering</h2>
-    <ul style="padding-left:18px; line-height:2; font-size:0.9rem; color:var(--muted)">
+    <h2>💡 Handige herinneringen</h2>
+
+    <p style="font-size:0.8rem;font-weight:800;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">🎒 Tas klaarmaken de avond ervoor</p>
+    <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+      <li style="background:#f0fff8;border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px;font-size:0.88rem;font-weight:700">
+        <span style="font-size:1.3rem">🍎</span>
+        <div>
+          <div>Wat voor <strong>fruit</strong> wil je mee?</div>
+          <div style="font-size:0.75rem;color:var(--muted);margin-top:2px">Appel, banaan, mandarijn, druiven...</div>
+        </div>
+      </li>
+      <li style="background:#fff8e0;border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px;font-size:0.88rem;font-weight:700">
+        <span style="font-size:1.3rem">🥪</span>
+        <div>
+          <div>Wat wil je op je <strong>brood</strong>?</div>
+          <div style="font-size:0.75rem;color:var(--muted);margin-top:2px">Beleg alvast klaarzetten of vragen aan mama/papa</div>
+        </div>
+      </li>
+      <li style="background:#f0f8ff;border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px;font-size:0.88rem;font-weight:700">
+        <span style="font-size:1.3rem">🥤</span>
+        <div>
+          <div>Wat wil je <strong>drinken</strong> mee?</div>
+          <div style="font-size:0.75rem;color:var(--muted);margin-top:2px">Flesje water, pakje drinken, thermoskan...</div>
+        </div>
+      </li>
+      <li style="background:#fff0f5;border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px;font-size:0.88rem;font-weight:700">
+        <span style="font-size:1.3rem">🍪</span>
+        <div>
+          <div>Iets <strong>lekkers tussendoor</strong>?</div>
+          <div style="font-size:0.75rem;color:var(--muted);margin-top:2px">Een koekje, reepje, of iets anders kleins</div>
+        </div>
+      </li>
+    </ul>
+
+    <p style="font-size:0.8rem;font-weight:800;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">✅ Nog meer checken</p>
+    <ul style="padding-left:18px;line-height:2.1;font-size:0.9rem;color:var(--muted)">
       <li>Op <strong>donderdag</strong> is het jouw rustdag 🌿</li>
-      <li>Leg je tas de avond van tevoren klaar</li>
-      <li>Zet je telefoon op stil voor het slapen</li>
+      <li>Tas klaar zetten de avond van tevoren</li>
+      <li>Telefoon op stil voor het slapen</li>
+      <li>Gymkleren in de tas als je gym hebt</li>
     </ul>
   </div>
 </section>
@@ -2205,7 +2240,6 @@ function kopieer(kleur) {
 }
 
 // ── POSITIEVE BERICHTEN (geladen vanuit data.js) ──
-// Definitie hier zodat de knop hem altijd kan aanroepen
 function nieuwBericht() {
   if (typeof BERICHTEN === 'undefined' || !BERICHTEN.length) return;
   const r = BERICHTEN[Math.floor(Math.random() * BERICHTEN.length)];
@@ -2219,7 +2253,17 @@ function nieuwBericht() {
 <!-- 📦 Data bestand — pas data.js aan voor updates, niet dit bestand! -->
 <script src="data.js"></script>
 <script>
-  // Laad het eerste berichtje nádat data.js geladen is
+  // ── Alles dat DAGQUOTES en BERICHTEN nodig heeft, laad HIER ──
+  // (pas nadat data.js volledig geladen is)
+
+  // Dagquote op home
+  const quoteEl = document.getElementById('dagquote');
+  if (quoteEl && typeof DAGQUOTES !== 'undefined') {
+    const dagNr = new Date().getDay();
+    quoteEl.textContent = DAGQUOTES[dagNr % DAGQUOTES.length];
+  }
+
+  // Eerste positieve bericht
   nieuwBericht();
 </script>
 </body>

@@ -189,13 +189,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const eventsEl = document.getElementById('robloxEvents');
   if (eventsEl) ROBLOX_EVENTS.forEach(e => renderEvent(e, eventsEl));
 
-  // Positieve berichten (rust-pagina)
-  if (typeof nieuwBericht === 'function') nieuwBericht();
-
-  // Home dagquote
-  const quoteEl = document.getElementById('dagquote');
-  if (quoteEl) {
-    const dagNr = new Date().getDay();
-    quoteEl.textContent = DAGQUOTES[dagNr % DAGQUOTES.length];
-  }
+  // Dagquote en berichten worden geladen vanuit het inline script-blok
+  // onderaan index.html, nádat data.js is ingeladen.
 });
