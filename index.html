@@ -2369,32 +2369,44 @@ function kopieer(kleur) {
   if (el) { el.textContent = `Gekopieerd: ${kleur} ✓`; setTimeout(() => el.textContent = '', 2000); }
 }
 
-// ── POSITIEVE BERICHTEN (geladen vanuit data.js) ──
+// ── POSITIEVE BERICHTEN ──
+// Hier als fallback zodat het altijd werkt, ook als data.js nog laadt
+const BERICHTEN_FALLBACK = [
+  { tekst: "Jij bent moediger dan je denkt, sterker dan je voelt, en slimmer dan je gelooft.", sub: "En dat is echt zo 💚" },
+  { tekst: "Het is oké om soms niet lekker in je vel te zitten. Dat hoort bij het leven.", sub: "Je hoeft niet altijd sterk te zijn 🌸" },
+  { tekst: "Je mag fouten maken. Zo leer je. Fouten zijn geen mislukkingen.", sub: "Ze zijn gewoon stappen 🌱" },
+  { tekst: "Jouw creativiteit is een gave. Blijf tekenen, bakken en zingen!", sub: "De wereld heeft jou nodig 🎨" },
+  { tekst: "Zorgen voelen groot, maar ze gaan ook weer weg. Altijd.", sub: "En er zijn mensen die van je houden 💕" },
+  { tekst: "Jij doet het heel goed. Echt.", sub: "Vergeet dat niet 🌟" },
+  { tekst: "Elke dag naar school gaan is dapper. Zeker als het moeilijk voelt.", sub: "Trots op je 💪" },
+  { tekst: "Als je rustdag nodig hebt, neem die dan. Rust is geen zwakte.", sub: "Donderdag is er voor jou 🌿" },
+  { tekst: "Je bent lief, grappig en slim. Vergeet dat nooit.", sub: "Mama en papa zijn zo trots op je! 💕" },
+  { tekst: "Ademen helpt. Probeer het maar.", sub: "In... en uit... alles komt goed 🌬️" },
+];
+
 function nieuwBericht() {
-  if (typeof BERICHTEN === 'undefined' || !BERICHTEN.length) return;
-  const r = BERICHTEN[Math.floor(Math.random() * BERICHTEN.length)];
+  // Gebruik BERICHTEN uit data.js als die geladen is, anders de fallback
+  const lijst = (typeof BERICHTEN !== 'undefined' && BERICHTEN.length) ? BERICHTEN : BERICHTEN_FALLBACK;
+  const r = lijst[Math.floor(Math.random() * lijst.length)];
   const el1 = document.getElementById('pk-bericht');
   const el2 = document.getElementById('pk-sub');
   if (el1) el1.textContent = r.tekst;
   if (el2) el2.textContent = r.sub;
 }
+
+// Laad meteen het eerste bericht — werkt altijd dankzij fallback
+nieuwBericht();
 </script>
 
 <!-- 📦 Data bestand — pas data.js aan voor updates, niet dit bestand! -->
 <script src="data.js"></script>
 <script>
-  // ── Alles dat DAGQUOTES en BERICHTEN nodig heeft, laad HIER ──
-  // (pas nadat data.js volledig geladen is)
-
-  // Dagquote op home
+  // Dagquote op home — laad nadat data.js geladen is
   const quoteEl = document.getElementById('dagquote');
   if (quoteEl && typeof DAGQUOTES !== 'undefined') {
     const dagNr = new Date().getDay();
     quoteEl.textContent = DAGQUOTES[dagNr % DAGQUOTES.length];
   }
-
-  // Eerste positieve bericht
-  nieuwBericht();
 </script>
 </body>
 </html>
