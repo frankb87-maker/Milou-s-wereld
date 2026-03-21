@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Milou's Wereld 🌸</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
+<!-- EmailJS voor wekelijkse stemmingsmail -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+  // ✏️ Vervang 'JOUW_PUBLIC_KEY' met jouw EmailJS Public Key
+  emailjs.init('WTRRhFmease4280Ro');
+</script>
 <style>
   :root {
     --pink:    #f7a8c4;
@@ -1471,6 +1477,124 @@ const dagTekstEl = document.getElementById('hero-dag-tekst');
 if (dagTekstEl) dagTekstEl.textContent = `${groet}, het is ${dagNu} 🌸`;
 // dagquote wordt geladen vanuit data.js
 
+// ════════════════════════════════════════════════════════
+//  📊 STEMMING TRACKING & WEKELIJKSE EMAIL
+// ════════════════════════════════════════════════════════
+
+// ── Stemming opslaan in localStorage ──
+function slaStemmingOp(emoji, label) {
+  const nu      = new Date();
+  const datumKey = `${nu.getFullYear()}-${String(nu.getMonth()+1).padStart(2,'0')}-${String(nu.getDate()).padStart(2,'0')}`;
+  const dagNaamNu = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'][nu.getDay()];
+  const tijdStr  = `${String(nu.getHours()).padStart(2,'0')}:${String(nu.getMinutes()).padStart(2,'0')}`;
+
+  // Lees bestaande week-data
+  let weekData = {};
+  try { weekData = JSON.parse(localStorage.getItem('milou_stemmingen') || '{}'); } catch(e) {}
+
+  // Voeg toe (meerdere stemmingen op één dag zijn OK)
+  if (!weekData[datumKey]) weekData[datumKey] = [];
+  weekData[datumKey].push({ emoji, label, dag: dagNaamNu, tijd: tijdStr, timestamp: nu.toISOString() });
+
+  localStorage.setItem('milou_stemmingen', JSON.stringify(weekData));
+  return weekData;
+}
+
+// ── Bouw het email-overzicht op ──
+function bouwWeekOverzicht(weekData) {
+  const dagNamenNL = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'];
+  const nu = new Date();
+
+  // Laatste 7 dagen
+  let overzicht = '';
+  let totaalStemmingen = 0;
+  let stemmingTelling = { '😊':0, '🥰':0, '😐':0, '😴':0, '😢':0 };
+
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(nu);
+    d.setDate(d.getDate() - i);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const dagNaam = dagNamenNL[d.getDay()];
+    const datumStr = `${d.getDate()} ${['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'][d.getMonth()]}`;
+
+    if (weekData[key] && weekData[key].length > 0) {
+      const items = weekData[key];
+      totaalStemmingen += items.length;
+      items.forEach(s => { if (stemmingTelling[s.emoji] !== undefined) stemmingTelling[s.emoji]++; });
+      const stemmingRegel = items.map(s => `${s.emoji} ${s.label} (${s.tijd})`).join(', ');
+      overzicht += `${dagNaam} ${datumStr}: ${stemmingRegel}\n`;
+    } else {
+      overzicht += `${dagNaam} ${datumStr}: geen stemming ingevuld\n`;
+    }
+  }
+
+  // Samenvatting
+  const vaakst = Object.entries(stemmingTelling).sort((a,b) => b[1]-a[1])[0];
+  const samenvatting = totaalStemmingen === 0
+    ? 'Milou heeft deze week geen stemmingen ingevuld.'
+    : `Milou vulde ${totaalStemmingen}x een stemming in. Meest voorkomend: ${vaakst[0]} (${vaakst[1]}x).`;
+
+  return { overzicht, samenvatting, stemmingTelling, totaalStemmingen };
+}
+
+// ── Verstuur weekmail via EmailJS ──
+function verstuurWeekmail(weekData) {
+  const { overzicht, samenvatting, stemmingTelling, totaalStemmingen } = bouwWeekOverzicht(weekData);
+  const nu = new Date();
+  const weekStr = `week van ${nu.getDate()-6} t/m ${nu.getDate()} ${['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'][nu.getMonth()]} ${nu.getFullYear()}`;
+
+  const templateParams = {
+    to_email_1:   'frankburrei@gmail.com',
+    to_email_2:   'marleenhomminga@gmail.com',
+    week_periode: weekStr,
+    samenvatting: samenvatting,
+    overzicht:    overzicht,
+    blij:         stemmingTelling['😊'] + stemmingTelling['🥰'],
+    gewoon:       stemmingTelling['😐'],
+    moe_verdrietig: stemmingTelling['😴'] + stemmingTelling['😢'],
+    totaal:       totaalStemmingen,
+  };
+
+  // Stuur naar beide adressen
+  emailjs.send(
+    'service_po4zbha',
+    'template_bilthjo',
+    templateParams
+  ).then(() => {
+    console.log('✅ Weekoverzicht verstuurd naar frank & marleen');
+    localStorage.setItem('milou_laatste_mail', new Date().toISOString());
+  }).catch(err => {
+    console.error('❌ EmailJS fout:', err);
+  });
+}
+
+// ── Controleer elke zondag of de mail al verstuurd is ──
+function checkZondagMail() {
+  const nu = new Date();
+  const isZondag = nu.getDay() === 0;
+  const isAvond  = nu.getHours() >= 19; // na 19:00
+
+  if (!isZondag || !isAvond) return;
+
+  // Voorkom dubbele verzending
+  const laatsteMail = localStorage.getItem('milou_laatste_mail');
+  if (laatsteMail) {
+    const laats = new Date(laatsteMail);
+    const vandaagDate = `${nu.getFullYear()}-${nu.getMonth()}-${nu.getDate()}`;
+    const laaatsteDate = `${laats.getFullYear()}-${laats.getMonth()}-${laats.getDate()}`;
+    if (vandaagDate === laaatsteDate) return; // al verstuurd vandaag
+  }
+
+  let weekData = {};
+  try { weekData = JSON.parse(localStorage.getItem('milou_stemmingen') || '{}'); } catch(e) {}
+  verstuurWeekmail(weekData);
+}
+
+// Controleer bij opstarten en daarna elk uur
+checkZondagMail();
+setInterval(checkZondagMail, 60 * 60 * 1000);
+
+// ── kiesStemming: opslaan + tonen ──
 const STEMMING_REACTIES = {
   '😊': ['Wat fijn! Geniet ervan! 🌟', 'Super! Jij straalt vandaag! ✨'],
   '🥰': ['Aah wat lief! Geniet van dat fijne gevoel 💕', 'Zo mooi! Je bent geliefd! 🌸'],
@@ -1478,9 +1602,15 @@ const STEMMING_REACTIES = {
   '😴': ['Doe het rustig aan vandaag. Jij mag ook uitrusten 😴', 'Moe zijn mag. Zorg goed voor jezelf 🌙'],
   '😢': ['Dat is oké. Slechte dagen horen erbij. Je bent niet alleen 💕', 'Ik hoor je. Misschien helpt een knuffel of muziek? 🎵'],
 };
+
 function kiesStemming(emoji, label) {
   document.querySelectorAll('.hw-btn').forEach(b => b.classList.remove('gekozen'));
   event.target.classList.add('gekozen');
+
+  // Sla op
+  slaStemmingOp(emoji, label);
+
+  // Toon reactie
   const reacties = STEMMING_REACTIES[emoji] || ['Bedankt dat je het deelt 💚'];
   const r = reacties[Math.floor(Math.random() * reacties.length)];
   const el = document.getElementById('stemming-reactie');
