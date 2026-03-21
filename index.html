@@ -51,6 +51,7 @@
   nav {
     position: sticky; top: 0; z-index: 100;
     background: rgba(253,246,250,0.92);
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     border-bottom: 2px solid var(--pink2);
     padding: 12px 20px;
@@ -546,6 +547,7 @@
   }
   .hero-widget {
     background: rgba(255,255,255,0.15);
+    -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     border-radius: 16px; padding: 14px;
     border: 1px solid rgba(255,255,255,0.25);
@@ -1571,14 +1573,14 @@
   <div class="card accent-yellow">
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center">
       <div id="kleur-kiezer" style="display:flex;gap:6px;flex-wrap:wrap">
-        <button onclick="setTekenKleur('#e63946')" style="width:32px;height:32px;border-radius:50%;background:#e63946;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
-        <button onclick="setTekenKleur('#f7a8c4')" style="width:32px;height:32px;border-radius:50%;background:#f7a8c4;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
-        <button onclick="setTekenKleur('#ff9f1c')" style="width:32px;height:32px;border-radius:50%;background:#ff9f1c;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
-        <button onclick="setTekenKleur('#2ec4b6')" style="width:32px;height:32px;border-radius:50%;background:#2ec4b6;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
-        <button onclick="setTekenKleur('#a8e6cf')" style="width:32px;height:32px;border-radius:50%;background:#a8e6cf;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
-        <button onclick="setTekenKleur('#c9b8f0')" style="width:32px;height:32px;border-radius:50%;background:#c9b8f0;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
-        <button onclick="setTekenKleur('#1a1a2e')" style="width:32px;height:32px;border-radius:50%;background:#1a1a2e;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
-        <button onclick="setTekenKleur('#ffffff')" style="width:32px;height:32px;border-radius:50%;background:#ffffff;border:3px solid #ddd;cursor:pointer" class="teken-kleur-btn" title="Gum"></button>
+        <button onclick="setTekenKleur('#e63946',this)" style="width:32px;height:32px;border-radius:50%;background:#e63946;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
+        <button onclick="setTekenKleur('#f7a8c4',this)" style="width:32px;height:32px;border-radius:50%;background:#f7a8c4;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
+        <button onclick="setTekenKleur('#ff9f1c',this)" style="width:32px;height:32px;border-radius:50%;background:#ff9f1c;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
+        <button onclick="setTekenKleur('#2ec4b6',this)" style="width:32px;height:32px;border-radius:50%;background:#2ec4b6;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
+        <button onclick="setTekenKleur('#a8e6cf',this)" style="width:32px;height:32px;border-radius:50%;background:#a8e6cf;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
+        <button onclick="setTekenKleur('#c9b8f0',this)" style="width:32px;height:32px;border-radius:50%;background:#c9b8f0;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
+        <button onclick="setTekenKleur('#1a1a2e',this)" style="width:32px;height:32px;border-radius:50%;background:#1a1a2e;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
+        <button onclick="setTekenKleur('#ffffff',this)" style="width:32px;height:32px;border-radius:50%;background:#ffffff;border:3px solid #ddd;cursor:pointer" class="teken-kleur-btn" title="Gum"></button>
       </div>
       <input type="range" min="2" max="30" value="6" oninput="tekenGrootte=this.value" style="width:80px" title="Penseelgrootte">
       <button onclick="wisTekenBord()" style="background:#fee2e2;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:7px 14px;border-radius:50px;color:#e63946;font-size:0.82rem">🗑️ Wis alles</button>
@@ -2725,10 +2727,10 @@ function tekenStip(pos) {
   tekenCtx.lineTo(pos.x, pos.y); tekenCtx.stroke();
   tekenCtx.beginPath(); tekenCtx.moveTo(pos.x, pos.y);
 }
-function setTekenKleur(kleur) {
+function setTekenKleur(kleur, el) {
   tekenKleur = kleur;
   document.querySelectorAll('.teken-kleur-btn').forEach(b => b.style.border = '3px solid transparent');
-  event.target.style.border = '3px solid #333';
+  if (el) el.style.border = '3px solid #333';
 }
 function wisTekenBord() { if (tekenCtx) tekenCtx.clearRect(0, 0, tekenCanvas.width, tekenCanvas.height); }
 function slaTekeningOp() {
@@ -2905,7 +2907,18 @@ function tekenStemmingGrafiek() {
     const x = 20 + i*((canvas.width-40)/7);
     const h = s > 0 ? (s/5)*mH : 4;
     ctx.fillStyle = kleuren[i];
-    ctx.beginPath(); ctx.roundRect(x, canvas.height-30-h, bW, h, 6); ctx.fill();
+    ctx.beginPath();
+    // iOS-compatible afgeronde rechthoek (roundRect werkt niet op oudere Safari)
+    const rx = 6, bx = x, by = canvas.height-30-h, bh = h;
+    ctx.moveTo(bx+rx, by); ctx.lineTo(bx+bW-rx, by);
+    ctx.arcTo(bx+bW, by, bx+bW, by+rx, rx);
+    ctx.lineTo(bx+bW, by+bh-rx);
+    ctx.arcTo(bx+bW, by+bh, bx+bW-rx, by+bh, rx);
+    ctx.lineTo(bx+rx, by+bh);
+    ctx.arcTo(bx, by+bh, bx, by+bh-rx, rx);
+    ctx.lineTo(bx, by+rx);
+    ctx.arcTo(bx, by, bx+rx, by, rx);
+    ctx.closePath(); ctx.fill();
     ctx.fillStyle='#3a2a3a'; ctx.font='bold 11px Nunito,sans-serif'; ctx.textAlign='center';
     ctx.fillText(labels[i], x+bW/2, canvas.height-10);
     if (s>0) { ctx.font='14px serif'; ctx.fillText(s>=4.5?'🥰':s>=3.5?'😊':s>=2.5?'😐':s>=1.5?'😴':'😢', x+bW/2, canvas.height-35-h); }
