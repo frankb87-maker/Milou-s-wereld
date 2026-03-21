@@ -1899,6 +1899,12 @@ function toon(id, btn) {
   document.getElementById(id).classList.add('active');
   if (btn) btn.classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Initialiseer secties bij eerste bezoek
+  if (id==='tekenen') setTimeout(initTekenbord, 50);
+  if (id==='dagboek') laadDagboekEntries();
+  if (id==='quiz')    initQuiz();
+  if (id==='ouder')   laadOuderDashboard();
+  if (id==='home')  { updateSterren(); checkGeheimBerichtje(); }
 }
 function navBtn(id) {
   return [...document.querySelectorAll('nav button')]
@@ -2969,17 +2975,6 @@ function checkBedtijdHerinnering() {
 }
 setInterval(checkBedtijdHerinnering, 60000);
 checkBedtijdHerinnering();
-
-// Override toon() om nieuwe secties te initialiseren
-const _origToon = toon;
-function toon(id, btn) {
-  _origToon(id, btn);
-  if (id==='tekenen') setTimeout(initTekenbord, 50);
-  if (id==='dagboek') laadDagboekEntries();
-  if (id==='quiz')    initQuiz();
-  if (id==='ouder')   laadOuderDashboard();
-  if (id==='home')  { updateSterren(); checkGeheimBerichtje(); }
-}
 
 // ════════════════════════════════════════════════════
 //  🤖 AI — AUTOMATISCHE BERICHTJES & QUOTES VIA CLAUDE
