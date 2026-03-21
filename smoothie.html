@@ -1,0 +1,2472 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<title>🥤 Milou's Smoothie & IJs Salon</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:#1a0a2e;overflow:hidden;width:100vw;height:100vh;font-family:'Nunito',sans-serif;}
+#gameCanvas{position:absolute;top:0;left:0;touch-action:none;display:block;}
+
+#hud{position:absolute;top:0;left:0;right:0;z-index:20;
+  padding:10px 14px;display:flex;align-items:center;justify-content:space-between;pointer-events:none;}
+.hud-logo{font-family:'Pacifico',cursive;font-size:1rem;
+  background:linear-gradient(135deg,#ff6eb4,#ffe066);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  text-shadow:none;pointer-events:none;}
+.hud-stat{background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.15);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border-radius:50px;padding:5px 13px;font-size:0.78rem;font-weight:800;color:white;
+  display:inline-flex;align-items:center;gap:5px;pointer-events:all;}
+.back-btn{background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.15);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border-radius:50px;padding:6px 14px;color:white;font-family:'Nunito',sans-serif;
+  font-weight:800;font-size:0.78rem;cursor:pointer;text-decoration:none;pointer-events:all;}
+
+/* PANELS */
+.panel{position:absolute;bottom:0;left:0;right:0;z-index:30;
+  background:linear-gradient(180deg,rgba(18,3,40,0.98) 0%,rgba(10,1,25,0.99) 100%);
+  border-top:1.5px solid rgba(255,110,180,0.3);
+  border-radius:26px 26px 0 0;padding:14px 14px 30px;
+  max-height:58vh;overflow-y:auto;
+  transform:translateY(100%);transition:transform .38s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 -8px 32px rgba(180,0,120,0.15);}
+.panel.open{transform:translateY(0);}
+.panel-greep{width:38px;height:4px;background:rgba(255,255,255,0.15);
+  border-radius:2px;margin:0 auto 14px;}
+.panel-titel{font-family:'Pacifico',cursive;font-size:1.05rem;text-align:center;
+  margin-bottom:10px;
+  background:linear-gradient(135deg,#ff6eb4,#ffe066);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.s-card{background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);
+  border-radius:18px;padding:13px 6px;text-align:center;cursor:pointer;transition:all .2s;position:relative;}
+.s-card:active{transform:scale(0.94);}
+.s-card.sel{border-color:#ff6eb4;background:linear-gradient(135deg,rgba(255,110,180,0.18),rgba(255,110,180,0.08));
+  box-shadow:0 0 14px rgba(255,110,180,0.2);}
+.sc-em{font-size:1.9rem;display:block;margin-bottom:4px;}
+.sc-nm{font-size:0.68rem;font-weight:800;color:rgba(255,255,255,0.85);}
+.ing-row{display:flex;gap:8px;overflow-x:auto;padding:6px 0;scrollbar-width:none;}
+.ing-row::-webkit-scrollbar{display:none;}
+.i-chip{flex-shrink:0;background:rgba(255,255,255,0.06);
+  border:1.5px solid rgba(255,255,255,0.12);border-radius:50px;
+  padding:7px 13px;cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;gap:5px;}
+.i-chip.g{border-color:#4caf50;background:rgba(76,175,80,0.18);}
+.i-chip span{font-size:0.75rem;font-weight:800;color:rgba(255,255,255,0.88);}
+.sel-bak{display:flex;gap:6px;flex-wrap:wrap;min-height:36px;
+  background:rgba(255,255,255,0.04);border-radius:12px;padding:7px;
+  margin:8px 0;border:1.5px dashed rgba(255,255,255,0.1);}
+.s-chip{background:rgba(76,175,80,0.2);border-radius:50px;
+  padding:3px 10px;font-size:0.72rem;font-weight:800;color:#a5d6a7;
+  display:inline-flex;align-items:center;gap:3px;}
+.pbtn{width:100%;padding:13px;border:none;border-radius:14px;
+  font-family:'Nunito',sans-serif;font-weight:900;font-size:0.9rem;
+  cursor:pointer;color:white;margin-top:9px;transition:all .15s;}
+.pbtn:active{transform:scale(0.97);}
+.bg{background:linear-gradient(135deg,#1b5e20,#388e3c);}
+.bo{background:linear-gradient(135deg,#bf360c,#e64a19);}
+.bp{background:linear-gradient(135deg,#880e4f,#c2185b);}
+.bw{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.65);}
+
+/* KEUKEN */
+#keuken{position:absolute;inset:0;z-index:40;
+  background:linear-gradient(180deg,#fff8e1,#ffe0b2);
+  transform:translateX(-100%);transition:transform .45s cubic-bezier(.4,0,.2,1);}
+#keuken.open{transform:translateX(0);}
+#kc{display:block;width:100%;}
+.kh{background:linear-gradient(135deg,#3e2723,#6d4c41,#4e342e);
+  padding:12px 14px;display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 2px 12px rgba(0,0,0,0.2);}
+.klogo{font-family:'Pacifico',cursive;font-size:0.95rem;color:white;}
+.kback{background:rgba(255,255,255,0.18);border:none;border-radius:50px;
+  padding:6px 14px;color:white;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.75rem;cursor:pointer;}
+.kctrl{padding:10px 14px 20px;}
+.kbw{background:rgba(0,0,0,0.08);border-radius:8px;height:11px;overflow:hidden;margin:8px 0;}
+.kbv{height:100%;background:linear-gradient(90deg,#e64a19,#ffb300);border-radius:8px;transition:width .5s;}
+.ku{font-size:0.92rem;font-weight:800;color:#3e2723;margin:4px 0;line-height:1.5;}
+.ks{font-size:0.74rem;color:#795548;}
+
+/* SNIJ */
+#snij{position:absolute;inset:0;z-index:45;background:rgba(0,0,0,0.75);
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;}
+#snij.open{display:flex;}
+#snijC{border-radius:18px;touch-action:none;}
+.snij-top{background:rgba(255,255,255,0.92);border-radius:50px;
+  padding:7px 20px;font-size:0.85rem;font-weight:800;color:#3e2723;}
+.snij-balk{width:80%;max-width:320px;background:rgba(255,255,255,0.2);
+  border-radius:6px;height:10px;}
+.snij-vul{height:100%;background:linear-gradient(90deg,#ff6eb4,#ffe066);
+  border-radius:6px;width:0%;transition:width .15s;}
+
+/* SERVEER */
+#srv{position:absolute;inset:0;z-index:50;
+  background:radial-gradient(ellipse at 50% 35%,#1c0845,#080015);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .4s;}
+#srv.open{opacity:1;pointer-events:all;}
+.srv-card{background:linear-gradient(145deg,#1a0840,#2d1065,#1a0840);
+  border:1.5px solid rgba(255,110,180,0.35);border-radius:28px;
+  padding:30px 24px;text-align:center;max-width:310px;width:88%;
+  box-shadow:0 24px 64px rgba(0,0,0,0.6),0 0 40px rgba(180,0,120,0.15);
+  animation:popIn .5s cubic-bezier(0.34,1.56,0.64,1);}
+@keyframes popIn{from{transform:scale(0.3) rotate(-5deg);}to{transform:scale(1) rotate(0);}}
+.srv-glas{font-size:4.2rem;animation:wob .7s ease;}
+@keyframes wob{0%,100%{transform:rotate(0);}25%{transform:rotate(-9deg);}75%{transform:rotate(9deg);}}
+.srv-score{font-family:'Pacifico',cursive;font-size:2.2rem;color:#ffe066;
+  text-shadow:0 0 24px rgba(255,224,102,.6);margin:8px 0;}
+.srv-speech{background:rgba(255,255,255,0.07);border-radius:16px;
+  padding:10px 14px;font-size:0.84rem;font-weight:800;
+  color:rgba(255,255,255,.88);margin:8px 0;line-height:1.6;}
+.srv-react{font-size:1.1rem;font-weight:900;color:#ff6eb4;margin-bottom:4px;}
+
+/* PARTICLES */
+.conf{position:fixed;pointer-events:none;z-index:400;width:8px;height:8px;
+  border-radius:2px;animation:cf 1.9s ease-in forwards;}
+@keyframes cf{0%{opacity:1;transform:translateY(0) rotate(0);}
+  100%{opacity:0;transform:translateY(100vh) rotate(560deg);}}
+.star{position:fixed;pointer-events:none;z-index:500;
+  animation:stfly .9s ease-out forwards;}
+@keyframes stfly{0%{transform:scale(0);opacity:1;}
+  55%{transform:scale(1.4) rotate(18deg);opacity:1;}
+  100%{transform:scale(.7) translateY(-80px);opacity:0;}}
+
+#fase{position:absolute;top:14%;left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,0.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border:1px solid rgba(255,110,180,0.2);
+  border-radius:50px;padding:7px 20px;
+  font-size:0.73rem;font-weight:800;color:rgba(255,255,255,.9);
+  z-index:25;pointer-events:none;transition:opacity .6s;white-space:nowrap;
+  letter-spacing:0.2px;}
+</style>
+</head>
+<body>
+<canvas id="gameCanvas"></canvas>
+<div id="hud">
+  <a href="leren.html" class="back-btn">← Terug</a>
+  <span class="hud-logo">🥤 Milou's Salon</span>
+  <div style="display:flex;gap:6px">
+    <div class="hud-stat">⭐<span id="sc">0</span></div>
+    <div class="hud-stat">👥<span id="kl">0</span></div>
+  </div>
+</div>
+<div id="fase">✨ Welkom in de Smoothie Salon!</div>
+<div class="panel" id="panel"><div class="panel-greep"></div><div id="pbody"></div></div>
+
+<div id="snij">
+  <div class="snij-top" id="snij-top">✂️ Veeg over het fruit!</div>
+  <canvas id="snijC"></canvas>
+  <div class="snij-balk"><div class="snij-vul" id="snijv"></div></div>
+</div>
+
+<div id="keuken">
+  <div class="kh">
+    <button class="kback" onclick="sluitKeuken()">← Salon</button>
+    <span class="klogo">👨‍🍳 De Keuken</span>
+    <span class="hud-stat" id="korder" style="pointer-events:none"></span>
+  </div>
+  <canvas id="kc"></canvas>
+  <div class="kctrl">
+    <div class="kbw"><div class="kbv" id="kbv" style="width:0%"></div></div>
+    <div class="ku" id="ku">Bereid je voor...</div>
+    <div class="ks" id="ks">Tik hieronder om te beginnen</div>
+    <button class="pbtn bo" id="kbtn" onclick="volgendKeukenStap()">👨‍🍳 Start!</button>
+    <button class="pbtn bw" onclick="sluitKeuken()">← Terug naar salon</button>
+  </div>
+</div>
+
+<div id="srv">
+  <div class="srv-card">
+    <div style="font-size:.72rem;font-weight:800;color:rgba(255,255,255,.35);margin-bottom:8px">✅ Smoothie klaar!</div>
+    <div class="srv-glas" id="sg">🥤</div>
+    <div style="font-size:3.5rem;margin:4px 0" id="sd">🐻</div>
+    <div class="srv-react" id="sr">⭐⭐⭐ Perfect!</div>
+    <div class="srv-speech" id="ss">Heerlijk!</div>
+    <div class="srv-score" id="ssc">+3 ⭐</div>
+    <button class="pbtn bg" onclick="sluitSrv()" style="margin-top:6px">🐾 Volgende klant →</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════════
+var DIEREN=[
+  {id:'beer',    nm:'Bruno de Beer',    fav:'bosbes',    z:'Mmm! Dit is de lekkerste smoothie ooit! 🐾', lk:'#8B6914',bk:'#c8a050',ok:'#6B4F10',nk:'#3a2010',ek:'#1a1a1a',type:'beer'},
+  {id:'konijn',  nm:'Lola het Konijn',  fav:'wortel',    z:'Wat lekker! Dankjewel! 🥕',                  lk:'#f0e0d0',bk:'#fff5ee',ok:'#ffb3ba',nk:'#ff8080',ek:'#3a2a4a',type:'konijn'},
+  {id:'vos',     nm:'Felix de Vos',     fav:'mango',     z:'Ik kom hier elke dag! 🦊',                   lk:'#e85d04',bk:'#fff0e0',ok:'#cc4400',nk:'#331a00',ek:'#1a1a1a',type:'vos'},
+  {id:'kat',     nm:'Mimi de Kat',     fav:'aardbei',   z:'Purrfect smoothie! Miauw! 😸',               lk:'#b0b0b0',bk:'#f0f0f0',ok:'#909090',nk:'#ff9999',ek:'#4a8a4a',type:'kat'},
+  {id:'panda',   nm:'Pip de Panda',   fav:'banaan',    z:'Beter dan bamboe! Dankjewel! 🐼',            lk:'#f8f8f8',bk:'#ffffff',ok:'#222222',nk:'#222222',ek:'#222222',type:'panda'},
+  {id:'uil',     nm:'Ollie de Uil',     fav:'kiwi',      z:'Heel wijs van je! Dankjewel! 🦉',            lk:'#8B7355',bk:'#f5deb3',ok:'#6B5335',nk:'#c87820',ek:'#f0c020',type:'uil'},
+  {id:'eekhoorn',nm:'Nootje Eekhoorn',fav:'ananas',    z:'Beter dan noten! 🌰',                        lk:'#a0522d',bk:'#deb887',ok:'#8B4513',nk:'#3a1a00',ek:'#1a1a1a',type:'eekhoorn'},
+  {id:'hamster', nm:'Hammy de Hamster', fav:'peer',      z:'In mijn wangen! Jummie! 🐹',                lk:'#d4956a',bk:'#f5deb3',ok:'#c07850',nk:'#ff8080',ek:'#1a1a1a',type:'hamster'},
+  {id:'wasbeer', nm:'Ringo de Wasbeer', fav:'watermeloen',z:'Heerlijk verfrissend! 🦝',                  lk:'#808080',bk:'#d0d0d0',ok:'#505050',nk:'#222222',ek:'#1a1a1a',type:'wasbeer'},
+];
+var SMOOTHIES=[
+  {id:'tropisch',nm:'Tropisch',    em:'🌴',gl:'🟡',kl:'#ffd54f',ing:['mango','ananas','banaan']},
+  {id:'bos',     nm:'Bosvruchten', em:'🫐',gl:'🟣',kl:'#8e24aa',ing:['bosbes','aardbei','framboos']},
+  {id:'citrus',  nm:'Citrus',      em:'🍊',gl:'🟠',kl:'#ff9800',ing:['sinaasappel','citroen','peer']},
+  {id:'groen',   nm:'Groene Kracht',em:'🥦',gl:'🟢',kl:'#43a047',ing:['spinazie','appel','kiwi']},
+  {id:'roze',    nm:'Roze Droom',  em:'🌸',gl:'🩷',kl:'#ec407a',ing:['aardbei','framboos','banaan']},
+  {id:'wortel',  nm:'Wortelsap',   em:'🥕',gl:'🟠',kl:'#f4511e',ing:['wortel','sinaasappel','mango']},
+  {id:'zomer',   nm:'Zomerfruit',  em:'☀️',gl:'🔴',kl:'#e53935',ing:['watermeloen','aardbei','peer']},
+  {id:'exotisch',nm:'Exotisch',    em:'🥭',gl:'🟡',kl:'#ffb300',ing:['mango','ananas','kiwi']},
+  {id:'bessen',  nm:'Bessenmix',   em:'🍇',gl:'🟣',kl:'#8e24aa',ing:['bosbes','framboos','peer']},
+];
+var IJS_SMAKEN=[
+  {id:'vanille',  nm:'Vanille',  em:'🍦', kl:'#fff8e1',kl2:'#ffe082',saus:'#f9a825'},
+  {id:'chocolade',nm:'Chocolade',em:'🍫', kl:'#6d4c41',kl2:'#4e342e',saus:'#3e2723'},
+  {id:'aardbei',  nm:'Aardbei',  em:'🍓', kl:'#ef9a9a',kl2:'#e57373',saus:'#c62828'},
+];
+var IJS_TOPPINGS=[
+  {id:'slagroom',    nm:'Slagroom',    em:'🍦',kl:'#ffffff'},
+  {id:'hagelslag',   nm:'Hagelslag',   em:'🎉',kl:'#3e2723'},
+  {id:'aardbeisaus', nm:'Aardbeisaus', em:'🍓',kl:'#e53935'},
+  {id:'caramelsaus', nm:'Caramelsaus', em:'🍯',kl:'#f9a825'},
+  {id:'noten',       nm:'Noten',       em:'🥜',kl:'#8d6e63'},
+  {id:'kers',        nm:'Kers',        em:'🍒',kl:'#c62828'},
+  {id:'chocostrips', nm:'Choco-strips',em:'🍫',kl:'#4e342e'},
+  {id:'wafel',       nm:'Wafelstukjes',em:'🧇',kl:'#f9a825'},
+];
+var INGREDIENTEN=[
+  {id:'banaan',      em:'🍌',nm:'Banaan',      kl:'#ffe066',sk:'#ffd700'},
+  {id:'aardbei',     em:'🍓',nm:'Aardbei',     kl:'#e53935',sk:'#b71c1c'},
+  {id:'mango',       em:'🥭',nm:'Mango',       kl:'#ff9800',sk:'#e65100'},
+  {id:'ananas',      em:'🍍',nm:'Ananas',      kl:'#fdd835',sk:'#f9a825'},
+  {id:'kiwi',        em:'🥝',nm:'Kiwi',        kl:'#7cb342',sk:'#558b2f'},
+  {id:'bosbes',      em:'🫐',nm:'Bosbes',      kl:'#5e35b1',sk:'#4527a0'},
+  {id:'framboos',    em:'🍇',nm:'Framboos',    kl:'#d81b60',sk:'#880e4f'},
+  {id:'sinaasappel', em:'🍊',nm:'Sinaasappel', kl:'#fb8c00',sk:'#e65100'},
+  {id:'citroen',     em:'🍋',nm:'Citroen',     kl:'#fdd835',sk:'#f9a825'},
+  {id:'appel',       em:'🍎',nm:'Appel',       kl:'#e53935',sk:'#b71c1c'},
+  {id:'peer',        em:'🍐',nm:'Peer',        kl:'#aed581',sk:'#7cb342'},
+  {id:'watermeloen', em:'🍉',nm:'Watermeloen', kl:'#43a047',sk:'#e53935'},
+  {id:'spinazie',    em:'🥬',nm:'Spinazie',    kl:'#2e7d32',sk:'#1b5e20'},
+  {id:'wortel',      em:'🥕',nm:'Wortel',      kl:'#fb8c00',sk:'#e65100'},
+  {id:'melk',        em:'🥛',nm:'Melk',        kl:'#f5f5f5',sk:'#e0e0e0'},
+  {id:'honing',      em:'🍯',nm:'Honing',      kl:'#ff8f00',sk:'#e65100'},
+];
+
+// ══════════════════════════════════════════════════
+// CANVAS & STATE
+// ══════════════════════════════════════════════════
+var gc=document.getElementById('gameCanvas');
+var gx=gc.getContext('2d');
+var W,H;
+function resize(){
+  W=window.innerWidth;H=window.innerHeight;
+  gc.width=W;gc.height=H;
+}
+resize();
+window.addEventListener('resize',function(){resize();});
+
+var score=0,nKlanten=0;
+var dier=null,smootje=null,gekozenIng=[];
+var dierX,dierY,dierRicht=-1,dierLoopt=false;
+var beenHoek=0,armHoek=0,idleT=0;
+var wolkTekst='',wolkAlpha=0,wolkTimer=0;
+var barSmootje=false;
+var gameStaat='idle';
+var T=0; // globale teller
+
+var kStappen=[],kStap=0;
+var modus='smoothie'; // 'smoothie' of 'ijs'
+var gekozenSmaak=null,gekozenToppings=[];
+var ijsMachineStap=0,ijsMachineStappen=[];
+var ijsSchepAnim=0,ijsToppingAnim=[];
+var blFase=0,blRot=0,blInhoud=[];
+var kCtx=null,kAnimId=null;
+
+var snijCtx=null,snijItems=[],snijGesneden=0,snijCb=null;
+var snijTekening=false,snijLast=null;
+
+// ══════════════════════════════════════════════════
+// LOOP
+// ══════════════════════════════════════════════════
+function loop(){
+  requestAnimationFrame(loop);
+  T++;
+  update();
+  draw();
+}
+
+function update(){
+  idleT+=0.03;
+  if(dierLoopt){
+    var doel=gameStaat==='wacht_stoel'?W*0.13:W*0.38;
+    if(gameStaat==='loopt_weg') doel=W*1.2;
+    var dx=doel-dierX;
+    if(Math.abs(dx)>3){
+      dierX+=dx*0.045;
+      dierRicht=dx>0?1:-1;
+      beenHoek=Math.sin(T*0.28)*0.45;
+      armHoek=Math.sin(T*0.28+Math.PI)*0.4;
+    } else {
+      dierX=doel; dierLoopt=false; beenHoek=0; armHoek=0;
+      if(gameStaat==='loopt_in'){
+        gameStaat='bestellen';
+        setTimeout(toonBestellenPanel,500);
+        toonWolk('😋 Ik wil graag iets lekkers...',2800);
+        setFase('💬 '+dier.nm+' wil bestellen!',true);
+      } else if(gameStaat==='wacht_stoel'){
+        setFase('👨‍🍳 Milou gaat koken!',true);
+        setTimeout(openKeuken,700);
+      } else if(gameStaat==='loopt_bar'){
+        gameStaat='ophalen';
+        toonWolk('😍 Ohh! Is dat voor mij?!',2200);
+        setTimeout(toonSrv,1500);
+      } else if(gameStaat==='loopt_weg'){
+        dierLoopt=false;
+        setTimeout(nieuweKlant,400);
+      }
+    }
+  } else {
+    armHoek=Math.sin(idleT)*0.1;
+  }
+  if(wolkTimer>0){wolkTimer--;wolkAlpha=Math.min(1,wolkAlpha+0.1);}
+  else wolkAlpha=Math.max(0,wolkAlpha-0.06);
+  if(blFase===2) blRot+=0.22;
+}
+
+// ══════════════════════════════════════════════════
+// TEKEN HELPERS
+// ══════════════════════════════════════════════════
+function rr(c,x,y,w,h,r,f,s,lw){
+  c.beginPath();
+  c.moveTo(x+r,y);c.lineTo(x+w-r,y);c.arcTo(x+w,y,x+w,y+r,r);
+  c.lineTo(x+w,y+h-r);c.arcTo(x+w,y+h,x+w-r,y+h,r);
+  c.lineTo(x+r,y+h);c.arcTo(x,y+h,x,y+h-r,r);
+  c.lineTo(x,y+r);c.arcTo(x,y,x+r,y,r);c.closePath();
+  if(f){c.fillStyle=f;c.fill();}
+  if(s){c.strokeStyle=s;c.lineWidth=lw||2;c.stroke();}
+}
+function circ(c,x,y,r,f,s,lw){
+  c.beginPath();c.arc(x,y,r,0,Math.PI*2);
+  if(f){c.fillStyle=f;c.fill();}
+  if(s){c.strokeStyle=s;c.lineWidth=lw||2;c.stroke();}
+}
+function shadow(c,col,blur){c.shadowColor=col||'transparent';c.shadowBlur=blur||0;}
+function noShadow(c){c.shadowColor='transparent';c.shadowBlur=0;}
+
+// ══════════════════════════════════════════════════
+// DRAW SALON
+// ══════════════════════════════════════════════════
+var vloerY;
+function draw(){
+  gx.clearRect(0,0,W,H);
+  vloerY=H*0.70;
+  tekenSalon();
+  if(dier) tekenDier(gx,dierX,vloerY,dier,dierRicht);
+  if(wolkAlpha>0.02&&dier) tekenWolk(gx,dierX,vloerY-getDierH()*0.85);
+  if(barSmootje&&smootje) tekenBarGlas(gx);
+}
+
+function tekenSalon(){
+  var c=gx;
+  // SKY / PLAFOND
+  var skyG=c.createLinearGradient(0,0,0,H*0.09);
+  skyG.addColorStop(0,'#fff9f0');skyG.addColorStop(1,'#ffe8c8');
+  c.fillStyle=skyG;c.fillRect(0,0,W,H*0.09);
+  // Kroonlijst
+  var klijst=c.createLinearGradient(0,H*0.085,0,H*0.1);
+  klijst.addColorStop(0,'#d4a870');klijst.addColorStop(1,'#c8956a');
+  c.fillStyle=klijst;c.fillRect(0,H*0.085,W,H*0.018);
+
+  // MUUR — behang stijl
+  var muurG=c.createLinearGradient(0,H*0.1,W,H*0.7);
+  muurG.addColorStop(0,'#fdf6ec');muurG.addColorStop(0.5,'#fff9f2');muurG.addColorStop(1,'#fdf0e4');
+  c.fillStyle=muurG;c.fillRect(0,H*0.1,W,vloerY-H*0.1);
+  // Behang streepjes
+  c.strokeStyle='rgba(210,175,130,0.18)';c.lineWidth=1;
+  for(var i=0;i<W;i+=W/14){
+    c.beginPath();c.moveTo(i,H*0.1);c.lineTo(i,vloerY);c.stroke();
+  }
+  // Lambrisering (houten latten onderaan muur)
+  var lambH=vloerY*0.18;
+  var lambG=c.createLinearGradient(0,vloerY-lambH,0,vloerY);
+  lambG.addColorStop(0,'#c8a070');lambG.addColorStop(1,'#a07040');
+  c.fillStyle=lambG;c.fillRect(0,vloerY-lambH,W,lambH);
+  // Latten lijnen
+  c.strokeStyle='rgba(120,80,30,0.25)';c.lineWidth=1.5;
+  for(var j=0;j<5;j++){
+    var ly2=vloerY-lambH+j*(lambH/5);
+    c.beginPath();c.moveTo(0,ly2);c.lineTo(W,ly2);c.stroke();
+  }
+  // Lambrisering rand
+  c.fillStyle='#8B5E3C';c.fillRect(0,vloerY-lambH-3,W,5);
+
+  // VLOER met houten planken
+  var vloerG=c.createLinearGradient(0,vloerY,0,H);
+  vloerG.addColorStop(0,'#b8864e');vloerG.addColorStop(0.5,'#a07040');vloerG.addColorStop(1,'#8B6330');
+  c.fillStyle=vloerG;c.fillRect(0,vloerY,W,H-vloerY);
+  // Planken
+  var plankH=(H-vloerY)/5;
+  for(var pi=0;pi<=5;pi++){
+    c.strokeStyle='rgba(60,30,10,0.18)';c.lineWidth=1.5;
+    c.beginPath();c.moveTo(0,vloerY+pi*plankH);c.lineTo(W,vloerY+pi*plankH);c.stroke();
+  }
+  var plankB=W/7;
+  for(var pj=0;pj<=7;pj++){
+    c.strokeStyle='rgba(60,30,10,0.1)';c.lineWidth=1;
+    c.beginPath();c.moveTo(pj*plankB,vloerY);c.lineTo(pj*plankB,H);c.stroke();
+  }
+  // Vloer glans
+  var vloeGl=c.createLinearGradient(0,vloerY,0,vloerY+20);
+  vloeGl.addColorStop(0,'rgba(255,255,255,0.12)');vloeGl.addColorStop(1,'rgba(255,255,255,0)');
+  c.fillStyle=vloeGl;c.fillRect(0,vloerY,W,20);
+
+  // RAAM (links)
+  tekenRaam(c,W*0.04,H*0.13,W*0.18,H*0.26);
+  // SCHILDERIJ (midden rechts)
+  tekenSchilderij(c,W*0.62,H*0.14,W*0.17,H*0.18);
+  // LAMP aan plafond
+  tekenLamp(c,W*0.5,H*0.085);
+  // LAMP 2
+  tekenLamp(c,W*0.25,H*0.085);
+  tekenLamp(c,W*0.75,H*0.085);
+  // PLANT links
+  tekenPlant(c,W*0.11,vloerY,1);
+  // PLANT rechts
+  tekenPlant(c,W*0.89,vloerY,-1);
+  // KEUKEN DEUR
+  tekenKeukenDeur(c,W*0.025,vloerY);
+  // INGANG DEUR
+  tekenIngangsDeur(c,W*0.875,vloerY);
+  // KRUK (stoel naast deur)
+  tekenKruk(c,W*0.17,vloerY);
+  // BAR
+  tekenBar(c,vloerY);
+  // BARTENDER
+  tekenBartender(c,W*0.5,vloerY);
+  // BAR decoraties
+  tekenBarDeco(c,vloerY);
+}
+
+// ── RAAM ──
+function tekenRaam(c,x,y,w,h){
+  // Schaduw
+  shadow(c,'rgba(0,0,0,0.15)',10);
+  // Kozijn
+  rr(c,x-4,y-4,w+8,h+8,5,'#c8a870','#a07040',3);
+  noShadow(c);
+  // Lucht gradient
+  var hemel=c.createLinearGradient(x,y,x,y+h);
+  hemel.addColorStop(0,'#87ceeb');hemel.addColorStop(0.6,'#b8e0f7');hemel.addColorStop(1,'#d0eeff');
+  rr(c,x,y,w,h,2,null);c.fillStyle=hemel;c.fill();
+  // Wolken
+  function wolkje2(cx,cy,sz){
+    c.fillStyle='rgba(255,255,255,0.92)';
+    circ(c,cx,cy,sz*0.55,'rgba(255,255,255,0.92)');
+    circ(c,cx+sz*0.5,cy+sz*0.2,sz*0.42,'rgba(255,255,255,0.92)');
+    circ(c,cx-sz*0.4,cy+sz*0.18,sz*0.38,'rgba(255,255,255,0.92)');
+    circ(c,cx+sz*0.15,cy+sz*0.4,sz*0.3,'rgba(255,255,255,0.92)');
+  }
+  var cscl=Math.sin(T*0.008)*3;
+  wolkje2(x+w*0.3,y+h*0.2,w*0.14+cscl);
+  wolkje2(x+w*0.7,y+h*0.32,w*0.1);
+  // Zon
+  var sunX=x+w*0.78,sunY=y+h*0.15;
+  shadow(c,'rgba(255,200,50,0.5)',12);
+  circ(c,sunX,sunY,w*0.1,'#ffe066');
+  noShadow(c);
+  circ(c,sunX,sunY,w*0.1,null,'rgba(255,220,80,0.4)',2);
+  // Bomen buiten
+  c.fillStyle='#4a7c40';
+  for(var ti=0;ti<3;ti++){
+    var tx=x+w*(0.15+ti*0.32),th=h*0.35;
+    c.beginPath();c.moveTo(tx,y+h-h*0.12);c.lineTo(tx-w*0.06,y+h*0.8);c.lineTo(tx+w*0.06,y+h*0.8);c.closePath();c.fill();
+    c.beginPath();c.moveTo(tx,y+h*0.55);c.lineTo(tx-w*0.08,y+h*0.72);c.lineTo(tx+w*0.08,y+h*0.72);c.closePath();c.fill();
+    c.fillStyle='#8B4513';rr(c,tx-w*0.015,y+h*0.8,w*0.03,h*0.2,1,'#8B4513');
+    c.fillStyle='#4a7c40';
+  }
+  // Raamkruisen
+  c.strokeStyle='#c8a870';c.lineWidth=3;
+  c.beginPath();c.moveTo(x+w/2,y);c.lineTo(x+w/2,y+h);c.stroke();
+  c.beginPath();c.moveTo(x,y+h/2);c.lineTo(x+w,y+h/2);c.stroke();
+  // Kozijn rand
+  c.strokeStyle='#a07040';c.lineWidth=4;
+  rr(c,x,y,w,h,2,null,'#a07040',4);
+  // Vensterbank
+  rr(c,x-6,y+h,w+12,8,3,'#e8d4a8','#c8a870',1.5);
+  // Gordijnen
+  var gA=c.createLinearGradient(x,y,x+w*0.2,y);
+  gA.addColorStop(0,'#ff8fab');gA.addColorStop(1,'rgba(255,143,171,0)');
+  c.fillStyle=gA;c.fillRect(x,y,w*0.22,h);
+  var gB=c.createLinearGradient(x+w,y,x+w*0.8,y);
+  gB.addColorStop(0,'#ff8fab');gB.addColorStop(1,'rgba(255,143,171,0)');
+  c.fillStyle=gB;c.fillRect(x+w*0.78,y,w*0.22,h);
+  // Gordijn knopen
+  c.fillStyle='#e91e8c';circ(c,x+w*0.19,y+h*0.5,4,'#e91e8c');
+  circ(c,x+w*0.81,y+h*0.5,4,'#e91e8c');
+}
+
+// ── SCHILDERIJ ──
+function tekenSchilderij(c,x,y,w,h){
+  shadow(c,'rgba(0,0,0,0.2)',8);
+  // Lijst
+  rr(c,x-5,y-5,w+10,h+10,4,'#8B6914','#5a3a00',2);
+  noShadow(c);
+  // Binnenrand
+  rr(c,x-2,y-2,w+4,h+4,2,'#c8a050');
+  // Canvas
+  var achterG=c.createLinearGradient(x,y,x+w,y+h);
+  achterG.addColorStop(0,'#e8f4e8');achterG.addColorStop(1,'#d4ecd4');
+  rr(c,x,y,w,h,2,null);c.fillStyle=achterG;c.fill();
+  // Schilderij inhoud: smoothies
+  c.font='bold '+Math.round(h*0.22)+'px serif';
+  c.textAlign='center';
+  c.fillText('🥤🍓🥝',x+w/2,y+h*0.55);
+  c.fillStyle='#2e7d32';
+  c.font='bold '+Math.round(h*0.13)+'px Nunito';
+  c.fillText('SMOOTHIE SALON',x+w/2,y+h*0.82);
+  // Glas effect
+  c.fillStyle='rgba(255,255,255,0.15)';
+  c.beginPath();c.moveTo(x,y);c.lineTo(x+w*0.4,y);c.lineTo(x,y+h*0.5);c.closePath();c.fill();
+}
+
+// ── LAMP ──
+function tekenLamp(c,x,y){
+  // Draad
+  var draadG=c.createLinearGradient(x,y,x,y+H*0.05);
+  draadG.addColorStop(0,'#888');draadG.addColorStop(1,'#555');
+  c.strokeStyle=draadG;c.lineWidth=2;
+  c.beginPath();c.moveTo(x,y);c.lineTo(x,y+H*0.05);c.stroke();
+  // Kap
+  var kapW=W*0.055,kapH=H*0.04;
+  var kapG=c.createLinearGradient(x-kapW/2,y+H*0.05,x+kapW/2,y+H*0.05+kapH);
+  kapG.addColorStop(0,'#f5e6c8');kapG.addColorStop(1,'#d4b870');
+  c.beginPath();c.moveTo(x-kapW*0.4,y+H*0.05);
+  c.lineTo(x-kapW/2,y+H*0.05+kapH);c.lineTo(x+kapW/2,y+H*0.05+kapH);
+  c.lineTo(x+kapW*0.4,y+H*0.05);c.closePath();
+  c.fillStyle=kapG;c.fill();
+  c.strokeStyle='#c8a050';c.lineWidth=1.5;c.stroke();
+  // Lichtglow
+  var p=0.7+0.3*Math.sin(T*0.05);
+  var lichG=c.createRadialGradient(x,y+H*0.07,0,x,y+H*0.07,W*0.12*p);
+  lichG.addColorStop(0,'rgba(255,240,180,0.18)');
+  lichG.addColorStop(1,'rgba(255,240,180,0)');
+  c.fillStyle=lichG;c.fillRect(x-W*0.12,y,W*0.24,H*0.25);
+  // Bol
+  shadow(c,'rgba(255,220,100,0.6)',8*p);
+  circ(c,x,y+H*0.055,W*0.013,'#fff9e0');
+  noShadow(c);
+}
+
+// ── PLANT ──
+function tekenPlant(c,x,y,spiegel){
+  var s=spiegel||1;
+  c.save();c.translate(x,y);c.scale(s,1);
+  // Pot
+  var potW=W*0.035,potH=H*0.05;
+  var potG=c.createLinearGradient(-potW/2,0,potW/2,potH);
+  potG.addColorStop(0,'#c8956a');potG.addColorStop(1,'#a06040');
+  c.beginPath();c.moveTo(-potW/2,0);c.lineTo(potW/2,0);
+  c.lineTo(potW*0.4,potH);c.lineTo(-potW*0.4,potH);c.closePath();
+  c.fillStyle=potG;c.fill();
+  c.strokeStyle='#8B5E3C';c.lineWidth=1.5;c.stroke();
+  // Aarde
+  rr(c,-potW/2,-potH*0.12,potW,potH*0.18,2,'#5a3a1a');
+  // Stam
+  c.strokeStyle='#8B5E3C';c.lineWidth=W*0.006;c.lineCap='round';
+  c.beginPath();c.moveTo(0,-potH*0.1);c.lineTo(0,-H*0.09);c.stroke();
+  // Tak links
+  c.beginPath();c.moveTo(0,-H*0.055);c.quadraticCurveTo(-W*0.04,-H*0.07,-W*0.05,-H*0.065);c.stroke();
+  // Tak rechts
+  c.beginPath();c.moveTo(0,-H*0.07);c.quadraticCurveTo(W*0.035,-H*0.085,W*0.045,-H*0.078);c.stroke();
+  // Bladeren
+  function blad(bx,by,br,ba){
+    c.save();c.translate(bx,by);c.rotate(ba);
+    var bg=c.createRadialGradient(0,0,0,0,0,br);
+    bg.addColorStop(0,'#66bb6a');bg.addColorStop(1,'#2e7d32');
+    c.beginPath();c.ellipse(0,0,br*0.55,br,0,0,Math.PI*2);
+    c.fillStyle=bg;c.fill();
+    c.strokeStyle='#1b5e20';c.lineWidth=0.8;c.stroke();
+    // Nerf
+    c.strokeStyle='rgba(255,255,255,0.2)';c.lineWidth=0.8;
+    c.beginPath();c.moveTo(0,-br*0.8);c.lineTo(0,br*0.8);c.stroke();
+    c.restore();
+  }
+  blad(0,-H*0.09,H*0.042,0);
+  blad(-W*0.05,-H*0.065,H*0.034,0.4);
+  blad(W*0.045,-H*0.078,H*0.034,-0.3);
+  blad(-W*0.025,-H*0.1,H*0.03,0.6);
+  blad(W*0.02,-H*0.095,H*0.028,-0.5);
+  blad(0,-H*0.115,H*0.025,0.1);
+  c.restore();
+}
+
+// ── KRUK ──
+function tekenKruk(c,x,y){
+  var kw=W*0.04,kh=H*0.065;
+  // Poten
+  c.strokeStyle='#5a2d0c';c.lineWidth=W*0.008;c.lineCap='round';
+  c.beginPath();c.moveTo(x-kw*0.4,y);c.lineTo(x-kw*0.5,y-kh);c.stroke();
+  c.beginPath();c.moveTo(x+kw*0.4,y);c.lineTo(x+kw*0.5,y-kh);c.stroke();
+  // Dwarsbalk
+  c.lineWidth=W*0.005;
+  c.beginPath();c.moveTo(x-kw*0.48,y-kh*0.45);c.lineTo(x+kw*0.48,y-kh*0.45);c.stroke();
+  // Zitting
+  var zG=c.createLinearGradient(x-kw*0.65,y-kh,x+kw*0.65,y-kh+6);
+  zG.addColorStop(0,'#8B4513');zG.addColorStop(1,'#6b3410');
+  rr(c,x-kw*0.65,y-kh,kw*1.3,kh*0.18,4,null,null);
+  c.fillStyle=zG;c.fill();
+  c.strokeStyle='#5a2d0c';c.lineWidth=1.5;c.stroke();
+}
+
+// ── KEUKEN DEUR ──
+function tekenKeukenDeur(c,x,y){
+  var dw=W*0.1,dh=H*0.24;
+  shadow(c,'rgba(0,0,0,0.2)',6);
+  // Deur frame
+  rr(c,x-4,y-dh-4,dw+8,dh+4,4,'#2d5a1b','#1a3a10',2);
+  noShadow(c);
+  // Deur
+  var dg=c.createLinearGradient(x,y-dh,x+dw,y);
+  dg.addColorStop(0,'#3d7a25');dg.addColorStop(1,'#2d5a1b');
+  rr(c,x,y-dh,dw,dh,3,null);c.fillStyle=dg;c.fill();
+  c.strokeStyle='#1a3a10';c.lineWidth=2;c.stroke();
+  // Panelen
+  rr(c,x+dw*0.12,y-dh*0.95,dw*0.76,dh*0.4,3,'rgba(0,0,0,0.12)','rgba(0,0,0,0.08)',1);
+  rr(c,x+dw*0.12,y-dh*0.5,dw*0.76,dh*0.36,3,'rgba(0,0,0,0.12)','rgba(0,0,0,0.08)',1);
+  // Ruitje
+  var rg=c.createLinearGradient(x+dw*0.2,y-dh*0.88,x+dw*0.8,y-dh*0.6);
+  rg.addColorStop(0,'rgba(135,206,235,0.7)');rg.addColorStop(1,'rgba(176,224,255,0.7)');
+  rr(c,x+dw*0.2,y-dh*0.9,dw*0.6,dh*0.28,2,null);c.fillStyle=rg;c.fill();
+  // Kruis in ruitje
+  c.strokeStyle='rgba(45,90,27,0.5)';c.lineWidth=1.5;
+  c.beginPath();c.moveTo(x+dw*0.5,y-dh*0.9);c.lineTo(x+dw*0.5,y-dh*0.62);c.stroke();
+  c.beginPath();c.moveTo(x+dw*0.2,y-dh*0.76);c.lineTo(x+dw*0.8,y-dh*0.76);c.stroke();
+  // Knop
+  shadow(c,'rgba(255,200,0,0.4)',4);
+  circ(c,x+dw*0.82,y-dh*0.45,W*0.006,'#f0c060','#c8a040',1.5);
+  noShadow(c);
+  // Bordje KEUKEN
+  rr(c,x+dw*0.1,y-dh*0.25,dw*0.8,dh*0.12,3,'#ffe066','#f0c000',1);
+  c.fillStyle='#3a2a00';c.font='bold '+Math.round(dw*0.22)+'px Nunito';c.textAlign='center';
+  c.fillText('KEUKEN',x+dw/2,y-dh*0.17);
+  // Pijl
+  c.fillStyle='#3d7a25';
+  c.font=Math.round(dw*0.3)+'px serif';
+  c.fillText('👨‍🍳',x+dw/2,y-dh*0.32);
+}
+
+// ── INGANGS DEUR ──
+function tekenIngangsDeur(c,x,y){
+  var dw=W*0.1,dh=H*0.24;
+  shadow(c,'rgba(0,0,0,0.2)',6);
+  rr(c,x-4,y-dh-4,dw+8,dh+4,4,'#5a2d0c','#3a1a00',2);
+  noShadow(c);
+  var dg=c.createLinearGradient(x,y-dh,x+dw,y);
+  dg.addColorStop(0,'#a0522d');dg.addColorStop(1,'#7a3a18');
+  rr(c,x,y-dh,dw,dh,3,null);c.fillStyle=dg;c.fill();
+  c.strokeStyle='#3a1a00';c.lineWidth=2;c.stroke();
+  rr(c,x+dw*0.12,y-dh*0.95,dw*0.76,dh*0.4,3,'rgba(0,0,0,0.1)','rgba(0,0,0,0.07)',1);
+  rr(c,x+dw*0.12,y-dh*0.5,dw*0.76,dh*0.36,3,'rgba(0,0,0,0.1)','rgba(0,0,0,0.07)',1);
+  // Boogvenster
+  c.save();c.beginPath();c.arc(x+dw/2,y-dh*0.96,dw*0.3,Math.PI,0);c.closePath();
+  c.fillStyle='rgba(135,206,235,0.65)';c.fill();
+  c.strokeStyle='#3a1a00';c.lineWidth=2;c.stroke();c.restore();
+  shadow(c,'rgba(255,200,0,0.4)',4);
+  circ(c,x+dw*0.18,y-dh*0.45,W*0.006,'#f0c060','#c8a040',1.5);
+  noShadow(c);
+  // Bel
+  c.font=Math.round(dw*0.38)+'px serif';c.textAlign='center';
+  c.fillText('🔔',x+dw/2,y-dh-5);
+}
+
+// ── BAR ──
+function tekenBar(c,vy){
+  var barW=W*0.52,bx=W*0.245;
+  var topH=H*0.038,bodyH=H*0.1;
+  var by=vy-bodyH-topH;
+
+  // Achterste muurplank boven bar
+  var plankG=c.createLinearGradient(bx,by-H*0.15,bx,by);
+  plankG.addColorStop(0,'#c8a870');plankG.addColorStop(1,'#a07040');
+  rr(c,bx-barW*0.05,by-H*0.16,barW*1.1,H*0.165,4,null);c.fillStyle=plankG;c.fill();
+  c.strokeStyle='#8B5E3C';c.lineWidth=2;c.stroke();
+  // Planken rand
+  rr(c,bx-barW*0.05,by-H*0.16,barW*1.1,H*0.018,2,'#d4b870','#c8a050',1);
+
+  // Bar achtergrond spiegel
+  rr(c,bx+barW*0.05,by-H*0.155,barW*0.9,H*0.14,4,null,null);
+  var spieG=c.createLinearGradient(bx,by-H*0.15,bx+barW,by);
+  spieG.addColorStop(0,'rgba(200,230,255,0.35)');spieG.addColorStop(0.5,'rgba(220,240,255,0.5)');spieG.addColorStop(1,'rgba(200,230,255,0.35)');
+  c.fillStyle=spieG;c.fill();
+  c.strokeStyle='rgba(180,210,240,0.4)';c.lineWidth=2;c.stroke();
+  // Spiegels glans
+  c.fillStyle='rgba(255,255,255,0.15)';
+  c.beginPath();c.moveTo(bx+barW*0.1,by-H*0.155);c.lineTo(bx+barW*0.25,by-H*0.155);
+  c.lineTo(bx+barW*0.15,by-H*0.015);c.lineTo(bx+barW*0.05,by-H*0.015);c.closePath();c.fill();
+
+  // Flessen op plank
+  var flessen=[
+    {kl:'#ff6eb4',dop:'#c21e8c'},{kl:'#ffe066',dop:'#f9a825'},
+    {kl:'#64b5f6',dop:'#1565c0'},{kl:'#a5d6a7',dop:'#2e7d32'},
+    {kl:'#ef9a9a',dop:'#c62828'},{kl:'#ce93d8',dop:'#6a1b9a'},
+  ];
+  flessen.forEach(function(f,i){
+    var fx=bx+barW*(0.08+i*0.155),fy=by-topH*0.5;
+    var fw=barW*0.045,fh=H*0.09;
+    // Fles
+    rr(c,fx-fw/2,fy-fh,fw,fh*0.7,fw*0.4,f.kl,'rgba(0,0,0,0.15)',1);
+    // Nek
+    rr(c,fx-fw*0.25,fy-fh,fw*0.5,fh*0.32,fw*0.25,f.kl,null);
+    // Dop
+    rr(c,fx-fw*0.22,fy-fh*1.05,fw*0.44,fh*0.1,2,f.dop,null);
+    // Glans
+    c.fillStyle='rgba(255,255,255,0.3)';
+    rr(c,fx-fw*0.3,fy-fh*0.9,fw*0.15,fh*0.45,3,'rgba(255,255,255,0.3)');
+  });
+
+  // Bar body
+  shadow(c,'rgba(0,0,0,0.25)',12);
+  var bodyG=c.createLinearGradient(bx,by+topH,bx,by+topH+bodyH);
+  bodyG.addColorStop(0,'#8B4513');bodyG.addColorStop(1,'#4a1a00');
+  rr(c,bx,by+topH,barW,bodyH,5,null);c.fillStyle=bodyG;c.fill();
+  c.strokeStyle='#3a0e00';c.lineWidth=2;c.stroke();
+  noShadow(c);
+
+  // Decoratieve panelen in bar body
+  for(var pi=0;pi<3;pi++){
+    var px=bx+barW*(0.04+pi*0.32),py=by+topH+bodyH*0.12;
+    rr(c,px,py,barW*0.28,bodyH*0.72,5,'rgba(255,255,255,0.04)','rgba(255,255,255,0.08)',1);
+    // Knop midden
+    circ(c,px+barW*0.14,py+bodyH*0.36,W*0.006,'#c8a050','#a07030',1);
+  }
+
+  // Bar bovenkant (blad)
+  var topG=c.createLinearGradient(bx-barW*0.03,by,bx-barW*0.03+barW*1.06,by);
+  topG.addColorStop(0,'#c8a870');topG.addColorStop(0.3,'#f5deb3');topG.addColorStop(0.7,'#e8cb90');topG.addColorStop(1,'#c8a870');
+  shadow(c,'rgba(0,0,0,0.2)',8);
+  rr(c,bx-barW*0.03,by,barW*1.06,topH,7,null);c.fillStyle=topG;c.fill();
+  c.strokeStyle='#a07040';c.lineWidth=2;c.stroke();
+  noShadow(c);
+  // Glans op bovenkant
+  c.fillStyle='rgba(255,255,255,0.25)';
+  rr(c,bx-barW*0.03+3,by+2,barW*1.06-6,topH*0.38,5,'rgba(255,255,255,0.25)');
+
+  // Lampjes
+  var lkl=['#ff6eb4','#ffe066','#64b5f6','#4caf50','#ff9800','#ce93d8','#ff5252','#80deea'];
+  for(var li=0;li<12;li++){
+    var lx=bx+li*(barW/11);
+    var lkk=lkl[li%lkl.length];
+    var lp=0.55+0.45*Math.sin(T*0.09+li*0.65);
+    shadow(c,lkk,10*lp);
+    circ(c,lx,by-2,W*0.005,lkk);
+    noShadow(c);
+  }
+}
+
+// ── BAR DECO (items op bar) ──
+function tekenBarDeco(c,vy){
+  var bx=W*0.245,barW=W*0.52;
+  var topH=H*0.038,bodyH=H*0.1;
+  var by=vy-bodyH-topH;
+  // Servethouder
+  var sh_x=bx+barW*0.72,sh_y=by-topH*0.1;
+  rr(c,sh_x-W*0.015,sh_y-H*0.045,W*0.03,H*0.045,2,'#c8a870','#a07040',1);
+  for(var si2=0;si2<5;si2++){
+    c.strokeStyle='rgba(255,255,255,0.6)';c.lineWidth=0.8;
+    c.beginPath();c.moveTo(sh_x-W*0.012,sh_y-H*0.04+si2*H*0.007);
+    c.lineTo(sh_x+W*0.012,sh_y-H*0.04+si2*H*0.007);c.stroke();
+  }
+  // Rietjes pot
+  var rp_x=bx+barW*0.2,rp_y=by-topH*0.1;
+  circ(c,rp_x,rp_y-H*0.025,H*0.025,'rgba(0,0,0,0.1)');
+  rr(c,rp_x-W*0.012,rp_y-H*0.05,W*0.024,H*0.05,3,'#8B4513','#5a2d0c',1);
+  var rietkl=['#ff6eb4','#ffe066','#64b5f6','#4caf50'];
+  for(var ri=0;ri<4;ri++){
+    c.strokeStyle=rietkl[ri];c.lineWidth=2;
+    c.beginPath();c.moveTo(rp_x-W*0.006+ri*W*0.004,rp_y-H*0.045);
+    c.lineTo(rp_x-W*0.009+ri*W*0.004,rp_y-H*0.09);c.stroke();
+  }
+  // Kassa
+  var kx=bx+barW*0.5,ky=by-topH*0.1;
+  rr(c,kx-W*0.038,ky-H*0.075,W*0.076,H*0.075,4,'#2d2d2d','#1a1a1a',1);
+  rr(c,kx-W*0.032,ky-H*0.07,W*0.064,H*0.04,3,'#1a8a1a','#0d5a0d',1);
+  c.fillStyle='#aaff88';c.font='bold '+Math.round(H*0.018)+'px Nunito';c.textAlign='center';
+  c.fillText('€ 3.50',kx,ky-H*0.04);
+  // Knoppen
+  for(var ki=0;ki<9;ki++){
+    rr(c,kx-W*0.028+ki%3*W*0.019,ky-H*0.025+Math.floor(ki/3)*H*0.013,W*0.015,H*0.01,2,'#444444','#222',0.5);
+  }
+}
+
+// ── BARTENDER ──
+function tekenBartender(c,cx,vy){
+  var bx=W*0.245,barW=W*0.52,topH=H*0.038,bodyH=H*0.1;
+  var barTopY=vy-bodyH-topH;
+  var scy=barTopY-H*0.01;
+  var schaal=Math.min(1.1,H/680);
+  var tH=H*0.16*schaal;
+  var hR=H*0.058*schaal;
+  var aL=H*0.1*schaal,aW=W*0.025*schaal;
+  var bL=H*0.0*schaal;
+  var aWig=Math.sin(T*0.04)*0.12;
+
+  c.save();c.translate(cx,scy);
+
+  // Schaduw
+  c.fillStyle='rgba(0,0,0,0.1)';
+  c.beginPath();c.ellipse(0,0,W*0.06,H*0.015,0,0,Math.PI*2);c.fill();
+
+  // Broek / rok
+  var rokG=c.createLinearGradient(-W*0.04,-tH*0.15,W*0.04,0);
+  rokG.addColorStop(0,'#1565c0');rokG.addColorStop(1,'#0d47a1');
+  rr(c,-W*0.04,-tH*0.15,W*0.08,tH*0.2,5,null);c.fillStyle=rokG;c.fill();
+
+  // Torso
+  var torsoG=c.createLinearGradient(-W*0.042,-tH,W*0.042,0);
+  torsoG.addColorStop(0,'#1976d2');torsoG.addColorStop(1,'#1565c0');
+  rr(c,-W*0.042,-tH,W*0.084,tH*0.85,W*0.018,null);c.fillStyle=torsoG;c.fill();
+  c.strokeStyle='#0d47a1';c.lineWidth=1.5;c.stroke();
+
+  // Schort
+  var schortG=c.createLinearGradient(-W*0.028,-tH*0.85,W*0.028,-tH*0.1);
+  schortG.addColorStop(0,'#ff80ab');schortG.addColorStop(1,'#ff4081');
+  rr(c,-W*0.028,-tH*0.85,W*0.056,tH*0.75,4,null);c.fillStyle=schortG;c.fill();
+  // Schort band
+  c.strokeStyle='rgba(255,255,255,0.4)';c.lineWidth=2;
+  c.beginPath();c.moveTo(-W*0.028,-tH*0.85);c.lineTo(-W*0.042,-tH);c.stroke();
+  c.beginPath();c.moveTo(W*0.028,-tH*0.85);c.lineTo(W*0.042,-tH);c.stroke();
+  // Schort zak
+  rr(c,-W*0.012,-tH*0.45,W*0.024,H*0.04,3,'rgba(255,255,255,0.15)','rgba(255,255,255,0.2)',1);
+
+  // Armen
+  c.lineCap='round';
+  // Links (actief, roert)
+  c.strokeStyle='#1565c0';c.lineWidth=aW;
+  c.save();c.translate(-W*0.044,-tH*0.62);c.rotate(0.35+aWig);
+  c.beginPath();c.moveTo(0,0);c.lineTo(0,aL);c.stroke();
+  c.fillStyle='#f5cba7';circ(c,0,aL,aW*0.55,'#f5cba7');
+  // Lepel in hand
+  c.strokeStyle='#c8a870';c.lineWidth=2;c.lineCap='round';
+  c.beginPath();c.moveTo(0,aL-2);c.lineTo(W*0.025,aL+H*0.045);c.stroke();
+  circ(c,W*0.028,aL+H*0.05,W*0.008,'#d4b870');
+  c.restore();
+  // Rechts
+  c.strokeStyle='#1565c0';c.lineWidth=aW;c.lineCap='round';
+  c.save();c.translate(W*0.044,-tH*0.62);c.rotate(-0.2-aWig*0.5);
+  c.beginPath();c.moveTo(0,0);c.lineTo(0,aL);c.stroke();
+  c.fillStyle='#f5cba7';circ(c,0,aL,aW*0.55,'#f5cba7');
+  c.restore();
+
+  // Hoofd
+  c.translate(0,-tH-hR*0.7);
+  // Nek
+  var nekG=c.createLinearGradient(-hR*0.2,0,hR*0.2,hR*0.5);
+  nekG.addColorStop(0,'#f5cba7');nekG.addColorStop(1,'#e8b896');
+  rr(c,-hR*0.22,0,hR*0.44,hR*0.5,hR*0.1,null);c.fillStyle=nekG;c.fill();
+  // Hoofd
+  var hG=c.createRadialGradient(-hR*0.2,-hR*0.3,0,0,0,hR*1.2);
+  hG.addColorStop(0,'#fde3c0');hG.addColorStop(1,'#f5cba7');
+  shadow(c,'rgba(0,0,0,0.15)',6);
+  circ(c,0,0,hR,null);c.fillStyle=hG;c.fill();
+  noShadow(c);
+  c.strokeStyle='#e8b896';c.lineWidth=1.5;c.stroke();
+
+  // Haar
+  c.fillStyle='#3d1a00';
+  c.beginPath();c.arc(0,-hR*0.1,hR*1.02,Math.PI*1.05,Math.PI*0.05);c.closePath();c.fill();
+  // Paardenstaart
+  c.strokeStyle='#3d1a00';c.lineWidth=hR*0.22;c.lineCap='round';
+  c.beginPath();c.moveTo(hR*0.85,-hR*0.1);
+  c.quadraticCurveTo(hR*1.4,hR*0.4,hR*1.0,hR*0.9);c.stroke();
+  // Haar glans
+  c.strokeStyle='rgba(120,60,0,0.3)';c.lineWidth=hR*0.12;
+  c.beginPath();c.arc(hR*0.1,-hR*0.2,hR*0.75,Math.PI*1.1,Math.PI*0.3);c.stroke();
+
+  // Koksmuts
+  // Band
+  rr(c,-hR*0.85,-hR*1.08,hR*1.7,hR*0.3,3,'white','#ddd',1.5);
+  // Bol
+  c.fillStyle='white';
+  c.beginPath();c.arc(0,-hR*1.25,hR*0.62,0,Math.PI*2);c.fill();
+  c.strokeStyle='#ddd';c.lineWidth=1;c.stroke();
+  // Plooien
+  c.strokeStyle='rgba(200,200,200,0.5)';c.lineWidth=1;
+  for(var mi=-2;mi<=2;mi++){
+    c.beginPath();c.arc(mi*hR*0.25,-hR*1.25,hR*0.4,Math.PI*0.2,Math.PI*0.8);c.stroke();
+  }
+
+  // Ogen
+  circ(c,-hR*0.3,-hR*0.08,hR*0.12,'#1a1a1a');
+  circ(c,hR*0.3,-hR*0.08,hR*0.12,'#1a1a1a');
+  // Glins
+  circ(c,-hR*0.26,-hR*0.12,hR*0.04,'white');
+  circ(c,hR*0.34,-hR*0.12,hR*0.04,'white');
+  // Wimpers
+  c.strokeStyle='#1a1a1a';c.lineWidth=1.5;c.lineCap='round';
+  [[-0.42,-0.18,-0.5,-0.28],[-0.3,-0.2,-0.3,-0.3],[0.42,-0.18,0.5,-0.28],[0.3,-0.2,0.3,-0.3]].forEach(function(l){
+    c.beginPath();c.moveTo(l[0]*hR,l[1]*hR);c.lineTo(l[2]*hR,l[3]*hR);c.stroke();
+  });
+  // Neus
+  c.fillStyle='#e8a080';c.beginPath();c.ellipse(0,hR*0.1,hR*0.1,hR*0.07,0,0,Math.PI*2);c.fill();
+  // Glimlach
+  c.strokeStyle='#c0392b';c.lineWidth=1.8;c.lineCap='round';
+  c.beginPath();c.arc(0,hR*0.18,hR*0.28,0.15,Math.PI-0.15);c.stroke();
+  // Wangen
+  c.fillStyle='rgba(255,150,150,0.35)';
+  circ(c,-hR*0.55,hR*0.12,hR*0.18,'rgba(255,150,150,0.35)');
+  circ(c,hR*0.55,hR*0.12,hR*0.18,'rgba(255,150,150,0.35)');
+
+  c.restore();
+}
+
+// ── WOLKJE MET TEKST ──
+function tekenWolk(c,x,y){
+  var tekst=wolkTekst;
+  if(!tekst)return;
+  c.save();c.globalAlpha=wolkAlpha;
+  c.font='bold '+Math.round(Math.min(14,W*0.035))+'px Nunito';
+  var tw=c.measureText(tekst).width;
+  var pw=tw+32,ph=36,r=18;
+  var wx=Math.min(Math.max(x-pw/2,8),W-pw-8);
+  var wy=y-ph-18;
+
+  // Schaduw
+  c.shadowColor='rgba(0,0,0,0.2)';c.shadowBlur=10;c.shadowOffsetY=3;
+  // Wolkje achtergrond
+  rr(c,wx,wy,pw,ph,r,'white','rgba(200,200,220,0.4)',1.5);
+  c.shadowColor='transparent';c.shadowBlur=0;c.shadowOffsetY=0;
+
+  // Puntje naar dier
+  var px2=Math.min(Math.max(x,wx+r),wx+pw-r);
+  c.fillStyle='white';
+  c.beginPath();c.moveTo(px2-7,wy+ph);c.lineTo(px2,wy+ph+14);c.lineTo(px2+7,wy+ph);c.closePath();c.fill();
+  // Lijn aan zijkant puntje
+  c.strokeStyle='rgba(200,200,220,0.4)';c.lineWidth=1.5;
+  c.beginPath();c.moveTo(px2-7,wy+ph);c.lineTo(px2,wy+ph+14);c.lineTo(px2+7,wy+ph);c.stroke();
+
+  // Kleine decoratieve bolletjes (cloud-stijl)
+  c.fillStyle='white';
+  circ(c,wx+r*0.5,wy+2,7,'white');
+  circ(c,wx+r*1.5,wy-2,9,'white');
+  circ(c,wx+pw-r*0.5,wy+2,7,'white');
+
+  // Tekst
+  c.fillStyle='#2d1a3a';
+  c.textAlign='left';
+  c.fillText(tekst,wx+16,wy+ph*0.67);
+  c.restore();
+}
+
+// ── BAR GLAS ──
+function tekenBarGlas(c){
+  var bx=W*0.245,barW=W*0.52,topH=H*0.038,bodyH=H*0.1;
+  var vy=vloerY;
+  var gx2=bx+barW*0.55,gy=vy-bodyH-topH-H*0.14;
+  var gw=W*0.06,gh=H*0.12;
+  var p=0.96+0.04*Math.sin(T*0.1);
+  c.save();c.translate(gx2+gw/2,gy+gh/2);c.scale(p,p);c.translate(-(gx2+gw/2),-(gy+gh/2));
+
+  // Glas
+  var glasG=c.createLinearGradient(gx2,gy,gx2+gw,gy);
+  glasG.addColorStop(0,'rgba(200,235,255,0.35)');
+  glasG.addColorStop(0.3,'rgba(230,245,255,0.5)');
+  glasG.addColorStop(1,'rgba(200,235,255,0.35)');
+  c.beginPath();c.moveTo(gx2,gy);c.lineTo(gx2+gw,gy);
+  c.lineTo(gx2+gw*0.85,gy+gh);c.lineTo(gx2+gw*0.15,gy+gh);c.closePath();
+  c.fillStyle=glasG;c.fill();
+  c.strokeStyle='rgba(180,220,255,0.7)';c.lineWidth=2;c.stroke();
+
+  // Vulling
+  if(smootje){
+    var vulG=c.createLinearGradient(gx2,gy+4,gx2+gw,gy+gh);
+    vulG.addColorStop(0,smootje.kl+'cc');vulG.addColorStop(1,smootje.kl);
+    c.beginPath();c.moveTo(gx2+2,gy+5);c.lineTo(gx2+gw-2,gy+5);
+    c.lineTo(gx2+gw*0.83,gy+gh-2);c.lineTo(gx2+gw*0.17,gy+gh-2);c.closePath();
+    c.fillStyle=vulG;c.fill();
+    // Schuimlaag
+    c.fillStyle='rgba(255,255,255,0.55)';
+    c.beginPath();c.moveTo(gx2+2,gy+4);c.lineTo(gx2+gw-2,gy+4);
+    c.lineTo(gx2+gw-3,gy+12);c.lineTo(gx2+3,gy+12);c.closePath();c.fill();
+    // Bubbels
+    c.fillStyle='rgba(255,255,255,0.45)';
+    for(var bi=0;bi<5;bi++){
+      var bx2=gx2+gw*0.2+bi*gw*0.14,by2=gy+gh*0.4+Math.sin(T*0.1+bi)*H*0.015;
+      circ(c,bx2,by2,2+bi*0.8,'rgba(255,255,255,0.45)');
+    }
+    // Emoji
+    c.font=Math.round(gw*0.8)+'px serif';c.textAlign='center';
+    c.fillText(smootje.em,gx2+gw/2,gy-5);
+  }
+  // Rietje
+  c.strokeStyle='#ff6eb4';c.lineWidth=3;c.lineCap='round';
+  c.beginPath();c.moveTo(gx2+gw*0.72,gy+gh*0.88);c.lineTo(gx2+gw*0.9,gy-8);c.stroke();
+  // Schijf limoen
+  circ(c,gx2+gw*0.3,gy+4,gw*0.22,'#a5d6a7','#66bb6a',1.5);
+  c.strokeStyle='#2e7d32';c.lineWidth=0.8;
+  c.beginPath();c.moveTo(gx2+gw*0.3,gy+4-gw*0.22);c.lineTo(gx2+gw*0.3,gy+4+gw*0.22);c.stroke();
+  c.restore();
+}
+
+// ══════════════════════════════════════════════════
+// DIER TEKENEN
+// ══════════════════════════════════════════════════
+function getDierH(){return H*0.22;}
+
+function tekenDier(c,x,y,d,richt){
+  var sc=Math.min(1.15,H/640);
+  var tW=W*0.075*sc,tH=H*0.12*sc;
+  var hR=W*0.045*sc;
+  var bL=H*0.08*sc,bW=W*0.022*sc;
+  var aL=H*0.072*sc,aW=W*0.02*sc;
+  var bHk=dierLoopt?beenHoek:0;
+  var aHk=armHoek;
+  c.save();c.translate(x,y);c.scale(richt,1);
+
+  // Schaduw
+  c.fillStyle='rgba(0,0,0,0.12)';
+  c.beginPath();c.ellipse(0,3,tW*0.9,H*0.015,0,0,Math.PI*2);c.fill();
+
+  // STAART
+  if(d.type!=='konijn'){
+    c.strokeStyle=d.lk;c.lineWidth=bW*1.2;c.lineCap='round';
+    var stHk=Math.sin(idleT*1.5)*0.35;
+    c.save();c.translate(tW*0.48,-tH*0.5);
+    c.beginPath();c.moveTo(0,0);
+    c.quadraticCurveTo(tW*(0.6+stHk),-(tH*0.3+stHk*10),tW*0.35,-tH*0.7);
+    c.stroke();
+    if(d.type==='vos'||d.type==='wasbeer'){
+      circ(c,tW*0.35,-tH*0.7,bW*1.4,'white');
+    }
+    c.restore();
+  }
+
+  // BENEN
+  c.lineCap='round';c.strokeStyle=d.lk;c.lineWidth=bW;
+  // Linker been (achter)
+  c.save();c.translate(-tW*0.3,-bL*0.05);c.rotate(-bHk*0.7);
+  c.beginPath();c.moveTo(0,0);c.lineTo(0,bL);c.stroke();
+  // Voet
+  var vG=c.createLinearGradient(-bW,bL,bW,bL+bW*0.6);
+  vG.addColorStop(0,d.lk);vG.addColorStop(1,d.ok);
+  c.fillStyle=vG;
+  c.beginPath();c.ellipse(bL*0.12*Math.sin(-bHk*0.7),bL+bW*0.4,bW*1.3,bW*0.7,0,0,Math.PI*2);c.fill();
+  c.restore();
+  // Rechter been (voor)
+  c.save();c.translate(tW*0.3,-bL*0.05);c.rotate(bHk*0.7);
+  c.beginPath();c.moveTo(0,0);c.lineTo(0,bL);c.stroke();
+  c.fillStyle=vG;
+  c.beginPath();c.ellipse(-bL*0.12*Math.sin(bHk*0.7),bL+bW*0.4,bW*1.3,bW*0.7,0,0,Math.PI*2);c.fill();
+  c.restore();
+
+  // TORSO
+  var torsoG=c.createRadialGradient(-tW*0.2,-tH*0.5,0,0,-tH*0.3,tW*1.2);
+  torsoG.addColorStop(0,lichten(d.lk,30));torsoG.addColorStop(1,d.lk);
+  rr(c,-tW/2,-tH,tW,tH,tW*0.35,null);c.fillStyle=torsoG;c.fill();
+  c.strokeStyle=donkeren(d.lk,20);c.lineWidth=1.5;c.stroke();
+  // Buik
+  var buikG=c.createRadialGradient(0,-tH*0.45,0,0,-tH*0.45,tW*0.5);
+  buikG.addColorStop(0,lichten(d.bk,20));buikG.addColorStop(1,d.bk);
+  circ(c,0,-tH*0.45,tW*0.36,null);c.fillStyle=buikG;c.fill();
+
+  // ARMEN
+  c.lineCap='round';c.strokeStyle=d.lk;c.lineWidth=aW;
+  // Links
+  c.save();c.translate(-tW*0.52,-tH*0.72);c.rotate(aHk+0.18+bHk*0.4);
+  c.beginPath();c.moveTo(0,0);c.lineTo(0,aL);c.stroke();
+  circ(c,0,aL,aW*0.65,d.lk);c.restore();
+  // Rechts
+  c.save();c.translate(tW*0.52,-tH*0.72);c.rotate(-aHk-0.12-bHk*0.4);
+  c.beginPath();c.moveTo(0,0);c.lineTo(0,aL);c.stroke();
+  circ(c,0,aL,aW*0.65,d.lk);c.restore();
+
+  // HOOFD
+  var hY=-tH-hR*0.55;
+  // Nek
+  rr(c,-hR*0.22,hY+hR*0.3,hR*0.44,hR*0.6,hR*0.1,d.lk,donkeren(d.lk,15),1);
+
+  // Hoofd vorm (type-specifiek)
+  var hG=c.createRadialGradient(-hR*0.25,hY-hR*0.3,0,0,hY,hR*1.4);
+  hG.addColorStop(0,lichten(d.lk,25));hG.addColorStop(1,d.lk);
+  shadow(c,'rgba(0,0,0,0.15)',6);
+
+  if(d.type==='konijn'||d.type==='hamster'){
+    // Ronde hoofd
+    circ(c,0,hY,hR,null);c.fillStyle=hG;c.fill();
+    c.strokeStyle=donkeren(d.lk,20);c.lineWidth=1.5;c.stroke();
+    // Wangen puffed (hamster)
+    if(d.type==='hamster'){
+      circ(c,-hR*0.72,hY+hR*0.15,hR*0.38,d.bk,donkeren(d.bk,15),1);
+      circ(c,hR*0.72,hY+hR*0.15,hR*0.38,d.bk,donkeren(d.bk,15),1);
+    }
+    // Lange oren
+    var oorH=hR*1.4,oorW=hR*0.32;
+    rr(c,-hR*0.55,hY-hR-oorH+hR*0.3,oorW,oorH,oorW/2,d.ok,donkeren(d.ok,15),1);
+    rr(c,hR*0.22,hY-hR-oorH+hR*0.3,oorW,oorH,oorW/2,d.ok,donkeren(d.ok,15),1);
+    rr(c,-hR*0.48,hY-hR-oorH+hR*0.35,oorW*0.55,oorH*0.82,oorW*0.28,'#ffb3ba',null);
+    rr(c,hR*0.29,hY-hR-oorH+hR*0.35,oorW*0.55,oorH*0.82,oorW*0.28,'#ffb3ba',null);
+  } else if(d.type==='uil'){
+    // Uil: meer vierkant hoofd
+    rr(c,-hR*0.95,hY-hR*0.9,hR*1.9,hR*1.8,hR*0.5,null);c.fillStyle=hG;c.fill();
+    c.strokeStyle=donkeren(d.lk,20);c.lineWidth=1.5;c.stroke();
+    // Oor-kuifjes
+    c.fillStyle=d.ok;
+    c.beginPath();c.moveTo(-hR*0.5,hY-hR*0.88);c.lineTo(-hR*0.7,hY-hR*1.4);c.lineTo(-hR*0.25,hY-hR*0.9);c.closePath();c.fill();
+    c.beginPath();c.moveTo(hR*0.5,hY-hR*0.88);c.lineTo(hR*0.7,hY-hR*1.4);c.lineTo(hR*0.25,hY-hR*0.9);c.closePath();c.fill();
+    // Gezichtsschijf
+    c.fillStyle=d.bk;c.beginPath();c.ellipse(0,hY,hR*0.82,hR*0.88,0,0,Math.PI*2);c.fill();
+  } else if(d.type==='kat'){
+    circ(c,0,hY,hR,null);c.fillStyle=hG;c.fill();
+    c.strokeStyle=donkeren(d.lk,20);c.lineWidth=1.5;c.stroke();
+    // Puntige oren
+    c.fillStyle=d.ok;
+    c.beginPath();c.moveTo(-hR*0.7,hY-hR*0.6);c.lineTo(-hR*0.45,hY-hR*1.45);c.lineTo(-hR*0.1,hY-hR*0.65);c.closePath();c.fill();
+    c.beginPath();c.moveTo(hR*0.7,hY-hR*0.6);c.lineTo(hR*0.45,hY-hR*1.45);c.lineTo(hR*0.1,hY-hR*0.65);c.closePath();c.fill();
+    // Binnen oor
+    c.fillStyle='#ffb3ba';
+    c.beginPath();c.moveTo(-hR*0.6,hY-hR*0.65);c.lineTo(-hR*0.45,hY-hR*1.25);c.lineTo(-hR*0.18,hY-hR*0.7);c.closePath();c.fill();
+    c.beginPath();c.moveTo(hR*0.6,hY-hR*0.65);c.lineTo(hR*0.45,hY-hR*1.25);c.lineTo(hR*0.18,hY-hR*0.7);c.closePath();c.fill();
+    // Snorren
+    c.strokeStyle='rgba(255,255,255,0.7)';c.lineWidth=1.2;c.lineCap='round';
+    [[-hR*0.95,hY+hR*0.18,-hR*0.28,hY+hR*0.2],[-hR*0.95,hY+hR*0.28,-hR*0.28,hY+hR*0.25],
+     [hR*0.95,hY+hR*0.18,hR*0.28,hY+hR*0.2],[hR*0.95,hY+hR*0.28,hR*0.28,hY+hR*0.25]].forEach(function(l){
+      c.beginPath();c.moveTo(l[0],l[1]);c.lineTo(l[2],l[3]);c.stroke();
+    });
+  } else if(d.type==='panda'){
+    circ(c,0,hY,hR,null);c.fillStyle=hG;c.fill();
+    c.strokeStyle='#ddd';c.lineWidth=1.5;c.stroke();
+    // Ronde oren
+    circ(c,-hR*0.68,hY-hR*0.72,hR*0.3,'#222222');
+    circ(c,hR*0.68,hY-hR*0.72,hR*0.3,'#222222');
+    // Zwarte oogvlekken
+    c.fillStyle='#1a1a1a';
+    c.beginPath();c.ellipse(-hR*0.3,hY-hR*0.08,hR*0.28,hR*0.22,0.25,0,Math.PI*2);c.fill();
+    c.beginPath();c.ellipse(hR*0.3,hY-hR*0.08,hR*0.28,hR*0.22,-0.25,0,Math.PI*2);c.fill();
+  } else {
+    // Beer, vos, eekhoorn, wasbeer — ronde oren
+    circ(c,0,hY,hR,null);c.fillStyle=hG;c.fill();
+    c.strokeStyle=donkeren(d.lk,20);c.lineWidth=1.5;c.stroke();
+    circ(c,-hR*0.68,hY-hR*0.72,hR*0.3,d.ok,donkeren(d.ok,15),1);
+    circ(c,hR*0.68,hY-hR*0.72,hR*0.3,d.ok,donkeren(d.ok,15),1);
+    circ(c,-hR*0.68,hY-hR*0.72,hR*0.16,'#ffb3ba');
+    circ(c,hR*0.68,hY-hR*0.72,hR*0.16,'#ffb3ba');
+    // Snuit
+    circ(c,0,hY+hR*0.28,hR*0.4,d.bk,donkeren(d.bk,10),1);
+    // Wasbeer masker
+    if(d.type==='wasbeer'){
+      c.fillStyle='rgba(40,40,40,0.45)';
+      c.beginPath();c.ellipse(-hR*0.3,hY-hR*0.08,hR*0.28,hR*0.2,0.2,0,Math.PI*2);c.fill();
+      c.beginPath();c.ellipse(hR*0.3,hY-hR*0.08,hR*0.28,hR*0.2,-0.2,0,Math.PI*2);c.fill();
+    }
+    // Vos-witte mond
+    if(d.type==='vos'){
+      circ(c,0,hY+hR*0.32,hR*0.28,'white');
+    }
+  }
+  noShadow(c);
+
+  // OGEN (universal, tenzij al getekend)
+  if(d.type!=='panda'){
+    var oogOffX=d.type==='uil'?hR*0.35:hR*0.3;
+    var oogY2=d.type==='uil'?hY+hR*0.08:hY-hR*0.08;
+    var oogR=d.type==='uil'?hR*0.22:hR*0.13;
+    circ(c,-oogOffX,oogY2,oogR,d.ek);
+    circ(c,oogOffX,oogY2,oogR,d.ek);
+    // Pupillen
+    if(d.type==='uil'){
+      circ(c,-oogOffX,oogY2,oogR*0.6,'#1a1a1a');
+      circ(c,oogOffX,oogY2,oogR*0.6,'#1a1a1a');
+    }
+    // Glinstertjes
+    circ(c,-oogOffX+oogR*0.28,oogY2-oogR*0.28,oogR*0.3,'white');
+    circ(c,oogOffX+oogR*0.28,oogY2-oogR*0.28,oogR*0.3,'white');
+  } else {
+    // Panda ogen wit op zwart vlak
+    circ(c,-hR*0.3,hY-hR*0.08,hR*0.12,'white');
+    circ(c,hR*0.3,hY-hR*0.08,hR*0.12,'white');
+    circ(c,-hR*0.27,hY-hR*0.11,hR*0.05,'white');
+    circ(c,hR*0.33,hY-hR*0.11,hR*0.05,'white');
+  }
+
+  // NEUS (type-specifiek)
+  if(d.type==='konijn'||d.type==='hamster'){
+    circ(c,0,hY+hR*0.2,hR*0.1,d.nk);
+    // Gespleten lip
+    c.strokeStyle=d.nk;c.lineWidth=1.2;c.lineCap='round';
+    c.beginPath();c.moveTo(0,hY+hR*0.3);c.lineTo(0,hY+hR*0.48);c.stroke();
+  } else if(d.type==='uil'){
+    // Snaveltje
+    c.fillStyle='#c87820';
+    c.beginPath();c.moveTo(-hR*0.1,hY+hR*0.15);c.lineTo(0,hY+hR*0.35);c.lineTo(hR*0.1,hY+hR*0.15);c.closePath();c.fill();
+  } else if(d.type==='kat'){
+    c.fillStyle=d.nk;c.beginPath();c.moveTo(-hR*0.08,hY+hR*0.12);c.lineTo(hR*0.08,hY+hR*0.12);c.lineTo(0,hY+hR*0.22);c.closePath();c.fill();
+  } else {
+    c.fillStyle=d.nk;c.beginPath();c.ellipse(0,hY+hR*0.26,hR*0.18,hR*0.12,0,0,Math.PI*2);c.fill();
+    circ(c,-hR*0.06,hY+hR*0.22,hR*0.04,'rgba(255,255,255,0.35)');
+  }
+
+  // MOND
+  if(d.type!=='uil'){
+    c.strokeStyle='rgba(0,0,0,0.35)';c.lineWidth=1.6;c.lineCap='round';
+    if(d.type==='kat'){
+      c.beginPath();c.moveTo(-hR*0.22,hY+hR*0.35);c.arc(-hR*0.12,hY+hR*0.35,hR*0.1,Math.PI,0);c.stroke();
+      c.beginPath();c.moveTo(hR*0.22,hY+hR*0.35);c.arc(hR*0.12,hY+hR*0.35,hR*0.1,0,Math.PI);c.stroke();
+    } else {
+      c.beginPath();c.arc(0,hY+hR*0.3,hR*0.22,0.1,Math.PI-0.1);c.stroke();
+    }
+  }
+
+  // WANGEN
+  c.fillStyle='rgba(255,150,150,0.28)';
+  circ(c,-hR*0.58,hY+hR*0.18,hR*0.2,'rgba(255,150,150,0.28)');
+  circ(c,hR*0.58,hY+hR*0.18,hR*0.2,'rgba(255,150,150,0.28)');
+
+  // NAAM LABEL — schaal resetten zodat tekst niet spiegelt
+  c.save();
+  c.scale(richt, 1); // herstel richting (richt is -1 of 1, dus *richt annuleert de eerder gezette scale)
+  c.font='bold '+Math.round(Math.min(13,W*0.032))+'px Nunito';
+  c.textAlign='center';
+  var lblW=c.measureText(d.nm).width+20;
+  var lblY=hY-hR*1.7;
+  rr(c,-lblW/2,lblY-14,lblW,19,9,'rgba(0,0,0,0.5)');
+  c.fillStyle='white';
+  c.fillText(d.nm,0,lblY);
+  c.restore();
+
+  c.restore();
+}
+
+// Kleur helpers
+function lichten(hex,pct){
+  var n=parseInt(hex.slice(1),16);
+  var r=Math.min(255,((n>>16)&0xff)+pct*2.2|0);
+  var g=Math.min(255,((n>>8)&0xff)+pct*2.2|0);
+  var b=Math.min(255,(n&0xff)+pct*2.2|0);
+  return 'rgb('+r+','+g+','+b+')';
+}
+function donkeren(hex,pct){
+  var n=parseInt(hex.slice(1),16);
+  var r=Math.max(0,((n>>16)&0xff)-pct*2|0);
+  var g=Math.max(0,((n>>8)&0xff)-pct*2|0);
+  var b=Math.max(0,(n&0xff)-pct*2|0);
+  return 'rgb('+r+','+g+','+b+')';
+}
+
+// ══════════════════════════════════════════════════
+// KEUKEN CANVAS
+// ══════════════════════════════════════════════════
+function initKeukenCanvas(){
+  var kc=document.getElementById('kc');
+  kc.width=W;kc.height=Math.round(Math.min(H*0.44,300));
+  kCtx=kc.getContext('2d');
+}
+function renderKeuken(){
+  if(!kCtx)return;
+  var c=kCtx;
+  var kw=c.canvas.width,kh=c.canvas.height;
+  c.clearRect(0,0,kw,kh);
+
+  // Keuken achtergrond
+  var bg=c.createLinearGradient(0,0,0,kh);
+  bg.addColorStop(0,'#fff9f0');bg.addColorStop(1,'#ffe0b2');
+  c.fillStyle=bg;c.fillRect(0,0,kw,kh);
+  // Tegels
+  c.strokeStyle='rgba(180,140,80,0.18)';c.lineWidth=1;
+  var tg=kw/10;
+  for(var ti=0;ti<=10;ti++){c.beginPath();c.moveTo(ti*tg,0);c.lineTo(ti*tg,kh);c.stroke();}
+  for(var tj=0;tj<=6;tj++){c.beginPath();c.moveTo(0,tj*kh/6);c.lineTo(kw,tj*kh/6);c.stroke();}
+  // Aanrecht
+  var ax=kw*0.04,ay=kh*0.18,aw=kw*0.92,ah=kh*0.6;
+  var aanG=c.createLinearGradient(ax,ay,ax,ay+ah);
+  aanG.addColorStop(0,'#e8f5e9');aanG.addColorStop(0.7,'#c8e6c9');aanG.addColorStop(1,'#a5d6a7');
+  rr(c,ax,ay,aw,ah,14,null);c.fillStyle=aanG;c.fill();
+  c.strokeStyle='#81c784';c.lineWidth=3;c.stroke();
+  // Glans aanrecht
+  c.fillStyle='rgba(255,255,255,0.35)';
+  rr(c,ax+4,ay+4,aw-8,ah*0.1,10,'rgba(255,255,255,0.35)');
+  // Onderkast
+  rr(c,ax,ay+ah,aw,kh*0.2,0,'#8d6e63','#5d4037',2);
+  // Kast deurtjes
+  for(var ki=0;ki<3;ki++){
+    rr(c,ax+aw*0.03+ki*(aw*0.32),ay+ah+kh*0.02,aw*0.3,kh*0.15,6,'#7d5c4a','#5d4037',1.5);
+    circ(c,ax+aw*0.18+ki*(aw*0.32),ay+ah+kh*0.1,kh*0.02,'#d4a870');
+  }
+
+  var stap=kStappen[kStap];
+  if(!stap)return;
+  if(stap.scene==='snij')           tekenSnijSceneK(c,kw,kh,ay,stap);
+  else if(stap.scene==='blend')     tekenBlendSceneK(c,kw,kh,ay,stap);
+  else if(stap.scene==='glas')      tekenGlasSceneK(c,kw,kh,ay,stap);
+  else if(stap.scene==='klaar')     tekenKlaarSceneK(c,kw,kh,ay,stap);
+  else if(stap.scene==='ijs_init')  tekenIjsMachineScene(c,kw,kh,ay,stap,false);
+  else if(stap.scene==='ijs_schep') tekenIjsSchepScene(c,kw,kh,ay,stap);
+  else if(stap.scene==='ijs_topping')tekenIjsToppingScene(c,kw,kh,ay,stap);
+  else if(stap.scene==='ijs_klaar') tekenIjsKlaarScene(c,kw,kh,ay,stap);
+}
+
+function tekenSnijSceneK(c,kw,kh,ay,stap){
+  // Snijplank
+  var bx=kw*0.22,by=ay+kh*0.06,bw=kw*0.56,bh=kh*0.44;
+  var plG=c.createLinearGradient(bx,by,bx,by+bh);
+  plG.addColorStop(0,'#d4a574');plG.addColorStop(1,'#c8956a');
+  rr(c,bx,by,bw,bh,10,null);c.fillStyle=plG;c.fill();
+  c.strokeStyle='#b8855a';c.lineWidth=2;c.stroke();
+  // Snijgroeven
+  c.strokeStyle='rgba(150,100,50,0.22)';c.lineWidth=1;
+  for(var gi=1;gi<5;gi++){c.beginPath();c.moveTo(bx+bw*gi/5,by+6);c.lineTo(bx+bw*gi/5,by+bh-6);c.stroke();}
+  for(var gj=1;gj<3;gj++){c.beginPath();c.moveTo(bx+6,by+bh*gj/3);c.lineTo(bx+bw-6,by+bh*gj/3);c.stroke();}
+
+  var ing=INGREDIENTEN.find(function(i){return i.id===stap.ingId;});
+  if(!ing)return;
+  var cx=bx+bw*0.5,cy=by+bh*0.5;
+  var ns=stap.stukjes||0;
+
+  if(ns===0){
+    tekenFruitGrootK(c,cx,cy,ing,kh*0.13,kh);
+    tekenMesK(c,bx+bw*0.82,by-kh*0.06,kh);
+  } else {
+    var posities=[];
+    for(var si=0;si<Math.min(ns,8);si++){
+      posities.push({x:bx+bw*(0.14+si%4*0.24),y:by+bh*(0.2+Math.floor(si/4)*0.5)});
+    }
+    posities.forEach(function(p,i){
+      tekenFruitStukjeK(c,p.x,p.y,ing,kh*0.07,i);
+    });
+    tekenMesK(c,cx+bw*0.12,by-kh*0.07,kh);
+    // Sap spatters
+    c.fillStyle=ing.kl+'80';
+    for(var sp=0;sp<6;sp++){
+      circ(c,bx+bw*(0.2+sp*0.14),by+bh*0.55+sp*3,3+sp*1.2,ing.kl+'60');
+    }
+  }
+}
+
+function tekenFruitGrootK(c,x,y,ing,r,kh){
+  if(ing.id==='banaan'){
+    c.strokeStyle='#ffd700';c.lineWidth=r*1.4;c.lineCap='round';
+    c.beginPath();c.arc(x,y+r*0.2,r*1.2,Math.PI*1.05,Math.PI*0.02);c.stroke();
+    c.fillStyle='#fff3a0';c.beginPath();c.ellipse(x-r*0.05,y+r*0.1,r*0.25,r*0.65,0.15,0,Math.PI*2);c.fill();
+    c.fillStyle='#8B6914';circ(c,x-r*1.1,y+r*0.65,r*0.12,'#8B6914');
+    circ(c,x+r*0.9,y-r*0.75,r*0.1,'#8B6914');
+  } else if(ing.id==='aardbei'){
+    c.fillStyle=ing.kl;
+    c.beginPath();c.moveTo(x,y-r);c.quadraticCurveTo(x+r*1.1,y-r*0.2,x+r*0.8,y+r*0.5);
+    c.quadraticCurveTo(x,y+r,x-r*0.8,y+r*0.5);c.quadraticCurveTo(x-r*1.1,y-r*0.2,x,y-r);c.closePath();c.fill();
+    c.fillStyle=donkeren(ing.kl,20);c.beginPath();c.ellipse(x,y+r*0.1,r*0.7,r*0.65,0,0,Math.PI*2);c.fill();
+    c.fillStyle='#2e7d32';c.font=Math.round(r*0.7)+'px serif';c.textAlign='center';c.fillText('🌿',x,y-r*0.7);
+    c.fillStyle='rgba(255,255,255,0.25)';
+    for(var di2=0;di2<8;di2++){c.font=Math.round(r*0.18)+'px serif';c.fillText('·',x+Math.cos(di2*0.8)*r*0.55,y+Math.sin(di2*0.8)*r*0.5);}
+  } else if(ing.id==='watermeloen'){
+    circ(c,x,y,r,'#2e7d32',donkeren('#2e7d32',15),2);
+    c.strokeStyle='#4caf50';c.lineWidth=1.5;
+    for(var wi=0;wi<4;wi++){c.beginPath();c.arc(x,y,r,wi*Math.PI*0.5,wi*Math.PI*0.5+0.3);c.stroke();}
+    circ(c,x,y,r*0.86,'#ef5350');
+    circ(c,x,y,r*0.78,'#e53935');
+    c.fillStyle='#1a1a1a';
+    for(var si3=0;si3<5;si3++){circ(c,x+Math.cos(si3*1.2)*r*0.45,y+Math.sin(si3*1.2)*r*0.4,r*0.05,'#1a1a1a');}
+    c.fillStyle='rgba(255,255,255,0.3)';circ(c,x-r*0.35,y-r*0.35,r*0.25,'rgba(255,255,255,0.3)');
+  } else if(ing.id==='ananas'){
+    c.fillStyle='#fdd835';
+    c.beginPath();c.ellipse(x,y+r*0.15,r*0.72,r*1.05,0,0,Math.PI*2);c.fill();
+    c.strokeStyle='#f9a825';c.lineWidth=1.5;
+    for(var ai2=0;ai2<12;ai2++){
+      c.beginPath();c.moveTo(x,y+r*0.15);
+      c.arc(x,y+r*0.15,r*0.68,ai2*Math.PI/6,ai2*Math.PI/6+Math.PI/6);c.stroke();
+    }
+    c.fillStyle='#2e7d32';c.font=Math.round(r*0.8)+'px serif';c.textAlign='center';c.fillText('🌿',x,y-r*0.9);
+    c.fillStyle='rgba(255,255,255,0.25)';circ(c,x-r*0.3,y-r*0.3,r*0.25,'rgba(255,255,255,0.25)');
+  } else if(ing.id==='citroen'||ing.id==='peer'||ing.id==='appel'){
+    var kleurTop=ing.id==='appel'?'#e53935':ing.id==='peer'?'#aed581':'#fdd835';
+    circ(c,x,y,r,kleurTop,donkeren(kleurTop,15),2);
+    if(ing.id==='appel'){c.fillStyle='rgba(200,0,0,0.15)';circ(c,x-r*0.25,y,r*0.7,'rgba(200,0,0,0.15)');}
+    c.fillStyle='#5d4037';c.fillRect(x-r*0.04,y-r*1.08,r*0.08,r*0.4);
+    if(ing.id!=='appel'){c.fillStyle='#4caf50';c.font=Math.round(r*0.5)+'px serif';c.textAlign='center';c.fillText('🍃',x+r*0.15,y-r*0.85);}
+    c.fillStyle='rgba(255,255,255,0.3)';circ(c,x-r*0.3,y-r*0.25,r*0.3,'rgba(255,255,255,0.3)');
+  } else {
+    circ(c,x,y,r,ing.kl,donkeren(ing.kl,20),2);
+    c.fillStyle='rgba(255,255,255,0.28)';circ(c,x-r*0.3,y-r*0.25,r*0.3,'rgba(255,255,255,0.28)');
+    circ(c,x-r*0.15,y-r*0.12,r*0.12,'rgba(255,255,255,0.28)');
+  }
+}
+
+function tekenFruitStukjeK(c,x,y,ing,r,idx){
+  var hoek=(idx*53)%360*Math.PI/180;
+  c.save();c.translate(x,y);c.rotate(hoek);
+  if(ing.id==='banaan'){
+    c.fillStyle='#ffd700';c.beginPath();c.arc(0,0,r,0,Math.PI*2);c.fill();
+    c.strokeStyle='#f9a825';c.lineWidth=1.5;
+    c.beginPath();c.moveTo(-r*0.6,0);c.lineTo(r*0.6,0);c.stroke();
+    c.fillStyle='rgba(255,255,255,0.3)';circ(c,-r*0.2,-r*0.2,r*0.25,'rgba(255,255,255,0.3)');
+  } else if(ing.id==='watermeloen'){
+    c.fillStyle='#ef5350';c.beginPath();c.moveTo(-r,0);c.arc(0,0,r,Math.PI,0);c.closePath();c.fill();
+    c.fillStyle='#2e7d32';c.fillRect(-r,-r*0.1,r*2,r*0.12);
+    c.strokeStyle='#1b5e20';c.lineWidth=1;c.stroke();
+    c.fillStyle='#1a1a1a';for(var bj=0;bj<3;bj++)circ(c,-r*0.4+bj*r*0.4,r*0.4,r*0.07,'#1a1a1a');
+    c.fillStyle='rgba(255,255,255,0.3)';circ(c,-r*0.4,r*0.3,r*0.2,'rgba(255,255,255,0.3)');
+  } else {
+    c.fillStyle=ing.kl;
+    c.beginPath();c.moveTo(0,0);c.arc(0,0,r,-Math.PI*0.65,Math.PI*0.65);c.closePath();c.fill();
+    c.fillStyle=ing.sk||ing.kl;
+    c.beginPath();c.moveTo(0,-r*0.55);c.lineTo(r*0.45,0);c.lineTo(0,r*0.55);c.closePath();c.fill();
+    c.fillStyle='rgba(255,255,255,0.22)';circ(c,-r*0.25,-r*0.2,r*0.22,'rgba(255,255,255,0.22)');
+    // Sap lijn
+    c.strokeStyle='rgba(255,255,255,0.4)';c.lineWidth=1;
+    c.beginPath();c.moveTo(-r*0.05,-r*0.7);c.lineTo(-r*0.1,r*0.7);c.stroke();
+  }
+  c.restore();
+}
+
+function tekenMesK(c,x,y,kh){
+  var l=kh*0.2;
+  c.save();c.translate(x,y);c.rotate(Math.PI*0.12);
+  // Heft
+  var hG=c.createLinearGradient(-l*0.09,0,l*0.09,l*0.38);
+  hG.addColorStop(0,'#795548');hG.addColorStop(1,'#4e342e');
+  rr(c,-l*0.09,0,l*0.18,l*0.38,l*0.04,null);c.fillStyle=hG;c.fill();
+  c.strokeStyle='#3e2723';c.lineWidth=1.5;c.stroke();
+  // Bout
+  circ(c,0,l*0.18,l*0.035,'#b0bec5');
+  circ(c,0,l*0.28,l*0.035,'#b0bec5');
+  // Kling
+  var kG=c.createLinearGradient(-l*0.06,l*0.38,l*0.04,l*1.05);
+  kG.addColorStop(0,'#e0e0e0');kG.addColorStop(0.5,'#f5f5f5');kG.addColorStop(1,'#bdbdbd');
+  c.beginPath();c.moveTo(-l*0.06,l*0.38);c.lineTo(l*0.04,l*0.38);
+  c.lineTo(l*0.025,l*1.05);c.lineTo(-l*0.065,l*0.98);c.closePath();
+  c.fillStyle=kG;c.fill();c.strokeStyle='#90a4ae';c.lineWidth=1;c.stroke();
+  // Glans
+  c.strokeStyle='rgba(255,255,255,0.7)';c.lineWidth=1.5;
+  c.beginPath();c.moveTo(-l*0.02,l*0.4);c.lineTo(-l*0.04,l*0.95);c.stroke();
+  c.restore();
+}
+
+function tekenBlendSceneK(c,kw,kh,ay,stap){
+  var bx=kw*0.28,by=ay+kh*0.01,bw=kw*0.44,bh=kh*0.5;
+  // Basis blender
+  var basG=c.createLinearGradient(bx+bw*0.1,by+bh*0.88,bx+bw*0.9,by+bh);
+  basG.addColorStop(0,'#546e7a');basG.addColorStop(1,'#37474f');
+  rr(c,bx+bw*0.08,by+bh*0.86,bw*0.84,bh*0.18,8,null);c.fillStyle=basG;c.fill();
+  c.strokeStyle='#263238';c.lineWidth=2;c.stroke();
+  // Knoppen
+  var kknl=['#ef5350','#42a5f5','#66bb6a'];
+  kknl.forEach(function(kk,ki){
+    var active=ki===0&&blFase===2;
+    shadow(c,active?kk:'transparent',active?8:0);
+    circ(c,bx+bw*(0.3+ki*0.2),by+bh*0.94,bw*0.055,active?kk:'#546e7a','#263238',1);
+    noShadow(c);
+  });
+
+  // Kan
+  var isShaking=blFase===2;
+  var shX=isShaking?Math.sin(T*0.7)*4:0;
+  var shY=isShaking?Math.cos(T*0.55)*2:0;
+  c.save();c.translate(bx+bw*0.5+shX,by+bh*0.86+shY);
+
+  // Kan lichaam
+  c.beginPath();c.moveTo(-bw*0.36,0);c.lineTo(bw*0.36,0);
+  c.lineTo(bw*0.26,-bh*0.82);c.lineTo(-bw*0.26,-bh*0.82);c.closePath();
+  var kanG=c.createLinearGradient(-bw*0.36,-bh*0.82,bw*0.36,0);
+  kanG.addColorStop(0,'rgba(207,227,242,0.4)');kanG.addColorStop(0.5,'rgba(227,242,252,0.55)');kanG.addColorStop(1,'rgba(207,227,242,0.4)');
+  c.fillStyle=kanG;c.fill();
+  c.strokeStyle='rgba(180,210,240,0.65)';c.lineWidth=3;c.stroke();
+  // Glans
+  c.fillStyle='rgba(255,255,255,0.18)';
+  c.beginPath();c.moveTo(-bw*0.36,0);c.lineTo(-bw*0.22,-bh*0.82);c.lineTo(-bw*0.12,-bh*0.82);c.lineTo(-bw*0.26,0);c.closePath();c.fill();
+  // Tuit
+  c.fillStyle='rgba(207,227,242,0.4)';
+  c.beginPath();c.moveTo(-bw*0.26,-bh*0.82);c.lineTo(-bw*0.4,-bh*0.88);c.lineTo(-bw*0.38,-bh*0.96);c.lineTo(-bw*0.24,-bh*0.82);c.closePath();c.fill();
+  c.strokeStyle='rgba(180,210,240,0.6)';c.lineWidth=2;c.stroke();
+
+  // Inhoud
+  if(blInhoud.length>0){
+    var vulH=Math.min(bh*0.68,bh*0.18*blInhoud.length);
+    var inhGg=c.createLinearGradient(0,-vulH,0,0);
+    var k1=INGREDIENTEN.find(function(i){return i.id===blInhoud[0];});
+    var k2=blInhoud.length>1?INGREDIENTEN.find(function(i){return i.id===blInhoud[1];}):k1;
+    inhGg.addColorStop(0,k1?k1.kl+'bb':'#ff9800bb');
+    inhGg.addColorStop(1,k2?k2.kl+'dd':'#ff9800dd');
+    c.beginPath();c.moveTo(-bw*0.33,-vulH);c.lineTo(bw*0.33,-vulH);
+    c.lineTo(bw*0.27,-bh*0.01);c.lineTo(-bw*0.27,-bh*0.01);c.closePath();
+    c.fillStyle=inhGg;c.globalAlpha=0.82;c.fill();c.globalAlpha=1;
+    // Bubbels
+    if(blFase===2){
+      for(var bi2=0;bi2<10;bi2++){
+        var bax=-bw*0.28+Math.random()*bw*0.56;
+        var bay=-vulH*0.15-Math.random()*vulH*0.75;
+        circ(c,bax,bay,2+Math.random()*4,'rgba(255,255,255,0.5)');
+      }
+      // Spat
+      c.fillStyle='rgba(255,255,255,0.15)';
+      c.beginPath();c.arc(0,-vulH,bw*0.35+Math.sin(T*0.3)*bw*0.05,Math.PI,0);c.fill();
+    }
+  }
+  // Mesblad
+  c.save();c.rotate(blRot);
+  c.strokeStyle='rgba(176,190,197,0.9)';c.lineWidth=4;c.lineCap='round';
+  c.beginPath();c.moveTo(-bw*0.24,-bh*0.04);c.lineTo(bw*0.24,-bh*0.04);c.stroke();
+  c.beginPath();c.moveTo(0,-bh*0.04-bw*0.24);c.lineTo(0,-bh*0.04+bw*0.24);c.stroke();
+  // Schroef
+  circ(c,0,-bh*0.04,bw*0.06,'#90a4ae','#607d8b',2);
+  c.restore();
+
+  c.restore();
+
+  // Ingrediënten aan de zijkant wachtend
+  if(stap.fase===0&&stap.wachtIng){
+    stap.wachtIng.forEach(function(id,i){
+      var ing=INGREDIENTEN.find(function(x){return x.id===id;});
+      if(ing)tekenFruitGrootK(c,bx-bw*0.1-i*kw*0.07,by+bh*0.4+i*kh*0.06,ing,kh*0.06,kh);
+    });
+  }
+}
+
+function tekenGlasSceneK(c,kw,kh,ay,stap){
+  var gx2=kw*0.36,gy=ay+kh*0.04,gw=kw*0.28,gh=kh*0.48;
+  // Glas
+  c.beginPath();c.moveTo(gx2,gy);c.lineTo(gx2+gw,gy);
+  c.lineTo(gx2+gw*0.85,gy+gh);c.lineTo(gx2+gw*0.15,gy+gh);c.closePath();
+  var glasG2=c.createLinearGradient(gx2,gy,gx2+gw,gy);
+  glasG2.addColorStop(0,'rgba(200,235,255,0.3)');
+  glasG2.addColorStop(0.4,'rgba(230,245,255,0.5)');
+  glasG2.addColorStop(1,'rgba(200,235,255,0.3)');
+  c.fillStyle=glasG2;c.fill();
+  c.strokeStyle='rgba(180,220,255,0.65)';c.lineWidth=2.5;c.stroke();
+
+  // Vulling animatie
+  var vp=stap.vulPct||0;
+  if(smootje&&vp>0){
+    var vulG2=c.createLinearGradient(gx2,gy,gx2+gw,gy+gh*vp);
+    vulG2.addColorStop(0,smootje.kl+'cc');vulG2.addColorStop(1,smootje.kl+'ff');
+    var fyTop=gy+gh*(1-vp);
+    c.beginPath();c.moveTo(gx2+gw*(1-(1-0.15)*vp*0.85),fyTop);
+    c.lineTo(gx2+gw*(1-(1-1)*0),fyTop);
+    c.lineTo(gx2+gw*0.15,gy+gh);c.lineTo(gx2+gw*0.85,gy+gh);c.closePath();
+    c.fillStyle=vulG2;c.fill();
+    // Schuim bovenop
+    c.fillStyle='rgba(255,255,255,0.5)';
+    c.beginPath();c.ellipse(gx2+gw*0.5,fyTop+2,gw*0.38*(0.15+vp*0.85),6,0,0,Math.PI*2);c.fill();
+    // Bubbels
+    c.fillStyle='rgba(255,255,255,0.4)';
+    for(var bub=0;bub<5;bub++){
+      circ(c,gx2+gw*(0.2+bub*0.14),fyTop+gh*vp*0.4+Math.sin(T*0.12+bub)*8,2+bub,'rgba(255,255,255,0.4)');
+    }
+  }
+  // Rietje
+  c.strokeStyle='#ff6eb4';c.lineWidth=4;c.lineCap='round';
+  c.beginPath();c.moveTo(gx2+gw*0.74,gy+gh*0.88);c.lineTo(gx2+gw*0.92,gy-12);c.stroke();
+  // Citroen schijf
+  circ(c,gx2+gw*0.26,gy+8,gw*0.18,'#fdd835','#f9a825',2);
+  c.strokeStyle='#f9a825';c.lineWidth=1;
+  c.beginPath();c.moveTo(gx2+gw*0.26,gy+8-gw*0.18);c.lineTo(gx2+gw*0.26,gy+8+gw*0.18);c.stroke();
+  c.beginPath();c.moveTo(gx2+gw*0.26-gw*0.18,gy+8);c.lineTo(gx2+gw*0.26+gw*0.18,gy+8);c.stroke();
+
+  // Blender giet
+  if(vp<0.9){
+    c.save();c.translate(kw*0.28,ay+kh*0.04);c.rotate(Math.PI*0.22);
+    c.fillStyle='rgba(200,230,255,0.15)';
+    c.beginPath();c.moveTo(-20,0);c.lineTo(20,0);c.lineTo(14,-55);c.lineTo(-14,-55);c.closePath();c.fill();
+    c.strokeStyle='rgba(200,230,255,0.5)';c.lineWidth=2;c.stroke();
+    if(smootje){
+      c.strokeStyle=smootje.kl;c.lineWidth=5;c.lineCap='round';
+      c.beginPath();c.moveTo(-4,2);
+      c.bezierCurveTo(10,30,gx2*0.12,ay*0.4,gx2*0.55,gy+10);c.stroke();
+    }
+    c.restore();
+  }
+}
+
+function tekenKlaarSceneK(c,kw,kh,ay,stap){
+  var gx2=kw*0.34,gy=ay+kh*0.02,gw=kw*0.32,gh=kh*0.5;
+  var p=0.96+0.04*Math.sin(T*0.08);
+  c.save();c.translate(gx2+gw/2,gy+gh/2);c.scale(p,p);c.translate(-(gx2+gw/2),-(gy+gh/2));
+
+  // Glas
+  c.beginPath();c.moveTo(gx2,gy);c.lineTo(gx2+gw,gy);
+  c.lineTo(gx2+gw*0.83,gy+gh);c.lineTo(gx2+gw*0.17,gy+gh);c.closePath();
+  shadow(c,'rgba(0,0,0,0.2)',12);
+  var glasG3=c.createLinearGradient(gx2,gy,gx2+gw,gy);
+  glasG3.addColorStop(0,'rgba(200,235,255,0.35)');
+  glasG3.addColorStop(0.45,'rgba(230,245,255,0.55)');
+  glasG3.addColorStop(1,'rgba(200,235,255,0.35)');
+  c.fillStyle=glasG3;c.fill();
+  noShadow(c);
+  c.strokeStyle='rgba(180,220,255,0.7)';c.lineWidth=3;c.stroke();
+
+  // Vulling
+  if(smootje){
+    var vulGk=c.createLinearGradient(gx2,gy+6,gx2+gw,gy+gh);
+    vulGk.addColorStop(0,smootje.kl+'cc');vulGk.addColorStop(1,smootje.kl+'ff');
+    c.beginPath();c.moveTo(gx2+3,gy+6);c.lineTo(gx2+gw-3,gy+6);
+    c.lineTo(gx2+gw*0.82,gy+gh-3);c.lineTo(gx2+gw*0.18,gy+gh-3);c.closePath();
+    c.fillStyle=vulGk;c.fill();
+    // Schuim
+    c.fillStyle='rgba(255,255,255,0.55)';
+    c.beginPath();c.ellipse(gx2+gw*0.5,gy+8,gw*0.45,8,0,0,Math.PI*2);c.fill();
+  }
+  // Decoraties
+  circ(c,gx2+gw*0.22,gy+10,gw*0.14,'#fdd835','#f9a825',2);
+  c.strokeStyle='#f9a825';c.lineWidth=1;
+  c.beginPath();c.moveTo(gx2+gw*0.22,gy);c.lineTo(gx2+gw*0.22,gy+20);c.stroke();
+  // Rietje
+  c.strokeStyle='#ff6eb4';c.lineWidth=5;c.lineCap='round';
+  c.beginPath();c.moveTo(gx2+gw*0.73,gy+gh*0.88);c.lineTo(gx2+gw*0.92,gy-14);c.stroke();
+  // Ster deco
+  c.font=Math.round(kh*0.038)+'px serif';c.textAlign='center';
+  for(var si4=0;si4<7;si4++){
+    var sa=si4*Math.PI*2/7+T*0.04;
+    var sr=Math.max(gw,gh)*0.78;
+    c.globalAlpha=0.45+0.45*Math.sin(T*0.1+si4*0.9);
+    c.fillText('⭐',gx2+gw/2+Math.cos(sa)*sr*0.88,gy+gh/2+Math.sin(sa)*sr*0.55);
+  }
+  c.globalAlpha=1;
+  // Emoji bovenaan
+  c.font=Math.round(kh*0.1)+'px serif';
+  c.fillText(smootje?smootje.em:'🥤',gx2+gw/2,gy-kh*0.03);
+  c.restore();
+  // Tekst
+  shadow(c,'rgba(46,125,50,0.3)',8);
+  c.fillStyle='#1b5e20';c.font='bold '+Math.round(kh*0.07)+'px Nunito';c.textAlign='center';
+  c.fillText('🎉 Klaar om te serveren!',kw/2,ay+kh*0.72);
+  noShadow(c);
+}
+
+// ══════════════════════════════════════════════════
+// SNIJ MINIGAME
+// ══════════════════════════════════════════════════
+var snijItemsArr=[],snijGesnedenN=0,snijCbFn=null;
+var snijTeken=false,snijLastP=null,snijCtx2=null;
+
+function initSnij(ingId){
+  var sc=document.getElementById('snijC');
+  var sz=Math.min(W*0.82,320);
+  sc.width=sz;sc.height=sz;
+  snijCtx2=sc.getContext('2d');
+  snijGesnedenN=0;snijItemsArr=[];
+  var ing=INGREDIENTEN.find(function(i){return i.id===ingId;});
+  document.getElementById('snij-top').textContent='✂️ Veeg over de '+(ing?ing.nm:'fruit')+' om te snijden!';
+  document.getElementById('snijv').style.width='0%';
+
+  var n=4+Math.floor(Math.random()*3);
+  for(var i=0;i<n;i++){
+    snijItemsArr.push({id:ingId,x:40+Math.random()*(sz-80),y:40+Math.random()*(sz-80),r:28+Math.random()*16,gsn:false,hoek:Math.random()*Math.PI*2});
+  }
+  renderSnij();
+
+  if(!sc._initDone){
+    sc._initDone=true;
+    sc.ontouchstart=function(e){e.preventDefault();snijTeken=true;snijLastP=sTPos(e.touches[0]);renderSnij();};
+    sc.ontouchmove=function(e){e.preventDefault();if(!snijTeken)return;var p=sTPos(e.touches[0]);snijMv(p);snijLastP=p;};
+    sc.ontouchend=function(){snijTeken=false;snijLastP=null;};
+    sc.onmousedown=function(e){snijTeken=true;snijLastP=sMPos(e);};
+    sc.onmousemove=function(e){if(!snijTeken)return;var p=sMPos(e);snijMv(p);snijLastP=p;};
+    sc.onmouseup=function(){snijTeken=false;};
+  }
+  document.getElementById('snij').classList.add('open');
+}
+
+function sTPos(t){var r=document.getElementById('snijC').getBoundingClientRect();return{x:t.clientX-r.left,y:t.clientY-r.top};}
+function sMPos(e){var r=document.getElementById('snijC').getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};}
+
+function snijMv(p){
+  snijItemsArr.forEach(function(item){
+    if(item.gsn)return;
+    var dx=p.x-item.x,dy=p.y-item.y;
+    if(Math.sqrt(dx*dx+dy*dy)<item.r+8){
+      item.gsn=true;snijGesnedenN++;
+      speelSnijGeluid();
+      document.getElementById('snijv').style.width=(snijGesnedenN/snijItemsArr.length*100)+'%';
+    }
+  });
+  renderSnij();
+  if(snijGesnedenN>=snijItemsArr.length){
+    setTimeout(function(){document.getElementById('snij').classList.remove('open');if(snijCbFn){snijCbFn();snijCbFn=null;}},500);
+  }
+}
+
+function renderSnij(){
+  var c=snijCtx2;if(!c)return;
+  var sz=c.canvas.width;
+  c.clearRect(0,0,sz,sz);
+  // Snijplank
+  var plG=c.createLinearGradient(0,0,0,sz);
+  plG.addColorStop(0,'#d4a574');plG.addColorStop(1,'#b8855a');
+  rr(c,0,0,sz,sz,16,null);c.fillStyle=plG;c.fill();
+  c.strokeStyle='rgba(150,100,50,0.4)';c.lineWidth=1.5;
+  for(var i=1;i<6;i++){c.beginPath();c.moveTo(sz/6*i,5);c.lineTo(sz/6*i,sz-5);c.stroke();}
+  for(var j=1;j<4;j++){c.beginPath();c.moveTo(5,sz/4*j);c.lineTo(sz-5,sz/4*j);c.stroke();}
+  // Schaduw rand
+  var sdG=c.createLinearGradient(0,0,20,20);
+  sdG.addColorStop(0,'rgba(0,0,0,0.15)');sdG.addColorStop(1,'rgba(0,0,0,0)');
+  rr(c,0,0,sz,sz,16,null);c.fillStyle=sdG;c.fill();
+
+  snijItemsArr.forEach(function(item){
+    var ing=INGREDIENTEN.find(function(i){return i.id===item.id;});
+    if(!ing)return;
+    if(!item.gsn){
+      shadow(c,'rgba(0,0,0,0.2)',8);
+      tekenFruitGrootK(c,item.x,item.y,ing,item.r,sz);
+      noShadow(c);
+      // Highlight ring
+      c.strokeStyle='rgba(255,255,255,0.35)';c.lineWidth=2;
+      c.beginPath();c.arc(item.x,item.y,item.r+4,0,Math.PI*2);c.stroke();
+    } else {
+      var off=15+snijGesnedenN*1.5;
+      c.save();c.translate(item.x-off*0.7,item.y-off*0.4);c.rotate(-0.35);
+      tekenFruitStukjeK(c,0,0,ing,item.r*0.78,0);c.restore();
+      c.save();c.translate(item.x+off*0.7,item.y+off*0.4);c.rotate(0.35);
+      tekenFruitStukjeK(c,0,0,ing,item.r*0.78,1);c.restore();
+      // Sap spatters
+      c.fillStyle=ing.kl+'70';
+      for(var si=0;si<6;si++){
+        var sx=item.x+Math.cos(si*1.05)*item.r*(0.8+si*0.15);
+        var sy=item.y+Math.sin(si*1.05)*item.r*(0.8+si*0.15);
+        circ(c,sx,sy,3+si*0.8,ing.kl+'70');
+      }
+      // Mes snijlijn
+      c.strokeStyle='rgba(255,255,255,0.5)';c.lineWidth=2;
+      c.beginPath();c.moveTo(item.x-item.r,item.y+off*0.1);c.lineTo(item.x+item.r,item.y-off*0.1);c.stroke();
+    }
+  });
+
+  // Mes cursor
+  if(snijLastP){
+    c.save();c.translate(snijLastP.x-5,snijLastP.y-5);c.rotate(-Math.PI*0.2);
+    tekenMesK(c,0,0,sz);c.restore();
+  }
+}
+
+function speelSnijGeluid(){
+  try{var ac=new(window.AudioContext||window.webkitAudioContext)();var o=ac.createOscillator();var g=ac.createGain();
+    o.connect(g);g.connect(ac.destination);o.frequency.setValueAtTime(600+Math.random()*500,ac.currentTime);
+    g.gain.setValueAtTime(0.15,ac.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.1);
+    o.start();o.stop(ac.currentTime+0.1);}catch(e){}
+}
+
+// ══════════════════════════════════════════════════
+// GAME FLOW
+// ══════════════════════════════════════════════════
+function setFase(t,fade){var el=document.getElementById('fase');el.textContent=t;el.style.opacity='1';if(fade)setTimeout(function(){el.style.opacity='0';},2200);}
+function toonWolk(t,d){wolkTekst=t;wolkTimer=Math.round(d/16);wolkAlpha=0;}
+function openPnl(){document.getElementById('panel').classList.add('open');}
+function sluitPnl(){document.getElementById('panel').classList.remove('open');}
+
+function speelGeluid(type){
+  try{var ac=new(window.AudioContext||window.webkitAudioContext)();var o=ac.createOscillator();var g=ac.createGain();
+    o.connect(g);g.connect(ac.destination);
+    if(type==='goed'){o.frequency.setValueAtTime(523,ac.currentTime);o.frequency.setValueAtTime(659,ac.currentTime+0.12);o.frequency.setValueAtTime(784,ac.currentTime+0.24);g.gain.setValueAtTime(0.3,ac.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.6);o.start();o.stop(ac.currentTime+0.6);}
+    else if(type==='blend'){o.type='sawtooth';o.frequency.setValueAtTime(80,ac.currentTime);o.frequency.linearRampToValueAtTime(250,ac.currentTime+0.9);g.gain.setValueAtTime(0.14,ac.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+1);o.start();o.stop(ac.currentTime+1);}
+    else if(type==='bel'){o.frequency.setValueAtTime(880,ac.currentTime);o.frequency.setValueAtTime(1100,ac.currentTime+0.08);g.gain.setValueAtTime(0.2,ac.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.4);o.start();o.stop(ac.currentTime+0.4);}
+    else{o.frequency.setValueAtTime(440,ac.currentTime);g.gain.setValueAtTime(0.15,ac.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.15);o.start();o.stop(ac.currentTime+0.15);}}
+  catch(e){}
+}
+function voegSterToe(n){
+  score+=n;document.getElementById('sc').textContent=score;
+  try{localStorage.setItem('mss',score);}catch(e){}
+  for(var i=0;i<n;i++){(function(d){setTimeout(function(){var s=document.createElement('div');s.className='star';s.textContent='⭐';s.style.fontSize='1.8rem';s.style.left=(25+Math.random()*50)+'%';s.style.top='35%';document.body.appendChild(s);setTimeout(function(){s.remove();},1000);},d*200);})(i);}
+}
+function maakConfetti(){
+  var kl=['#ff6eb4','#ffe066','#64b5f6','#4caf50','#b39ddb','#ff9800','#ff5252'];
+  for(var i=0;i<55;i++){(function(d){setTimeout(function(){var c2=document.createElement('div');c2.className='conf';c2.style.left=(Math.random()*100)+'%';c2.style.top='-10px';c2.style.background=kl[Math.floor(Math.random()*kl.length)];c2.style.animationDelay=(Math.random()*0.7)+'s';c2.style.animationDuration=(1.3+Math.random()*0.8)+'s';document.body.appendChild(c2);setTimeout(function(){c2.remove();},2900);},d*18);})(i);}
+}
+
+function nieuweKlant(){
+  document.getElementById('srv').classList.remove('open');
+  barSmootje=false;sluitPnl();
+  smootje=null;gekozenIng=[];blInhoud=[];blFase=0;blRot=0;kStap=0;kStappen=[];
+  modus='smoothie';gekozenSmaak=null;gekozenToppings=[];ijsMachineAan=false;
+  dier=DIEREN[Math.floor(Math.random()*DIEREN.length)];
+  nKlanten++;document.getElementById('kl').textContent=nKlanten;
+  dierX=W*1.15;dierRicht=-1;dierLoopt=true;gameStaat='loopt_in';
+  setFase('🔔 '+dier.nm+' komt binnen!',true);
+  speelGeluid('bel');
+}
+
+function toonBestellenPanel(){
+  var h='<div class="panel-titel">🍴 Wat wil '+dier.nm+'?</div>';
+  h+='<p style="text-align:center;font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:12px">Kies een categorie</p>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
+  h+='<div class="s-card'+(modus==='smoothie'?' sel':'')+'" onclick="kiesModus(\'smoothie\')" style="padding:18px 10px">';
+  h+='<span class="sc-em" style="font-size:2.4rem">🥤</span><div class="sc-nm" style="font-size:.82rem;margin-top:6px">Smoothie</div><div style="font-size:.65rem;color:rgba(255,255,255,.45);margin-top:3px">Vers fruit mixen</div></div>';
+  h+='<div class="s-card'+(modus==='ijs'?' sel':'')+'" onclick="kiesModus(\'ijs\')" style="padding:18px 10px">';
+  h+='<span class="sc-em" style="font-size:2.4rem">🍨</span><div class="sc-nm" style="font-size:.82rem;margin-top:6px">IJssalon</div><div style="font-size:.65rem;color:rgba(255,255,255,.45);margin-top:3px">Schepijs maken</div></div>';
+  h+='</div>';
+  document.getElementById('pbody').innerHTML=h;openPnl();
+}
+
+function kiesModus(m){
+  modus=m;
+  speelGeluid('tik');
+  if(m==='smoothie') setTimeout(toonSmoothieKeuze,300);
+  else setTimeout(toonIjsKeuze,300);
+}
+
+function toonSmoothieKeuze(){
+  var h='<div class="panel-titel">🥤 Milou\u2019s Smoothies</div>';
+  h+='<div style="cursor:pointer;margin-bottom:10px" onclick="toonBestellenPanel()"><span style="color:rgba(255,255,255,.5);font-size:.8rem">← Terug naar menu</span></div>';
+  h+='<div class="grid3">';
+  SMOOTHIES.forEach(function(s){
+    h+='<div class="s-card'+(smootje&&smootje.id===s.id?' sel':'')+'" onclick="kiesSmoothie(\''+s.id+'\')">'+
+       '<span class="sc-em">'+s.em+'</span><div class="sc-nm">'+s.nm+'</div></div>';
+  });
+  h+='</div>';
+  document.getElementById('pbody').innerHTML=h;
+}
+
+function kiesSmoothie(id){
+  smootje=SMOOTHIES.find(function(s){return s.id===id;});
+  speelGeluid('tik');toonWolk(smootje.em+' '+smootje.nm+'! 😍',2000);
+  setTimeout(toonIngPanel,400);
+}
+
+function toonIngPanel(){
+  gekozenIng=[];
+  var h='<div class="panel-titel">🛒 Ingrediënten</div>';
+  h+='<p style="font-size:.75rem;color:rgba(255,255,255,.5);text-align:center;margin-bottom:8px">Voor <b style="color:#ff6eb4">'+smootje.nm+'</b>: kies '+smootje.ing.length+' ingrediënten</p>';
+  h+='<div class="sel-bak" id="sbak"><span style="color:rgba(255,255,255,.3);font-size:.75rem">Nog niets...</span></div>';
+  h+='<div class="ing-row">';
+  INGREDIENTEN.forEach(function(ing){
+    var nodig=smootje.ing.indexOf(ing.id)>=0;
+    h+='<div class="i-chip'+(nodig?'':'')+'" id="ic-'+ing.id+'" onclick="togIng(\''+ing.id+'\')" style="'+(nodig?'':'opacity:.42;')+'">';
+    h+=ing.em+'<span>'+ing.nm+'</span></div>';
+  });
+  h+='</div><button class="pbtn bo" id="kbtn2" onclick="naarKeuken2()" style="opacity:.4" disabled>👨‍🍳 Ga naar de keuken!</button>';
+  document.getElementById('pbody').innerHTML=h;
+}
+
+function togIng(id){
+  var idx=gekozenIng.indexOf(id);
+  var el=document.getElementById('ic-'+id);
+  if(idx>=0){gekozenIng.splice(idx,1);el.classList.remove('g');}
+  else{if(gekozenIng.length>=5)return;gekozenIng.push(id);el.classList.add('g');speelGeluid('tik');}
+  var bak=document.getElementById('sbak');var btn=document.getElementById('kbtn2');
+  if(!bak)return;
+  bak.innerHTML=gekozenIng.length?gekozenIng.map(function(iid){var i=INGREDIENTEN.find(function(x){return x.id===iid;});return'<div class="s-chip">'+i.em+' '+i.nm+'</div>';}).join(''):'<span style="color:rgba(255,255,255,.3);font-size:.75rem">Nog niets...</span>';
+  btn.disabled=gekozenIng.length<2;btn.style.opacity=gekozenIng.length>=2?'1':'.4';
+}
+
+function naarKeuken2(){
+  sluitPnl();dierLoopt=true;gameStaat='wacht_stoel';
+  setFase('👨‍🍳 Milou gaat koken!',true);
+}
+
+function toonIjsKeuze(){
+  var h='<div class="panel-titel">🍦 Milou\u2019s IJssalon</div>';
+  h+='<div style="cursor:pointer;margin-bottom:10px" onclick="toonBestellenPanel()"><span style="color:rgba(255,255,255,.5);font-size:.8rem">← Terug naar menu</span></div>';
+  h+='<p style="font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:8px">Kies een smaak:</p>';
+  h+='<div class="grid3" style="margin-bottom:14px">';
+  IJS_SMAKEN.forEach(function(s){
+    var isGek=gekozenSmaak&&gekozenSmaak.id===s.id;
+    var sel=isGek?' sel':'';
+    var vink=isGek?'<span style="position:absolute;top:5px;right:6px;font-size:.75rem">✅</span>':'';
+    h+='<div class="s-card'+sel+'" onclick="kiesIjsSmaak(\''+s.id+'\')" style="position:relative">'+vink;
+    h+='<span class="sc-em" style="font-size:2rem">'+s.em+'</span><div class="sc-nm">'+s.nm+'</div></div>';
+  });
+  h+='</div>';
+  h+='<p style="font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:8px">Toppings (optioneel, max 4):</p>';
+  h+='<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px">';
+  IJS_TOPPINGS.forEach(function(t){
+    var sel=gekozenToppings.indexOf(t.id)>=0;
+    h+='<div class="i-chip'+(sel?' g':'')+'" onclick="togTopping(\''+t.id+'\')">'+t.em+'<span>'+t.nm+'</span></div>';
+  });
+  h+='</div>';
+  if(gekozenToppings.length>0){
+    h+='<div class="sel-bak">';
+    gekozenToppings.forEach(function(tid){
+      var t=IJS_TOPPINGS.find(function(x){return x.id===tid;});
+      if(t) h+='<div class="s-chip">'+t.em+' '+t.nm+'</div>';
+    });
+    h+='</div>';
+  }
+  var ok=gekozenSmaak!==null;
+  h+='<button class="pbtn bo" onclick="naarIjsKeuken()" style="margin-top:10px;opacity:'+(ok?'1':'0.38')+'"'+(ok?'':' disabled')+'>🍨 Maak het ijs!</button>';
+  if(!ok) h+='<p style="font-size:.72rem;color:rgba(255,200,80,.8);text-align:center;margin-top:6px">👆 Kies eerst een smaak!</p>';
+  document.getElementById('pbody').innerHTML=h;
+}
+
+function kiesIjsSmaak(id){
+  gekozenSmaak=IJS_SMAKEN.find(function(s){return s.id===id;});
+  speelGeluid('tik');
+  toonWolk(gekozenSmaak.em+' '+gekozenSmaak.nm+'! 😋',2000);
+  toonIjsKeuze();
+}
+
+function togTopping(id){
+  var idx=gekozenToppings.indexOf(id);
+  if(idx>=0){gekozenToppings.splice(idx,1);}
+  else{if(gekozenToppings.length>=4)return;gekozenToppings.push(id);speelGeluid('tik');}
+  toonIjsKeuze();
+}
+
+function naarIjsKeuken(){
+  if(!gekozenSmaak){
+    var hint=document.createElement('div');
+    hint.style.cssText='position:fixed;top:38%;left:50%;transform:translate(-50%,-50%);background:#ff9800;color:white;padding:12px 24px;border-radius:50px;font-family:Nunito,sans-serif;font-weight:800;font-size:.9rem;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.3)';
+    hint.textContent='👆 Kies eerst een smaak!';
+    document.body.appendChild(hint);
+    setTimeout(function(){hint.remove();},1800);
+    return;
+  }
+  sluitPnl();dierLoopt=true;gameStaat='wacht_stoel';
+  modus='ijs';
+  setFase('🍨 Milou maakt ijs!',true);
+}
+
+
+function openKeuken(){
+  if(modus==='ijs'){
+    if(!gekozenSmaak){toonIjsKeuze();openPnl();return;}
+    bouwIjsStappen();kStap=0;
+    initKeukenCanvas();
+    document.getElementById('korder').textContent='🍨 '+gekozenSmaak.nm;
+    document.getElementById('keuken').classList.add('open');
+    gameStaat='keuken';toonKStap();
+    if(kAnimId)cancelAnimationFrame(kAnimId);
+    (function kLus(){kAnimId=requestAnimationFrame(kLus);renderKeuken();})();
+    return;
+  }
+  if(!smootje||gekozenIng.length<2){
+    if(!smootje)toonBestellenPanel();else toonIngPanel();
+    openPnl();return;
+  }
+  bouwStappen();kStap=0;
+  initKeukenCanvas();
+  document.getElementById('korder').textContent=dier.nm+' '+dier.id.slice(0,1).toUpperCase()+dier.id.slice(1);
+  document.getElementById('keuken').classList.add('open');
+  gameStaat='keuken';toonKStap();
+  if(kAnimId)cancelAnimationFrame(kAnimId);
+  (function kLus(){kAnimId=requestAnimationFrame(kLus);renderKeuken();})();
+}
+
+function bouwStappen(){
+  kStappen=[];
+  gekozenIng.forEach(function(id){
+    kStappen.push({scene:'snij',ingId:id,stukjes:0,uitleg:'Snijd de '+ingNm(id)+' in stukjes!',sub:'Klik de knop — dan kun je het fruit snijden ✂️'});
+  });
+  kStappen.push({scene:'blend',fase:0,wachtIng:gekozenIng.slice(),uitleg:'Gooi alles in de blender!',sub:'Tik om de ingrediënten te gooien 🫙'});
+  kStappen.push({scene:'blend',fase:1,uitleg:'Zet de blender aan! 🌀',sub:'Tik — brrrrr! Houd vast!'});
+  kStappen.push({scene:'glas',vulPct:0,uitleg:'Giet de smoothie in het glas!',sub:'Tik om te gieten 🥤'});
+  kStappen.push({scene:'klaar',uitleg:smootje.nm+' is klaar! Serveer '+dier.nm+'! 🎉',sub:'Tik om te serveren!'});
+}
+
+function ingNm(id){var i=INGREDIENTEN.find(function(x){return x.id===id;});return i?i.nm:id;}
+
+// ─── IJS STAPPEN ───
+function bouwIjsStappen(){
+  kStappen=[];
+  kStappen.push({scene:'ijs_init', uitleg:'Maak de ijsmachine klaar!', sub:'Tik om de machine aan te zetten 🔌'});
+  kStappen.push({scene:'ijs_schep', stap:0, uitleg:'Schep het '+gekozenSmaak.nm.toLowerCase()+' ijs in de bak!', sub:'Tik om te scheppen 🍨', geSchept:0});
+  if(gekozenToppings.length>0){
+    gekozenToppings.forEach(function(tid,i){
+      var t=IJS_TOPPINGS.find(function(x){return x.id===tid;});
+      kStappen.push({scene:'ijs_topping',toppingId:tid,stap:i,uitleg:'Voeg '+t.nm+' toe!',sub:'Tik om te strooien '+t.em,gedaan:false});
+    });
+  }
+  kStappen.push({scene:'ijs_klaar', uitleg:gekozenSmaak.nm+' ijs is klaar! 🎉', sub:'Tik om te serveren!'});
+}
+
+// ─── IJS RENDER ───
+var ijsMachineAan=false,ijsSchepProg=0,ijsToppingsGedaan=[];
+
+function renderIjsKeuken(c,kw,kh,ay,stap){
+  if(!stap)return;
+  if(stap.scene==='ijs_init') tekenIjsMachineScene(c,kw,kh,ay,stap,false);
+  else if(stap.scene==='ijs_schep') tekenIjsSchepScene(c,kw,kh,ay,stap);
+  else if(stap.scene==='ijs_topping') tekenIjsToppingScene(c,kw,kh,ay,stap);
+  else if(stap.scene==='ijs_klaar') tekenIjsKlaarScene(c,kw,kh,ay,stap);
+}
+
+function tekenIjsMachineScene(c,kw,kh,ay,stap,aan){
+  // Werkblad decoraties
+  var mw=kw*0.55,mx=kw*0.22,my=ay+kh*0.04;
+  
+  // IJSmachine body - groot en realistisch
+  var mh=kh*0.72;
+  // Machine behuizing
+  var machG=c.createLinearGradient(mx,my,mx+mw,my+mh);
+  machG.addColorStop(0,'#e0e0e0');machG.addColorStop(0.3,'#f5f5f5');machG.addColorStop(1,'#bdbdbd');
+  shadow(c,'rgba(0,0,0,0.2)',14);
+  rr(c,mx,my,mw,mh,16,null);c.fillStyle=machG;c.fill();
+  c.strokeStyle='#9e9e9e';c.lineWidth=3;c.stroke();
+  noShadow(c);
+
+  // Machine glans
+  c.fillStyle='rgba(255,255,255,0.25)';
+  rr(c,mx+6,my+6,mw*0.18,mh*0.55,8,'rgba(255,255,255,0.25)');
+
+  // Kleur panelen per smaak
+  var smkl=gekozenSmaak?gekozenSmaak.kl2:'#9e9e9e';
+  rr(c,mx+mw*0.08,my+mh*0.06,mw*0.84,mh*0.22,8,smkl,'#9e9e9e',2);
+  // Smaak label op paneel
+  c.fillStyle='rgba(255,255,255,0.9)';
+  c.font='bold '+Math.round(kh*0.062)+'px Nunito';c.textAlign='center';
+  c.fillText(gekozenSmaak?gekozenSmaak.em+' '+gekozenSmaak.nm:'🍨 Ijs',mx+mw*0.5,my+mh*0.2);
+
+  // Display scherm
+  rr(c,mx+mw*0.1,my+mh*0.32,mw*0.5,mh*0.18,6,'#1a2a1a','#0a1a0a',2);
+  // LCD effect
+  c.fillStyle=aan?'#00ff44':'#003300';
+  c.font='bold '+Math.round(kh*0.045)+'px Nunito';c.textAlign='center';
+  c.fillText(aan?'KLAAR ✓':'STAND-BY',mx+mw*0.35,my+mh*0.43);
+  // Groen knipperend lichtje
+  if(aan){
+    var p2=0.6+0.4*Math.sin(T*0.15);
+    shadow(c,'rgba(0,255,68,0.8)',8*p2);
+    circ(c,mx+mw*0.68,my+mh*0.4,kh*0.022,'#00ff44');
+    noShadow(c);
+  } else {
+    circ(c,mx+mw*0.68,my+mh*0.4,kh*0.022,'#333333');
+  }
+
+  // Knoppen rij
+  var knpkl=['#f44336','#ff9800','#4caf50'];
+  ['STOP','MED','AAN'].forEach(function(lbl,i){
+    var kx=mx+mw*(0.12+i*0.26),ky=my+mh*0.56;
+    var kw2=mw*0.2,kh2=kh*0.09;
+    var active=(i===2&&aan)||(i===0&&!aan);
+    shadow(c,active?knpkl[i]:'transparent',active?8:0);
+    rr(c,kx,ky,kw2,kh2,kh2/2,knpkl[i],'rgba(0,0,0,0.3)',2);
+    noShadow(c);
+    // Knop glans
+    c.fillStyle='rgba(255,255,255,0.3)';
+    rr(c,kx+3,ky+3,kw2-6,kh2*0.4,kh2*0.2,'rgba(255,255,255,0.3)');
+    c.fillStyle='white';c.font='bold '+Math.round(kh*0.036)+'px Nunito';c.textAlign='center';
+    c.fillText(lbl,kx+kw2/2,ky+kh2*0.67);
+  });
+
+  // IJsmachine tap/tuit
+  var tx=mx+mw*0.4,ty=my+mh*0.74,tw2=mw*0.2,th2=kh*0.1;
+  rr(c,tx,ty,tw2,th2*0.6,4,'#bdbdbd','#9e9e9e',2);
+  // Tuit
+  c.fillStyle='#9e9e9e';
+  c.beginPath();c.moveTo(tx+tw2*0.25,ty+th2*0.6);c.lineTo(tx+tw2*0.75,ty+th2*0.6);
+  c.lineTo(tx+tw2*0.65,ty+th2*1.0);c.lineTo(tx+tw2*0.35,ty+th2*1.0);c.closePath();c.fill();
+  c.strokeStyle='#757575';c.lineWidth=1.5;c.stroke();
+
+  // Hendel
+  rr(c,tx+tw2*0.72,ty+th2*0.08,mw*0.1,th2*0.44,4,'#e0e0e0','#9e9e9e',2);
+
+  // Als machine aan: ijs stroomt naar hoorntje
+  if(aan&&gekozenSmaak){
+    var smaakKl=gekozenSmaak.kl;
+    var dropPct=Math.min(1,(T%80)/50);
+    // Spiraal soft-serve stroom
+    c.strokeStyle=smaakKl;c.lineWidth=mw*0.07;c.lineCap='round';
+    c.beginPath();
+    var tuitX=tx+tw2*0.5, tuitY2=ty+th2;
+    c.moveTo(tuitX,tuitY2);
+    for(var ds=0;ds<8*dropPct;ds++){
+      var dang=ds*0.8, drad=mw*0.018, dy=ds*kh*0.018;
+      c.lineTo(tuitX+Math.cos(dang)*drad, tuitY2+dy+Math.sin(dang)*drad*0.4);
+    }
+    c.stroke();
+    // Druppel aan het einde
+    if(dropPct>0.5){
+      circ(c,tuitX,tuitY2+8*kh*0.018*dropPct,mw*0.04,smaakKl);
+    }
+  }
+
+  // Bak/schaaltje onderaan
+  var bkx=mx+mw*0.28,bky=my+mh+kh*0.02,bkw=mw*0.44,bkh=kh*0.1;
+  tekenIjsBak(c,bkx,bky,bkw,bkh,0,[]);
+}
+
+function tekenIjsHoorntje(c,hx,hy,hw,hh){
+  // Hoorntje (wafelkegel)
+  var hG=c.createLinearGradient(hx-hw/2,hy,hx+hw/2,hy+hh);
+  hG.addColorStop(0,'#f9a825');hG.addColorStop(0.5,'#e65100');hG.addColorStop(1,'#bf360c');
+  c.beginPath();c.moveTo(hx-hw/2,hy);c.lineTo(hx+hw/2,hy);c.lineTo(hx,hy+hh);c.closePath();
+  c.fillStyle=hG;c.fill();
+  c.strokeStyle='#bf360c';c.lineWidth=1.5;c.stroke();
+  // Wafelpatroon
+  c.strokeStyle='rgba(150,60,0,0.35)';c.lineWidth=1;
+  var steps=6;
+  for(var wi=1;wi<steps;wi++){
+    var wy=hy+hh*wi/steps;
+    var wx=hw/2*(1-wi/steps);
+    c.beginPath();c.moveTo(hx-wx,wy);c.lineTo(hx+wx,wy);c.stroke();
+  }
+  for(var di=0;di<steps;di++){
+    var t2=di/steps;
+    var t3=(di+1)/steps;
+    var x1=hx-hw/2*(1-t2), y1=hy+hh*t2;
+    var x2=hx, y2=hy+hh;
+    var frac=t2/(1-t2+0.001);
+    c.beginPath();c.moveTo(hx-hw/2+di*(hw/steps),hy);c.lineTo(hx,hy+hh);c.stroke();
+    c.beginPath();c.moveTo(hx+hw/2-di*(hw/steps),hy);c.lineTo(hx,hy+hh);c.stroke();
+  }
+  // Glans
+  c.fillStyle='rgba(255,200,100,0.25)';
+  c.beginPath();c.moveTo(hx-hw*0.35,hy);c.lineTo(hx-hw*0.05,hy);c.lineTo(hx-hw*0.1,hy+hh*0.6);c.closePath();c.fill();
+  // Rand bovenaan hoorntje
+  c.strokeStyle='#e65100';c.lineWidth=2.5;
+  c.beginPath();c.moveTo(hx-hw/2,hy);c.lineTo(hx+hw/2,hy);c.stroke();
+}
+
+function tekenIjsSchepje(c,x,y,r,smaak,idx){
+  // Drop-shadow
+  c.fillStyle='rgba(0,0,0,0.13)';
+  c.beginPath();c.ellipse(x+2,y+r*0.18,r*0.8,r*0.2,0,0,Math.PI*2);c.fill();
+  // Ijs bol — radiale gradient voor 3D effect
+  var schG=c.createRadialGradient(x-r*0.32,y-r*0.32,r*0.05,x,y,r*1.05);
+  schG.addColorStop(0,lichten(smaak.kl,35));
+  schG.addColorStop(0.45,smaak.kl);
+  schG.addColorStop(0.85,donkeren(smaak.kl,18));
+  schG.addColorStop(1,donkeren(smaak.kl,30));
+  circ(c,x,y,r,null);c.fillStyle=schG;c.fill();
+  c.strokeStyle='rgba(0,0,0,0.07)';c.lineWidth=1.2;c.stroke();
+  // Hoofd-glans (grote ovaal)
+  c.save();
+  c.beginPath();c.ellipse(x-r*0.28,y-r*0.26,r*0.38,r*0.25,Math.PI*0.3,0,Math.PI*2);
+  c.fillStyle='rgba(255,255,255,0.48)';c.fill();
+  // Klein glansje
+  c.beginPath();c.ellipse(x-r*0.14,y-r*0.38,r*0.14,r*0.1,0.4,0,Math.PI*2);
+  c.fillStyle='rgba(255,255,255,0.3)';c.fill();
+  c.restore();
+  // Textuur per smaak
+  if(smaak.id==='vanille'){
+    // Vanille zaadjes
+    c.fillStyle='rgba(160,120,30,0.35)';
+    [[-0.15,0.1],[0.2,-0.05],[-0.05,0.28],[0.25,0.2],[-0.28,-0.05],[0.05,-0.22]].forEach(function(p){
+      c.save();c.translate(x+p[0]*r,y+p[1]*r);c.rotate(Math.random()*Math.PI);
+      c.fillRect(-r*0.04,-r*0.01,r*0.08,r*0.02);c.restore();
+    });
+  } else if(smaak.id==='chocolade'){
+    // Chocolade vlekken
+    c.fillStyle='rgba(20,5,0,0.22)';
+    [[-0.22,-0.08],[0.18,0.12],[-0.08,0.28],[0.32,-0.18],[-0.3,0.15],[0.05,-0.28]].forEach(function(p){
+      c.beginPath();c.ellipse(x+p[0]*r,y+p[1]*r,r*0.13,r*0.09,p[0]*2,0,Math.PI*2);c.fill();
+    });
+    // Choco glans ribbe
+    c.strokeStyle='rgba(255,180,100,0.12)';c.lineWidth=2;
+    c.beginPath();c.arc(x,y,r*0.65,Math.PI*0.8,Math.PI*1.4);c.stroke();
+  } else if(smaak.id==='aardbei'){
+    // Aardbei vlekjes
+    c.fillStyle='rgba(160,0,30,0.22)';
+    [[-0.2,0.05],[0.22,-0.1],[-0.05,0.3],[0.28,0.18],[-0.3,-0.08]].forEach(function(p){
+      c.beginPath();c.arc(x+p[0]*r,y+p[1]*r,r*0.07,0,Math.PI*2);c.fill();
+    });
+    // Aardbei-zaadjes als kleine gele stipjes
+    c.fillStyle='rgba(255,240,100,0.45)';
+    [[-0.12,0.18],[0.15,0.05],[0.0,0.32],[-0.25,0.02],[0.28,0.22]].forEach(function(p){
+      c.beginPath();c.arc(x+p[0]*r,y+p[1]*r,r*0.04,0,Math.PI*2);c.fill();
+    });
+  }
+}
+
+function tekenIjsHoorntjeMetSchepjes(c,cx,baseY,r,schepjes,toppings,kh){
+  var hw=r*2.2, hh=r*2.8;
+  var hy=baseY-hh;
+  // Hoorntje tekenen
+  tekenIjsHoorntje(c,cx,hy,hw,hh);
+  // Schepjes tekenen (van onder naar boven, licht overlappend)
+  var n=Math.min(schepjes,3);
+  for(var i=0;i<n;i++){
+    var sy=hy - r*0.6 - i*(r*1.55);
+    var sx=cx + (i===1?r*0.12:i===2?-r*0.1:0); // kleine verschuiving voor realistisch effect
+    tekenIjsSchepje(c,sx,sy,r,gekozenSmaak,i);
+  }
+  if(n===0)return;
+  // Sausdruppels
+  var topY=hy - r*0.6 - (n-1)*r*1.55 - r;
+  toppings.forEach(function(tid){
+    var t=IJS_TOPPINGS.find(function(x){return x.id===tid;});
+    if(!t)return;
+    if(tid==='slagroom'){
+      tekenSlagroomSwirl(c,cx+r*0.1,topY-r*0.3,r*0.75);
+    } else if(tid==='kers'){
+      tekenKers(c,cx+r*0.4,topY-r*0.8,r*0.32);
+    } else if(tid==='aardbeisaus'||tid==='caramelsaus'){
+      // Saus druppelt over de bolletjes
+      for(var si2=0;si2<n;si2++){
+        var dripY=hy-r*0.6-si2*r*1.55;
+        var dripX=cx+r*(si2%2===0?0.5:-0.5);
+        c.strokeStyle=t.kl+'cc';c.lineWidth=r*0.18;c.lineCap='round';
+        c.beginPath();c.moveTo(dripX,dripY-r*0.3);
+        c.bezierCurveTo(dripX+r*0.3,dripY+r*0.2,dripX+r*0.15,dripY+r*0.6,dripX-r*0.1,dripY+r*0.7);
+        c.stroke();
+      }
+    } else if(tid==='hagelslag'||tid==='chocostrips'){
+      // Hagelslag over de bolletjes
+      for(var hi=0;hi<n;hi++){
+        var hbY=hy-r*0.6-hi*r*1.55;
+        for(var hj=0;hj<8;hj++){
+          var ha=hj*Math.PI*2/8+hi*0.3;
+          var hbX=cx+Math.cos(ha)*r*0.65,hbYY=hbY+Math.sin(ha)*r*0.5;
+          c.save();c.translate(hbX,hbYY);c.rotate(ha+0.5);
+          c.fillStyle=tid==='chocostrips'?'#4e342e':t.kl;
+          c.fillRect(-r*0.05,-r*0.015,r*0.1,r*0.03);c.restore();
+        }
+      }
+    } else if(tid==='noten'){
+      for(var ni=0;ni<n;ni++){
+        var nbY=hy-r*0.6-ni*r*1.55;
+        for(var nj=0;nj<6;nj++){
+          var na=nj*Math.PI/3+ni*0.5;
+          circ(c,cx+Math.cos(na)*r*0.7,nbY+Math.sin(na)*r*0.55,r*0.07,'#8d6e63');
+        }
+      }
+    } else if(tid==='wafel'){
+      // Wafelstukje steekt in het ijs
+      c.save();c.translate(cx+r*0.6,topY-r*0.1);c.rotate(-0.3);
+      var wG=c.createLinearGradient(-r*0.15,0,r*0.15,r*0.8);
+      wG.addColorStop(0,'#fff9c4');wG.addColorStop(1,'#f9a825');
+      rr(c,-r*0.12,0,r*0.24,r*0.75,3,null);c.fillStyle=wG;c.fill();
+      c.strokeStyle='#f9a825';c.lineWidth=1;c.stroke();
+      c.strokeStyle='rgba(200,140,0,0.4)';c.lineWidth=0.8;
+      c.beginPath();c.moveTo(0,0);c.lineTo(0,r*0.75);c.stroke();
+      c.beginPath();c.moveTo(-r*0.12,r*0.25);c.lineTo(r*0.12,r*0.25);c.stroke();
+      c.beginPath();c.moveTo(-r*0.12,r*0.5);c.lineTo(r*0.12,r*0.5);c.stroke();
+      c.restore();
+    }
+  });
+}
+
+function tekenSlagroomSwirl(c,x,y,r){
+  // Swirl opbouwen
+  c.save();
+  var points=[];
+  for(var si=0;si<22;si++){
+    var frac=si/21;
+    var ang=si*0.55;
+    var rad=r*(0.08+frac*0.45);
+    var yoff=-frac*r*1.1;
+    points.push([x+Math.cos(ang)*rad, y+yoff+Math.sin(ang)*rad*0.4]);
+  }
+  // Schaduw swirl
+  c.strokeStyle='rgba(200,200,200,0.4)';c.lineWidth=r*0.45;c.lineCap='round';c.lineJoin='round';
+  c.beginPath();points.forEach(function(p,i){i===0?c.moveTo(p[0],p[1]):c.lineTo(p[0],p[1]);});c.stroke();
+  // Witte swirl
+  c.strokeStyle='white';c.lineWidth=r*0.38;
+  c.beginPath();points.forEach(function(p,i){i===0?c.moveTo(p[0],p[1]):c.lineTo(p[0],p[1]);});c.stroke();
+  // Glans lijn
+  c.strokeStyle='rgba(255,255,255,0.7)';c.lineWidth=r*0.1;
+  c.beginPath();points.slice(0,12).forEach(function(p,i){i===0?c.moveTo(p[0]+1,p[1]-1):c.lineTo(p[0]+1,p[1]-1);});c.stroke();
+  // Punt bovenaan
+  var top=points[points.length-1];
+  circ(c,top[0],top[1],r*0.12,'white');
+  c.restore();
+}
+
+function tekenKers(c,x,y,r){
+  // Steel(s)
+  c.strokeStyle='#2e7d32';c.lineWidth=r*0.15;c.lineCap='round';
+  c.beginPath();c.moveTo(x,y);c.bezierCurveTo(x+r*0.5,y-r*1.2,x+r*1.5,y-r*0.8,x+r*2,y-r*0.5);c.stroke();
+  // Blaadje
+  c.fillStyle='#43a047';
+  c.beginPath();c.ellipse(x+r,y-r*0.85,r*0.4,r*0.18,0.8,0,Math.PI*2);c.fill();
+  // Kers bol
+  shadow(c,'rgba(0,0,0,0.25)',r*0.5);
+  var kG=c.createRadialGradient(x-r*0.25,y-r*0.25,0,x,y,r);
+  kG.addColorStop(0,'#ef5350');kG.addColorStop(0.6,'#c62828');kG.addColorStop(1,'#8e0000');
+  circ(c,x,y,r,null);c.fillStyle=kG;c.fill();
+  noShadow(c);
+  c.strokeStyle='rgba(0,0,0,0.1)';c.lineWidth=1;c.stroke();
+  // Glans
+  c.fillStyle='rgba(255,200,200,0.55)';
+  c.beginPath();c.ellipse(x-r*0.28,y-r*0.28,r*0.3,r*0.2,0.4,0,Math.PI*2);c.fill();
+}
+
+function tekenIjsSchepScene(c,kw,kh,ay,stap){
+  tekenIjsMachineScene(c,kw,kh,ay,stap,true);
+  var mx=kw*0.22,mw2=kw*0.55,mh=kh*0.72,my=ay+kh*0.04;
+  var ns=stap.geSchept||0;
+  // Teken hoorntje met schepjes
+  var hcx=kw*0.76,hbaseY=my+mh+kh*0.12,hr=kh*0.07;
+  if(ns>0) tekenIjsHoorntjeMetSchepjes(c,hcx,hbaseY,hr,ns,[],kh);
+  else {
+    // Leeg hoorntje wachten
+    tekenIjsHoorntje(c,hcx,hbaseY-hr*2.8,hr*2.2,hr*2.8);
+    c.fillStyle='rgba(255,255,255,0.5)';c.font='bold '+Math.round(kh*0.04)+'px Nunito';c.textAlign='center';
+    c.fillText('Klaar voor ijs!',hcx,hbaseY-hr*3.5);
+  }
+  // Schep teller
+  c.fillStyle='rgba(0,0,0,0.5)';
+  rr(c,kw*0.72,ay+kh*0.05,kw*0.24,kh*0.1,8,'rgba(0,0,0,0.4)');
+  c.fillStyle='white';c.font='bold '+Math.round(kh*0.04)+'px Nunito';c.textAlign='center';
+  c.fillText(ns+'/3 schepjes',kw*0.84,ay+kh*0.115);
+  // Schep animatie
+  if(stap.schepAnim){
+    var ap=stap.schepAnim;
+    c.font=Math.round(kh*0.12)+'px serif';c.textAlign='center';
+    c.fillText('🥄',kw*0.84-ap*kw*0.4,ay+kh*0.35+ap*kh*0.2);
+  }
+}
+
+function tekenIjsToppingScene(c,kw,kh,ay,stap){
+  tekenIjsMachineScene(c,kw,kh,ay,stap,true);
+  var mx=kw*0.22,mw2=kw*0.55,mh=kh*0.72,my=ay+kh*0.04;
+  // Welke toppings zijn al gedaan
+  var gedaan=[];
+  for(var i=0;i<kStappen.length;i++){
+    if(kStappen[i]&&kStappen[i].scene==='ijs_topping'&&kStappen[i].gedaan){
+      gedaan.push(kStappen[i].toppingId);
+    }
+  }
+  var hcx=kw*0.76,hbaseY=my+mh+kh*0.12,hr=kh*0.07;
+  tekenIjsHoorntjeMetSchepjes(c,hcx,hbaseY,hr,3,gedaan,kh);
+  // Actieve topping tonen
+  var t=IJS_TOPPINGS.find(function(x){return x.id===stap.toppingId;});
+  if(t){
+    c.font=Math.round(kh*0.08)+'px serif';c.textAlign='center';
+    c.fillText(t.em,kw*0.8,ay+kh*0.25);
+    c.fillStyle='rgba(255,255,255,0.85)';c.font='bold '+Math.round(kh*0.044)+'px Nunito';
+    c.fillText(t.nm,kw*0.8,ay+kh*0.32);
+  }
+}
+
+function tekenIjsKlaarScene(c,kw,kh,ay,stap){
+  var mx=kw*0.22,mw2=kw*0.55,mh=kh*0.72,my=ay+kh*0.04;
+  var hcx=kw*0.5,hbaseY=ay+kh*0.68,hr=kh*0.08;
+  var p3=0.97+0.03*Math.sin(T*0.07);
+  c.save();c.translate(hcx,hbaseY);c.scale(p3,p3);c.translate(-hcx,-hbaseY);
+  tekenIjsHoorntjeMetSchepjes(c,hcx,hbaseY,hr,3,gekozenToppings,kh);
+  c.restore();
+  // Sterren
+  c.font=Math.round(kh*0.042)+'px serif';c.textAlign='center';
+  for(var si5=0;si5<8;si5++){
+    var sa2=si5*Math.PI*2/8+T*0.04;
+    var sr2=kw*0.2;
+    c.globalAlpha=0.5+0.5*Math.sin(T*0.1+si5);
+    c.fillText('⭐',kw*0.5+Math.cos(sa2)*sr2,ay+kh*0.5+Math.sin(sa2)*kh*0.18);
+  }
+  c.globalAlpha=1;
+  // Emoji
+  c.font=Math.round(kh*0.09)+'px serif';c.fillText(gekozenSmaak?gekozenSmaak.em:'🍨',kw*0.5,ay+kh*0.08);
+  shadow(c,'rgba(30,100,30,0.3)',8);
+  c.fillStyle='#1b5e20';c.font='bold '+Math.round(kh*0.065)+'px Nunito';
+  c.fillText('🎉 Klaar!',kw*0.5,ay+kh*0.73);
+  noShadow(c);
+}
+
+function toonKStap(){
+  if(kStap>=kStappen.length){klaarKoken();return;}
+  var s=kStappen[kStap];
+  var pct=Math.round(kStap/kStappen.length*100);
+  document.getElementById('kbv').style.width=pct+'%';
+  document.getElementById('ku').innerHTML=s.uitleg;
+  document.getElementById('ks').textContent=s.sub;
+  // Smoothie labels
+  var lbs=['✂️ Snijden!','🫙 In de blender!','🌀 MIXEN!','🥤 Gieten!','🎉 Serveren!'];
+  var li=s.scene==='snij'?0:s.scene==='blend'&&s.fase===0?1:s.scene==='blend'&&s.fase===1?2:s.scene==='glas'?3:4;
+  // IJS labels
+  if(s.scene==='ijs_init')   {document.getElementById('kbtn').textContent='🔌 Zet machine aan!';document.getElementById('kbtn').className='pbtn bo';return;}
+  if(s.scene==='ijs_schep')  {document.getElementById('kbtn').textContent='🥄 Schep ijs! ('+((s.geSchept||0)+1)+'/3)';document.getElementById('kbtn').className='pbtn bo';return;}
+  if(s.scene==='ijs_topping'){var t2=IJS_TOPPINGS.find(function(x){return x.id===s.toppingId;});document.getElementById('kbtn').textContent=(t2?t2.em+' ':'')+' Toevoegen!';document.getElementById('kbtn').className='pbtn bo';return;}
+  if(s.scene==='ijs_klaar')  {document.getElementById('kbtn').textContent='🎉 Serveren!';document.getElementById('kbtn').className='pbtn bg';return;}
+  document.getElementById('kbtn').textContent=lbs[li];
+  document.getElementById('kbtn').className='pbtn '+(s.scene==='klaar'?'bg':'bo');
+  if(s.scene==='blend')blFase=s.fase;
+}
+
+function volgendKeukenStap(){
+  var s=kStappen[kStap];if(!s)return;
+  // Smoothie scenes
+  if(s.scene==='snij'){
+    snijCbFn=function(){s.stukjes=snijGesnedenN;kStap++;toonKStap();};
+    initSnij(s.ingId);return;
+  }
+  if(s.scene==='blend'&&s.fase===0){blInhoud=gekozenIng.slice();speelGeluid('tik');}
+  if(s.scene==='blend'&&s.fase===1){blFase=2;speelGeluid('blend');setTimeout(function(){blFase=3;},1000);}
+  if(s.scene==='glas'){
+    var vp=0;var iv=setInterval(function(){vp+=0.06;kStappen[kStap].vulPct=Math.min(vp,0.92);if(vp>=0.92)clearInterval(iv);},55);
+    speelGeluid('tik');
+  }
+  if(s.scene==='klaar'){klaarKoken();return;}
+  // IJS scenes
+  if(s.scene==='ijs_init'){
+    ijsMachineAan=true;speelGeluid('bel');
+    kStap++;setTimeout(toonKStap,600);return;
+  }
+  if(s.scene==='ijs_schep'){
+    s.geSchept=(s.geSchept||0)+1;
+    s.schepAnim=0;
+    var schepIv=setInterval(function(){s.schepAnim=Math.min(1,(s.schepAnim||0)+0.08);},30);
+    setTimeout(function(){clearInterval(schepIv);s.schepAnim=0;},600);
+    speelGeluid('tik');
+    if(s.geSchept>=3){kStap++;setTimeout(toonKStap,500);}
+    else{toonKStap();}
+    return;
+  }
+  if(s.scene==='ijs_topping'){
+    s.gedaan=true;speelGeluid('tik');
+    kStap++;setTimeout(toonKStap,350);return;
+  }
+  if(s.scene==='ijs_klaar'){klaarKoken();return;}
+  kStap++;setTimeout(toonKStap,280);
+}
+
+function klaarKoken(){
+  document.getElementById('kbv').style.width='100%';
+  if(kAnimId){cancelAnimationFrame(kAnimId);kAnimId=null;}
+  document.getElementById('keuken').classList.remove('open');
+  barSmootje=true;speelGeluid('bel');
+  gameStaat='loopt_bar';dierX=W*0.13;dierLoopt=true;dierRicht=-1;
+  var nm=modus==='ijs'?(gekozenSmaak?gekozenSmaak.nm+' ijs':'IJsje'):smootje.nm;
+  setFase('✅ '+nm+' is klaar! Serveer '+dier.nm+'!',false);
+}
+
+function sluitKeuken(){
+  if(kAnimId){cancelAnimationFrame(kAnimId);kAnimId=null;}
+  document.getElementById('keuken').classList.remove('open');
+  if(gameStaat==='keuken'){toonIngPanel();openPnl();}
+}
+
+function toonSrv(){
+  var pt, isFav;
+  if(modus==='ijs'){
+    // IJS: extra punt voor favoriete smaak
+    var favSmaken={beer:'chocolade',konijn:'vanille',vos:'aardbei',kat:'vanille',
+      panda:'chocolade',uil:'vanille',eekhoorn:'aardbei',hamster:'vanille',wasbeer:'chocolade'};
+    isFav=gekozenSmaak&&gekozenSmaak.id===favSmaken[dier.id];
+    pt=isFav?3:2;
+    pt+=Math.min(gekozenToppings.length,3); // toppings geven extra punten
+    document.getElementById('sg').textContent=(gekozenSmaak?gekozenSmaak.em:'🍨')+'🍨';
+  } else {
+    isFav=smootje.ing.indexOf(dier.fav)>=0||gekozenIng.indexOf(dier.fav)>=0;
+    pt=isFav?3:2;
+    document.getElementById('sg').textContent=(smootje.gl||'🟡')+'🥤';
+  }
+  document.getElementById('sd').textContent=dier.em||'🐾';
+  // Gebruik dier emoji uit naam want we tekenden het
+  var dierEmojis={beer:'🐻',konijn:'🐰',vos:'🦊',kat:'🐱',panda:'🐼',uil:'🦉',eekhoorn:'🐿️',hamster:'🐹',wasbeer:'🦝'};
+  document.getElementById('sd').textContent=dierEmojis[dier.id]||'🐾';
+  var ijsZinnen=['Jummie! Het lekkerste ijsje ooit! 🍨','Wauw, zo lekker en koud! 😍','Meer! Meer! Dit is geweldig! 🌟'];
+  document.getElementById('ss').textContent=modus==='ijs'?ijsZinnen[Math.floor(Math.random()*ijsZinnen.length)]:dier.z;
+  document.getElementById('ssc').textContent='+'+pt+' ⭐';
+  var re=isFav?['💗 Favoriete smaak! Perfect!','⭐⭐⭐ Uitstekend!']:['⭐⭐ Lekker!','😊 Goed gedaan!'];
+  document.getElementById('sr').textContent=re[Math.floor(Math.random()*re.length)];
+  document.getElementById('srv').classList.add('open');
+  speelGeluid('goed');
+  setTimeout(function(){voegSterToe(pt);maakConfetti();},300);
+}
+
+function sluitSrv(){
+  document.getElementById('srv').classList.remove('open');
+  dierRicht=1;dierLoopt=true;gameStaat='loopt_weg';
+  setFase('👋 Tot ziens '+dier.nm+'!',true);
+  barSmootje=false;
+}
+
+// Keuken deur klikken (in salon)
+gc.addEventListener('click',function(e){
+  var r=gc.getBoundingClientRect();
+  var x=e.clientX-r.left,y=e.clientY-r.top;
+  var dw=W*0.1,dh=H*0.24;
+  if(x>W*0.025&&x<W*0.025+dw&&y>vloerY-dh&&y<vloerY)openKeuken();
+},false);
+gc.addEventListener('touchend',function(e){
+  var t=e.changedTouches[0];var r=gc.getBoundingClientRect();
+  var x=t.clientX-r.left,y=t.clientY-r.top;
+  var dw=W*0.1,dh=H*0.24;
+  if(x>W*0.025&&x<W*0.025+dw&&y>vloerY-dh&&y<vloerY)openKeuken();
+},false);
+
+// START
+try{score=parseInt(localStorage.getItem('mss')||'0');}catch(e){}
+document.getElementById('sc').textContent=score;
+setTimeout(function(){
+  setFase("\uD83C\uDF38 Welkom in Milou\u2019s Smoothie & IJs Salon!",false);
+  setTimeout(function(){
+    document.getElementById('fase').style.opacity='0';
+    setTimeout(nieuweKlant,600);
+  },2000);
+},400);
+loop();
+</script>
+</body>
+</html>
