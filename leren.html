@@ -333,6 +333,57 @@ canvas.overtrek-canvas {
   color: var(--tekst); font-family: 'Nunito', sans-serif;
   font-weight: 800; font-size: 0.9rem; cursor: pointer; margin-top: 8px;
 }
+
+/* ── KLOKKIJKEN ── */
+.klok-niveaus { display: flex; gap: 6px; overflow-x: auto; padding: 2px 2px 8px; margin: -6px 0 10px; }
+.klok-niv {
+  flex: none; border: 2px solid var(--roze2); background: var(--bg); color: var(--tekst);
+  border-radius: 999px; padding: 7px 12px; font-family: 'Nunito', sans-serif; font-weight: 800;
+  font-size: 0.8rem; cursor: pointer; touch-action: manipulation;
+}
+.klok-niv.actief { background: var(--paars); border-color: var(--paars); color: white; }
+.klok-niv .vink { color: var(--groen); margin-left: 3px; }
+.klok-niv.actief .vink { color: white; }
+.klok-uitleg { background: #f4efff; border-radius: 14px; padding: 10px 14px; margin-bottom: 12px; font-size: 0.86rem; line-height: 1.45; }
+.klok-uitleg summary { font-weight: 900; cursor: pointer; color: #6a4fb0; }
+.klok-uitleg p { margin-top: 6px; }
+.klok-vraag { text-align: center; font-weight: 900; font-size: 1.15rem; margin: 4px 0 10px; line-height: 1.35; }
+.klok-vraag .doel { color: var(--roze); }
+.klok-digi {
+  display: none; margin: 6px auto 12px; width: fit-content; background: #2a2035; color: #7dffb0;
+  font-weight: 900; font-size: 3rem; letter-spacing: 3px; padding: 6px 22px; border-radius: 16px;
+  font-variant-numeric: tabular-nums; box-shadow: inset 0 0 0 4px #4a3a5a;
+}
+#klok-svg { display: block; width: 100%; max-width: 320px; margin: 0 auto; touch-action: none; }
+#klok-svg .hulp-el { display: none; }
+#klok-svg.met-hulp .hulp-el { display: inline; }
+#klok-svg.sleepbaar { cursor: grab; }
+.klok-tip { text-align: center; font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+.klok-live { text-align: center; margin: 8px 0 4px; }
+.klok-live .tekst { font-weight: 900; font-size: 1.3rem; color: var(--roze); }
+.klok-live .digi { font-weight: 800; color: var(--muted); margin-top: 2px; }
+.klok-uur { display: flex; gap: 8px; justify-content: center; margin-top: 8px; }
+.klok-uur button {
+  border: 2px solid var(--roze2); background: var(--bg); border-radius: 12px; padding: 8px 14px;
+  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.85rem; cursor: pointer; color: var(--tekst);
+}
+.klok-opties { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0 6px; }
+.klok-opt {
+  background: var(--bg); border: 3px solid var(--roze2); border-radius: 14px; padding: 12px 8px;
+  font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 1rem; cursor: pointer; color: var(--tekst);
+  transition: all .15s; touch-action: manipulation;
+}
+.klok-opt.groot { font-size: 1.4rem; font-variant-numeric: tabular-nums; }
+.klok-opt:active { transform: scale(0.96); }
+.klok-opt.goed { background: #d4f8d4; border-color: var(--groen); color: #2a7a2a; }
+.klok-opt.fout { background: #ffd6d6; border-color: #e63946; color: #8a1a1a; }
+.klok-onder { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; }
+.klok-hulp-knop {
+  border: 2px solid var(--paars); background: white; color: #6a4fb0; border-radius: 999px; padding: 7px 14px;
+  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.82rem; cursor: pointer;
+}
+.klok-hulp-knop.aan { background: var(--paars); color: white; }
+.klok-reeks { font-weight: 800; font-size: 0.82rem; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -379,6 +430,11 @@ canvas.overtrek-canvas {
         <div class="mk-emoji">✏️</div>
         <div class="mk-naam">Overtrekken</div>
         <div class="mk-sub">Cijfers & letters</div>
+      </div>
+      <div class="module-kaart" onclick="startKlok()">
+        <div class="mk-emoji">🕐</div>
+        <div class="mk-naam">Klokkijken</div>
+        <div class="mk-sub">Van hele uren tot 24 uur</div>
       </div>
       <div class="module-kaart" onclick="startVeters()">
         <div class="mk-emoji">👟</div>
@@ -468,6 +524,34 @@ canvas.overtrek-canvas {
       <canvas id="veter-canvas" width="300" height="280"></canvas>
       <div class="feedback-vak" id="veter-feedback"></div>
       <button class="btn" onclick="volgendVeterStap()" id="veter-btn">👟 Start!</button>
+    </div>
+    <button class="btn-secundair" onclick="naarMenu()">← Terug naar menu</button>
+  </div>
+
+  <!-- ══ KLOKKIJKEN ══ -->
+  <div class="scherm" id="scherm-klok">
+    <div class="boek-wrap">
+      <div class="boek-bloemen">🌸🌷🌼🌺🌸🌷🌼🌺🌸</div>
+      <div class="bladzijde-titel" style="color:var(--paars)">🕐 Klokkijken</div>
+      <div class="klok-niveaus" id="klok-niveaus"></div>
+      <details class="klok-uitleg" id="klok-uitleg"><summary>💡 Uitleg</summary><p id="klok-uitleg-tekst"></p></details>
+      <div class="klok-vraag" id="klok-vraag"></div>
+      <div class="klok-digi" id="klok-digi"></div>
+      <svg id="klok-svg" viewBox="0 0 340 340" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="klok-tip" id="klok-tip"></div>
+      <div class="klok-live" id="klok-live"></div>
+      <div class="klok-uur" id="klok-uur">
+        <button onclick="klokUur(-1)">− 1 uur</button>
+        <button onclick="klokUur(1)">+ 1 uur</button>
+      </div>
+      <div class="klok-opties" id="klok-opties"></div>
+      <button class="btn" id="klok-check" onclick="checkKlokZet()">✅ Klaar!</button>
+      <div class="feedback-vak" id="klok-feedback"></div>
+      <button class="btn" id="klok-volgende" onclick="nieuweKlokVraag()">Volgende ➡️</button>
+      <div class="klok-onder">
+        <button class="klok-hulp-knop aan" id="klok-hulp-knop" onclick="toggleKlokHulp()">🎨 Hulp aan</button>
+        <span class="klok-reeks" id="klok-reeks"></span>
+      </div>
     </div>
     <button class="btn-secundair" onclick="naarMenu()">← Terug naar menu</button>
   </div>
@@ -1118,6 +1202,345 @@ function maakBloemenBg() {
     bg.appendChild(b);
   }
 }
+
+// ══════════════════════════════════════════════════
+//  KLOKKIJKEN
+// ══════════════════════════════════════════════════
+const KLOK_NIVEAUS = [
+  { id: 1, naam: 'Hele uren', stap: 60,
+    uitleg: 'De <b>kleine wijzer</b> wijst het uur aan. Staat de <b>grote wijzer</b> recht omhoog op de 12? Dan is het precies zoveel uur. Kleine wijzer op de 4 = vier uur.' },
+  { id: 2, naam: 'Half', stap: 30,
+    uitleg: 'Staat de grote wijzer onderaan op de 6? Dan is het <b>half</b>. Let op: half vier betekent een half uur <b>vóór</b> vier uur. De kleine wijzer staat dan tussen de 3 en de 4. Bij half noem je dus altijd het uur dat eraan komt.' },
+  { id: 3, naam: 'Kwartier', stap: 15,
+    uitleg: 'Een kwartier is 15 minuten. Grote wijzer op de 3 = <b>kwart over</b>. Grote wijzer op de 9 = <b>kwart voor</b> het volgende uur.' },
+  { id: 4, naam: 'Per 5 minuten', stap: 5,
+    uitleg: 'Elk cijfer op de klok is 5 minuten. In het eerste kwartier zeg je <b>over</b> het uur, in het laatste kwartier <b>voor</b> het uur. Rond de half tel je vanaf de half: <b>tien voor half</b>, <b>vijf voor half</b>, <b>half</b>, <b>vijf over half</b>, <b>tien over half</b>. Zet de hulp aan om de vier stukken te zien.' },
+  { id: 5, naam: 'Digitaal & 24 uur', stap: 5,
+    uitleg: 'Een digitale klok telt na 12 uur door: 13:00 is één uur &rsquo;s middags. Trek er 12 vanaf om het uur te vinden: 19:30 is half acht &rsquo;s avonds. Voor 12:00 is het &rsquo;s ochtends (of &rsquo;s nachts).' },
+  { id: 0, naam: '🔍 Oefenklok', stap: 5,
+    uitleg: 'Sleep de wijzers zelf en kijk hoe de tijd heet. De grote wijzer pak je aan de buitenkant, de kleine wijzer dichtbij het midden.' },
+];
+const KLOK_GETAL = ['twaalf','één','twee','drie','vier','vijf','zes','zeven','acht','negen','tien','elf','twaalf'];
+const KLOK_CONTEXT = [
+  { h: 7,  m: 0,  t: 'Je wekker gaat om <span class="doel">zeven uur</span>. Zet de klok!' },
+  { h: 7,  m: 30, t: 'Op schooldagen ga je om <span class="doel">half acht</span> naar bed. Zet de klok!' },
+  { h: 3,  m: 15, t: 'De film begint om <span class="doel">kwart over drie</span>. Zet de klok!' },
+  { h: 10, m: 45, t: 'De smoothiebar gaat open om <span class="doel">kwart voor elf</span>. Zet de klok!' },
+  { h: 4,  m: 20, t: 'Je vriendin komt om <span class="doel">tien voor half vijf</span>. Zet de klok!' },
+  { h: 8,  m: 35, t: 'Het concert op tv begint om <span class="doel">vijf over half negen</span>. Zet de klok!' },
+  { h: 12, m: 30, t: 'De lunch op school begint om <span class="doel">half één</span>. Zet de klok!' },
+];
+
+let klokNiv = 1, klokType = 'lees', klokDoel = { h: 3, m: 0, h24: 15 }, klokZet = { h: 12, m: 0 };
+let klokHulp = true, klokReeks = 0, klokBeantwoord = false, klokSleep = null, klokVorige = '';
+
+const kPad = n => String(n).padStart(2, '0');
+const kUur = h => ((h - 1) % 12 + 12) % 12 + 1;           // altijd 1..12
+const kHoofd = s => s.charAt(0).toUpperCase() + s.slice(1);
+function klokTekst(h, m) {
+  h = kUur(h);
+  const H = KLOK_GETAL[h], V = KLOK_GETAL[kUur(h + 1)];
+  const t = {
+    0: `${H} uur`, 5: `vijf over ${H}`, 10: `tien over ${H}`, 15: `kwart over ${H}`,
+    20: `tien voor half ${V}`, 25: `vijf voor half ${V}`, 30: `half ${V}`, 35: `vijf over half ${V}`,
+    40: `tien over half ${V}`, 45: `kwart voor ${V}`, 50: `tien voor ${V}`, 55: `vijf voor ${V}`,
+  };
+  return t[m] !== undefined ? t[m] : `${m} minuten over ${H}`;
+}
+function klokDagdeel(h24) {
+  if (h24 < 6) return '’s nachts';
+  if (h24 < 12) return '’s ochtends';
+  if (h24 < 18) return '’s middags';
+  return '’s avonds';
+}
+function klokDigitaal(h24, m) { return kPad(h24) + ':' + kPad(m); }
+function klokLaadKlaar() { try { return JSON.parse(localStorage.getItem('milou_klok_niveaus') || '[]'); } catch (e) { return []; } }
+function klokBewaarKlaar(id) {
+  const k = klokLaadKlaar(); if (k.indexOf(id) === -1) k.push(id);
+  try { localStorage.setItem('milou_klok_niveaus', JSON.stringify(k)); } catch (e) {}
+}
+function schud(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+
+// ── Klok tekenen ──
+const KC = 170, KR = 128;
+function kPunt(graden, r) { const a = graden * Math.PI / 180; return [+(KC + Math.sin(a) * r).toFixed(1), +(KC - Math.cos(a) * r).toFixed(1)]; }
+function bouwKlok() {
+  const svg = document.getElementById('klok-svg');
+  let s = `<circle cx="${KC}" cy="${KC}" r="${KR + 8}" fill="#ffd6ec"/><circle cx="${KC}" cy="${KC}" r="${KR}" fill="#ffffff" stroke="#3a2a3a" stroke-width="4"/>`;
+  const zones = [['#c8f2dd', 'over'], ['#fff1b8', 'voor half'], ['#ffe0c2', 'over half'], ['#ffd6e7', 'voor']];
+  zones.forEach((z, i) => {
+    const a0 = i * 90, a1 = a0 + 90, p0 = kPunt(a0, KR - 3), p1 = kPunt(a1, KR - 3), pl = kPunt(a0 + 45, 56);
+    s += `<path class="hulp-el" d="M${KC} ${KC} L${p0[0]} ${p0[1]} A${KR - 3} ${KR - 3} 0 0 1 ${p1[0]} ${p1[1]} Z" fill="${z[0]}"/>`;
+    s += `<text class="hulp-el" x="${pl[0]}" y="${pl[1] + 5}" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="900" font-size="13" fill="#8a6a8a">${z[1]}</text>`;
+  });
+  for (let i = 0; i < 60; i++) {
+    const groot = i % 5 === 0, p0 = kPunt(i * 6, KR - 4), p1 = kPunt(i * 6, groot ? KR - 16 : KR - 10);
+    s += `<line x1="${p0[0]}" y1="${p0[1]}" x2="${p1[0]}" y2="${p1[1]}" stroke="#3a2a3a" stroke-width="${groot ? 3.5 : 1.5}" stroke-linecap="round"/>`;
+  }
+  for (let u = 1; u <= 12; u++) {
+    const p = kPunt(u * 30, KR - 32);
+    s += `<text x="${p[0]}" y="${p[1] + 9}" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="900" font-size="26" fill="#3a2a3a">${u}</text>`;
+  }
+  for (let k = 0; k < 12; k++) {
+    const p = kPunt(k * 30, KR + 22);
+    s += `<text class="hulp-el" x="${p[0]}" y="${p[1] + 5}" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="800" font-size="13" fill="#9b6fd6">${k === 0 ? '00' : k * 5}</text>`;
+  }
+  s += `<g id="klok-uurwijzer"><line x1="${KC}" y1="${KC + 12}" x2="${KC}" y2="${KC - 64}" stroke="#ff6eb4" stroke-width="11" stroke-linecap="round"/><circle class="knop-el" cx="${KC}" cy="${KC - 64}" r="11" fill="#ff6eb4" opacity="0.35"/></g>`;
+  s += `<g id="klok-minuutwijzer"><line x1="${KC}" y1="${KC + 16}" x2="${KC}" y2="${KC - 104}" stroke="#3a2a3a" stroke-width="6" stroke-linecap="round"/><circle class="knop-el" cx="${KC}" cy="${KC - 104}" r="13" fill="#3a2a3a" opacity="0.25"/></g>`;
+  s += `<circle cx="${KC}" cy="${KC}" r="9" fill="#3a2a3a"/><circle cx="${KC}" cy="${KC}" r="4" fill="#ffe066"/>`;
+  svg.innerHTML = s;
+  svg.classList.toggle('met-hulp', klokHulp);
+}
+function zetWijzers(h, m) {
+  document.getElementById('klok-uurwijzer').setAttribute('transform', `rotate(${(h % 12) * 30 + m * 0.5} ${KC} ${KC})`);
+  document.getElementById('klok-minuutwijzer').setAttribute('transform', `rotate(${m * 6} ${KC} ${KC})`);
+}
+function toonKnoppen(aan) {
+  document.querySelectorAll('#klok-svg .knop-el').forEach(el => { el.style.display = aan ? '' : 'none'; });
+  document.getElementById('klok-svg').classList.toggle('sleepbaar', aan);
+}
+
+// ── Scherm opbouwen ──
+function startKlok() {
+  toonScherm('klok');
+  const klaar = klokLaadKlaar();
+  const eerste = KLOK_NIVEAUS.find(n => n.id > 0 && klaar.indexOf(n.id) === -1);
+  kiesKlokNiveau(eerste ? eerste.id : 1);
+}
+function renderKlokNiveaus() {
+  const klaar = klokLaadKlaar();
+  document.getElementById('klok-niveaus').innerHTML = KLOK_NIVEAUS.map(n =>
+    `<button class="klok-niv${n.id === klokNiv ? ' actief' : ''}" onclick="kiesKlokNiveau(${n.id})">${n.id ? n.id + '. ' : ''}${n.naam}${klaar.indexOf(n.id) > -1 ? '<span class="vink">✓</span>' : ''}</button>`
+  ).join('');
+}
+function kiesKlokNiveau(id) {
+  klokNiv = id; klokReeks = 0;
+  const n = KLOK_NIVEAUS.find(x => x.id === id);
+  document.getElementById('klok-uitleg-tekst').innerHTML = n.uitleg;
+  document.getElementById('klok-uitleg').open = (id === 0 || id <= 2);
+  renderKlokNiveaus();
+  nieuweKlokVraag();
+}
+function klokStap() { return KLOK_NIVEAUS.find(x => x.id === klokNiv).stap; }
+
+function nieuweKlokVraag() {
+  bouwKlok();
+  klokBeantwoord = false;
+  const fb = document.getElementById('klok-feedback'); fb.textContent = ''; fb.className = 'feedback-vak';
+  const vraag = document.getElementById('klok-vraag'), digi = document.getElementById('klok-digi');
+  const opties = document.getElementById('klok-opties'), live = document.getElementById('klok-live');
+  const svg = document.getElementById('klok-svg');
+  opties.innerHTML = ''; live.innerHTML = ''; digi.style.display = 'none'; svg.style.display = '';
+  document.getElementById('klok-tip').textContent = '';
+  document.getElementById('klok-volgende').style.display = 'none';
+  document.getElementById('klok-check').style.display = 'none';
+  document.getElementById('klok-uur').style.display = 'none';
+  document.getElementById('klok-reeks').textContent = klokNiv ? `🔥 ${klokReeks} op een rij` : '';
+  toonKnoppen(false);
+
+  // Oefenklok: vrij spelen
+  if (klokNiv === 0) {
+    klokType = 'oefen'; klokZet = { h: 3, m: 15 };
+    vraag.textContent = 'Sleep de wijzers en ontdek de tijd';
+    document.getElementById('klok-uur').style.display = 'flex';
+    document.getElementById('klok-tip').textContent = 'Grote wijzer: buitenkant pakken · Kleine wijzer: dichtbij het midden';
+    toonKnoppen(true); zetWijzers(klokZet.h, klokZet.m); updateKlokLive();
+    return;
+  }
+
+  const stap = klokStap();
+  let h, m, h24, sleutel;
+  do {
+    h = 1 + Math.floor(Math.random() * 12);
+    m = stap === 60 ? 0 : Math.floor(Math.random() * (60 / stap)) * stap;
+    h24 = h === 12 ? (Math.random() < 0.5 ? 0 : 12) : h + (Math.random() < 0.5 ? 0 : 12);
+    sleutel = h24 + ':' + m;
+  } while (sleutel === klokVorige);
+  klokVorige = sleutel;
+
+  if (klokNiv === 5) klokType = Math.random() < 0.5 ? 'digi-tekst' : 'analoog-digi';
+  else klokType = Math.random() < 0.5 ? 'lees' : 'zet';
+
+  let context = null;
+  if (klokType === 'zet' && Math.random() < 0.4) {
+    const passend = KLOK_CONTEXT.filter(c => c.m % stap === 0);
+    if (passend.length) { context = passend[Math.floor(Math.random() * passend.length)]; h = context.h; m = context.m; }
+  }
+  klokDoel = { h: h, m: m, h24: h24 };
+
+  if (klokType === 'lees') {
+    vraag.textContent = 'Hoe laat is het?';
+    zetWijzers(h, m);
+    const antwoord = klokTekst(h, m);
+    const lijst = klokAfleiders(h, m, stap).map(t => klokTekst(t[0], t[1]));
+    renderKlokOpties(antwoord, lijst, false);
+  } else if (klokType === 'zet') {
+    vraag.innerHTML = context ? context.t : `Zet de klok op <span class="doel">${klokTekst(h, m)}</span>`;
+    klokZet = { h: 12, m: 0 };
+    zetWijzers(12, 0); toonKnoppen(true);
+    document.getElementById('klok-uur').style.display = 'flex';
+    document.getElementById('klok-check').style.display = 'block';
+    document.getElementById('klok-tip').textContent = 'Grote wijzer: buitenkant pakken · Kleine wijzer: dichtbij het midden';
+  } else if (klokType === 'digi-tekst') {
+    vraag.textContent = 'Hoe zeg je deze tijd?';
+    svg.style.display = 'none';
+    digi.style.display = 'block'; digi.textContent = klokDigitaal(h24, m);
+    const antwoord = klokTekst(h, m) + ' ' + klokDagdeel(h24);
+    const andereDeel = klokDagdeel((h24 + 12) % 24);
+    const lijst = [klokTekst(h, m) + ' ' + andereDeel].concat(
+      klokAfleiders(h, m, stap).map(t => klokTekst(t[0], t[1]) + ' ' + klokDagdeel(h24)));
+    renderKlokOpties(antwoord, lijst, false);
+  } else {
+    vraag.innerHTML = `Het is <span class="doel">${klokDagdeel(h24)}</span>. Welke digitale tijd is dit?`;
+    zetWijzers(h, m);
+    const antwoord = klokDigitaal(h24, m);
+    const lijst = [klokDigitaal((h24 + 12) % 24, m)].concat(klokAfleiders(h, m, stap).map(t => {
+      const u = kUur(t[0]) % 12 + (h24 >= 12 ? 12 : 0);
+      return klokDigitaal(u, t[1]);
+    }));
+    renderKlokOpties(antwoord, lijst, true);
+  }
+}
+
+// Foute antwoorden die lijken op veelgemaakte fouten
+function klokAfleiders(h, m, stap) {
+  const c = [[h + 1, m], [h - 1, m], [h, (60 - m) % 60], [h, (m + stap) % 60], [h, (m - stap + 60) % 60],
+             [m === 0 ? 12 : m / 5, (h % 12) * 5]];
+  return c.filter(t => t[1] % stap === 0);
+}
+function renderKlokOpties(antwoord, kandidaten, groot) {
+  const gekozen = [antwoord];
+  schud(kandidaten.slice()).forEach(k => { if (gekozen.length < 4 && gekozen.indexOf(k) === -1) gekozen.push(k); });
+  let poging = 0;
+  while (gekozen.length < 4 && poging < 50) {
+    poging++;
+    const rh = 1 + Math.floor(Math.random() * 12), rm = klokDoel.m;
+    const t = groot ? klokDigitaal(kUur(rh) % 12 + (klokDoel.h24 >= 12 ? 12 : 0), rm)
+            : klokType === 'digi-tekst' ? klokTekst(rh, rm) + ' ' + klokDagdeel(klokDoel.h24) : klokTekst(rh, rm);
+    if (gekozen.indexOf(t) === -1) gekozen.push(t);
+  }
+  const lijst = schud(gekozen);
+  const box = document.getElementById('klok-opties');
+  box.innerHTML = '';
+  lijst.forEach(t => {
+    const b = document.createElement('button');
+    b.className = 'klok-opt' + (groot ? ' groot' : '');
+    b.textContent = groot ? t : kHoofd(t);
+    b.addEventListener('click', function () { checkKlokOptie(this, t === antwoord, antwoord); });
+    box.appendChild(b);
+  });
+}
+function checkKlokOptie(knop, juist, antwoord) {
+  if (klokBeantwoord) return;
+  klokBeantwoord = true;
+  document.querySelectorAll('#klok-opties .klok-opt').forEach(b => {
+    if (b.textContent.toLowerCase() === antwoord.toLowerCase()) b.classList.add('goed');
+  });
+  if (!juist) knop.classList.add('fout');
+  klokResultaat(juist, antwoord);
+}
+function checkKlokZet() {
+  if (klokBeantwoord) return;
+  klokBeantwoord = true;
+  const juist = klokZet.h % 12 === klokDoel.h % 12 && klokZet.m === klokDoel.m;
+  document.getElementById('klok-check').style.display = 'none';
+  document.getElementById('klok-uur').style.display = 'none';
+  toonKnoppen(false);
+  if (!juist) setTimeout(function () { zetWijzers(klokDoel.h, klokDoel.m); }, 900);
+  klokResultaat(juist, klokTekst(klokDoel.h, klokDoel.m),
+    juist ? '' : ` Jij had ${klokTekst(klokZet.h, klokZet.m)}.`);
+}
+function klokTipBijFout() {
+  const m = klokDoel.m;
+  if (klokNiv === 5) return 'Tip: na 12:00 tel je 12 uur terug om het uur op de wijzerklok te vinden.';
+  if (m >= 20 && m <= 40) return 'Tip: bij "half" noem je altijd het uur dat eraan komt.';
+  if (m === 45 || m >= 50) return 'Tip: bij "voor" noem je het uur dat eraan komt.';
+  return 'Tip: de kleine wijzer wijst het uur aan, de grote wijzer de minuten.';
+}
+function klokResultaat(juist, antwoord, extra) {
+  const fb = document.getElementById('klok-feedback');
+  const sterren = klokHulp ? 1 : 2;
+  if (juist) {
+    klokReeks++;
+    fb.textContent = `✅ Goed zo! Het is ${antwoord}.${klokHulp ? '' : ' Zonder hulp: dubbele sterren! ⭐⭐'}`;
+    fb.className = 'feedback-vak goed';
+    speelGeluid('goed');
+    voegSterToe(sterren, window.innerWidth / 2, window.innerHeight / 2);
+    if (klokReeks === 5) {
+      klokBewaarKlaar(klokNiv); renderKlokNiveaus(); maakConfetti();
+      const volgende = KLOK_NIVEAUS.find(n => n.id === klokNiv + 1);
+      fb.textContent += volgende ? ` 🏆 5 op een rij! Klaar voor niveau ${volgende.id}: ${volgende.naam}?` : ' 🏆 5 op een rij! Jij bent een echte klokkenkenner!';
+    }
+  } else {
+    klokReeks = 0;
+    fb.textContent = `😊 Bijna! Het is ${antwoord}.${extra || ''} ${klokTipBijFout()}`;
+    fb.className = 'feedback-vak fout';
+    speelGeluid('fout');
+  }
+  document.getElementById('klok-reeks').textContent = `🔥 ${klokReeks} op een rij`;
+  document.getElementById('klok-volgende').style.display = 'block';
+}
+function toggleKlokHulp() {
+  klokHulp = !klokHulp;
+  const k = document.getElementById('klok-hulp-knop');
+  k.classList.toggle('aan', klokHulp);
+  k.textContent = klokHulp ? '🎨 Hulp aan' : '🎨 Hulp uit';
+  document.getElementById('klok-svg').classList.toggle('met-hulp', klokHulp);
+}
+
+// ── Wijzers slepen ──
+function klokHoek(e) {
+  const svg = document.getElementById('klok-svg');
+  const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+  const p = pt.matrixTransform(svg.getScreenCTM().inverse());
+  const dx = p.x - KC, dy = p.y - KC;
+  let hoek = Math.atan2(dx, -dy) * 180 / Math.PI;
+  if (hoek < 0) hoek += 360;
+  return { hoek: hoek, afstand: Math.sqrt(dx * dx + dy * dy) };
+}
+function klokSleepNaar(e) {
+  const r = klokHoek(e);
+  if (klokSleep === 'min') {
+    const stap = klokNiv === 0 ? 5 : klokStap();
+    const nieuw = (Math.round(r.hoek / 6 / stap) * stap) % 60;
+    let delta = nieuw - klokZet.m;
+    if (delta < -30) delta += 60;
+    if (delta > 30) delta -= 60;
+    let tot = ((klokZet.h % 12) * 60 + klokZet.m + delta + 720) % 720;
+    klokZet.h = Math.floor(tot / 60) || 12; klokZet.m = tot % 60;
+  } else {
+    const u = Math.round((r.hoek - klokZet.m * 0.5) / 30);
+    klokZet.h = ((u % 12) + 12) % 12 || 12;
+  }
+  zetWijzers(klokZet.h, klokZet.m);
+  if (klokType === 'oefen') updateKlokLive();
+}
+function klokUur(d) {
+  if (klokBeantwoord && klokType !== 'oefen') return;
+  klokZet.h = kUur(klokZet.h + d);
+  zetWijzers(klokZet.h, klokZet.m);
+  if (klokType === 'oefen') updateKlokLive();
+}
+function updateKlokLive() {
+  const h = klokZet.h, m = klokZet.m;
+  const ochtend = klokDigitaal(h === 12 ? 0 : h, m), middag = klokDigitaal(h === 12 ? 12 : h + 12, m);
+  document.getElementById('klok-live').innerHTML =
+    `<div class="tekst">${kHoofd(klokTekst(h, m))}</div><div class="digi">Digitaal: ${ochtend} of ${middag}</div>`;
+}
+(function initKlokSlepen() {
+  const svg = document.getElementById('klok-svg');
+  svg.addEventListener('pointerdown', function (e) {
+    const magSlepen = klokType === 'oefen' || (klokType === 'zet' && !klokBeantwoord);
+    if (!magSlepen) return;
+    e.preventDefault();
+    klokSleep = klokHoek(e).afstand < 75 ? 'uur' : 'min';
+    try { svg.setPointerCapture(e.pointerId); } catch (err) {}
+    klokSleepNaar(e);
+  });
+  svg.addEventListener('pointermove', function (e) { if (klokSleep) { e.preventDefault(); klokSleepNaar(e); } });
+  svg.addEventListener('pointerup', function () { klokSleep = null; });
+  svg.addEventListener('pointercancel', function () { klokSleep = null; });
+})();
 
 // ══════════════════════════════════════════════════
 //  INIT

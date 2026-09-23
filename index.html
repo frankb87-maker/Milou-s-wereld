@@ -352,21 +352,6 @@
   }
   .geruststelling strong { font-weight: 900; }
 
-  /* ─── ROBLOX ─── */
-  .roblox-card {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    border-radius: var(--radius); padding: 22px;
-    color: white; margin-bottom: 18px;
-  }
-  .roblox-card h2 { color: white; }
-  .roblox-list { list-style: none; }
-  .roblox-list li {
-    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.1);
-    display: flex; gap: 12px; align-items: center; font-size: 0.9rem;
-    color: rgba(255,255,255,.85);
-  }
-  .roblox-list li:last-child { border-bottom: none; }
-
   /* ─── TODAY BADGE ─── */
   .vandaag-badge {
     display: inline-block;
@@ -481,65 +466,6 @@
   .link-sub   { font-size: 0.75rem; color: var(--muted); }
   .link-arrow { margin-left: auto; font-weight: 900; color: var(--muted); font-size: 1rem; }
 
-  /* ─── DARK LINK LIJST (Roblox) ─── */
-  .link-lijst-dark { display: flex; flex-direction: column; gap: 8px; }
-  .link-rij-dark {
-    display: flex; align-items: center; gap: 12px;
-    background: rgba(255,255,255,0.07); border-radius: 12px; padding: 12px 14px;
-    text-decoration: none; transition: background .15s;
-  }
-  .link-rij-dark:hover { background: rgba(255,255,255,0.15); }
-  .link-titel-dark { font-weight: 800; font-size: 0.88rem; color: white; }
-  .link-sub-dark   { font-size: 0.75rem; color: rgba(255,255,255,0.6); }
-  .link-arrow-dark { margin-left: auto; font-weight: 900; color: rgba(255,255,255,0.4); }
-
-  /* ─── PROMO CODES ─── */
-  .promo-grid { display: flex; flex-direction: column; gap: 8px; }
-  .promo-item {
-    background: rgba(255,255,255,0.08); border-radius: 12px;
-    padding: 12px 14px; display: flex; align-items: center; gap: 12px;
-    cursor: pointer; transition: background .15s;
-  }
-  .promo-item:hover { background: rgba(255,255,255,0.15); }
-  .promo-code {
-    font-family: monospace; font-size: 1rem; font-weight: 900;
-    color: #ffd700; letter-spacing: 1px; flex: 1;
-  }
-  .promo-reward { font-size: 0.78rem; color: rgba(255,255,255,0.75); }
-  .promo-copy {
-    background: rgba(255,215,0,0.2); color: #ffd700;
-    font-size: 0.72rem; font-weight: 800; padding: 3px 10px;
-    border-radius: 20px; white-space: nowrap;
-  }
-  .promo-verlopen { opacity: 0.4; }
-
-  /* ─── EVENT LIJST ─── */
-  .event-lijst { display: flex; flex-direction: column; gap: 8px; }
-  .event-item {
-    background: rgba(255,255,255,0.08); border-radius: 12px;
-    padding: 12px 14px; display: flex; gap: 12px; align-items: flex-start;
-  }
-  .event-emoji { font-size: 1.5rem; }
-  .event-naam { font-weight: 800; font-size: 0.88rem; color: white; }
-  .event-info { font-size: 0.75rem; color: rgba(255,255,255,0.65); margin-top: 2px; }
-  .event-badge {
-    margin-left: auto; font-size: 0.68rem; font-weight: 800;
-    padding: 3px 8px; border-radius: 20px; white-space: nowrap;
-  }
-  .badge-nieuw  { background: #22c55e; color: white; }
-  .badge-binnenkort { background: #f59e0b; color: white; }
-  .badge-actief { background: #3b82f6; color: white; }
-
-  /* ─── ROBLOX LINK BTN ─── */
-  .roblox-link-btn {
-    display: block; text-align: center;
-    background: rgba(255,255,255,0.1); color: white;
-    text-decoration: none; padding: 10px; border-radius: 12px;
-    font-weight: 800; font-size: 0.88rem;
-    transition: background .15s;
-  }
-  .roblox-link-btn:hover { background: rgba(255,255,255,0.2); }
-
   /* ─── HOME HERO WIDGETS ─── */
   .hero-widgets {
     display: grid; grid-template-columns: 1fr 1fr;
@@ -629,8 +555,6 @@
   <button onclick="toon('blackpink', this)">🎵 BLACKPINK</button>
   <button onclick="toon('creatief', this)">🎨 Creatief</button>
   <button onclick="toon('rust', this)">💚 Rust</button>
-  <button onclick="toon('roblox', this)">🎮 Roblox</button>
-  <button onclick="toon('tekenen', this)">✏️ Teken</button>
   <button onclick="toon('dagboek', this)">📓 Dagboek</button>
   <button onclick="toon('quiz', this)">🎵 Quiz</button>
   <button onclick="toon('ouder', this)" style="opacity:0.4;font-size:0.7rem">🔒 Ouder</button>
@@ -690,17 +614,6 @@
       <div class="tile-label">Even Uitblazen</div>
       <div class="tile-sub">Rustmoment voor jou</div>
     </button>
-    <button class="home-tile" onclick="toon('roblox', navBtn('roblox'))">
-      <div class="tile-emoji">🎮</div>
-      <div class="tile-label">Roblox</div>
-      <div class="tile-sub">Games & tips</div>
-    </button>
-    <button class="home-tile" onclick="toon('tekenen', navBtn('tekenen'))" style="position:relative">
-      <div class="tile-emoji">✏️</div>
-      <div class="tile-label">Tekenbord</div>
-      <div class="tile-sub">Teken met je vinger</div>
-      <span style="position:absolute;top:8px;right:8px;background:var(--pink);color:white;font-size:0.6rem;font-weight:900;padding:2px 6px;border-radius:10px">NIEUW</span>
-    </button>
     <button class="home-tile" onclick="toon('dagboek', navBtn('dagboek'))" style="position:relative">
       <div class="tile-emoji">📓</div>
       <div class="tile-label">Mijn Dagboek</div>
@@ -716,20 +629,14 @@
     <a href="leren.html" class="home-tile" style="text-decoration:none;position:relative">
       <div class="tile-emoji">📚</div>
       <div class="tile-label">Leerboek</div>
-      <div class="tile-sub">Rekenen, overtrekken & meer</div>
+      <div class="tile-sub">Rekenen, klokkijken & meer</div>
       <span style="position:absolute;top:8px;right:8px;background:linear-gradient(135deg,#ff6eb4,#ffb347);color:white;font-size:0.6rem;font-weight:900;padding:2px 6px;border-radius:10px">NIEUW</span>
     </a>
-    <a href="smoothie.html" class="home-tile" style="text-decoration:none;position:relative">
-      <div class="tile-emoji">🥤</div>
-      <div class="tile-label">Smoothie & IJs</div>
-      <div class="tile-sub">Milou's salon</div>
-      <span style="position:absolute;top:8px;right:8px;background:linear-gradient(135deg,#4caf50,#2196f3);color:white;font-size:0.6rem;font-weight:900;padding:2px 6px;border-radius:10px">NIEUW</span>
-    </a>
-    <a href="game.html" class="home-tile" style="text-decoration:none;position:relative">
-      <div class="tile-emoji">💗</div>
-      <div class="tile-label">Fashion Star</div>
-      <div class="tile-sub">BLACKPINK dress-up game</div>
-      <span style="position:absolute;top:8px;right:8px;background:linear-gradient(135deg,#ff4da6,#8b00ff);color:white;font-size:0.6rem;font-weight:900;padding:2px 6px;border-radius:10px">GAME</span>
+    <a href="kleurplaat.html" class="home-tile" style="text-decoration:none;position:relative">
+      <div class="tile-emoji">🖍️</div>
+      <div class="tile-label">Kleurplaten</div>
+      <div class="tile-sub">Tik en kleur in</div>
+      <span style="position:absolute;top:8px;right:8px;background:linear-gradient(135deg,#ff7bb5,#a77bff);color:white;font-size:0.6rem;font-weight:900;padding:2px 6px;border-radius:10px">NIEUW</span>
     </a>
     <div class="home-tile" id="weer-tile" style="cursor:default">
       <div id="weer-emoji" style="font-size:2.4rem;margin-bottom:4px">🌤️</div>
@@ -876,10 +783,9 @@
 
     <p style="font-size:0.8rem;font-weight:800;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">✅ Nog meer checken</p>
     <ul style="padding-left:18px;line-height:2.1;font-size:0.9rem;color:var(--muted)">
-      <li>Op <strong>donderdag</strong> is het jouw rustdag 🌿</li>
       <li>Tas klaar zetten de avond van tevoren</li>
       <li>Telefoon op stil voor het slapen</li>
-      <li>Gymkleren in de tas als je gym hebt</li>
+      <li>Gymkleren in de tas op <strong>maandag en dinsdag</strong> 🏃</li>
     </ul>
   </div>
 </section>
@@ -1433,202 +1339,6 @@
 
 </section>
 
-<!-- ══════════ ROBLOX ══════════ -->
-<section class="section" id="roblox">
-  <div class="page-header">
-    <div class="emoji">🎮</div>
-    <h1>Roblox</h1>
-    <p>Milou's favoriete games, codes & gratis items!</p>
-  </div>
-
-  <!-- MILOU'S FAVORIETE GAMES - visuele kaartjes -->
-  <div style="background:linear-gradient(135deg,#0d0d1a,#1a1a2e);border-radius:var(--radius);padding:22px;margin-bottom:18px">
-    <h2 style="color:white;margin-bottom:4px">🕹️ Milou's favoriete games</h2>
-    <p style="color:rgba(255,255,255,0.5);font-size:0.78rem;margin-bottom:16px">Tik op een game om hem direct te openen in Roblox 📱</p>
-    <div class="game-grid">
-
-      <a href="https://www.roblox.com/games/142823291/Murder-Mystery-2" target="_blank" class="game-card" style="--gc:linear-gradient(160deg,#1a0a0a,#4a0000)">
-        <div class="game-emoji">🔪</div>
-        <div class="game-naam">Murder Mystery 2</div>
-        <div class="game-sub">Moordenaar vs Sheriffs</div>
-        <div class="game-tag">🔥 Populair</div>
-      </a>
-
-      <a href="https://www.roblox.com/games/79546208627805/99-Nights-in-the-Forest" target="_blank" class="game-card" style="--gc:linear-gradient(160deg,#0a1a0a,#0d3d1a)">
-        <div class="game-emoji">🌲</div>
-        <div class="game-naam">99 Nights in the Forest</div>
-        <div class="game-sub">Overleef 99 nachten!</div>
-        <div class="game-tag">😱 Horror</div>
-      </a>
-
-      <a href="https://www.roblox.com/games/4924922222/Brookhaven-RP" target="_blank" class="game-card" style="--gc:linear-gradient(160deg,#0a0a2e,#1a1a5e)">
-        <div class="game-emoji">🏡</div>
-        <div class="game-naam">Brookhaven RP</div>
-        <div class="game-sub">Roleplay & outfits</div>
-        <div class="game-tag">⭐ #1 op Roblox</div>
-      </a>
-
-      <a href="https://www.roblox.com/games/137826330724902/Scary-Shawarma-Kiosk-the-ANOMALY" target="_blank" class="game-card" style="--gc:linear-gradient(160deg,#1a0d00,#4a2000)">
-        <div class="game-emoji">🌯</div>
-        <div class="game-naam">Scary Shawarma Kiosk</div>
-        <div class="game-sub">Werk je nachtdienst... of niet</div>
-        <div class="game-tag">👻 Spooky</div>
-      </a>
-
-      <a href="https://www.roblox.com/games/11848247239/Conveyor-Sushi-Restaurant" target="_blank" class="game-card" style="--gc:linear-gradient(160deg,#001a1a,#004d4d)">
-        <div class="game-emoji">🍣</div>
-        <div class="game-naam">Conveyor Sushi Restaurant</div>
-        <div class="game-sub">Eet sushi van de lopende band</div>
-        <div class="game-tag">🍜 Restaurantje</div>
-      </a>
-
-      <a href="https://www.roblox.com/games/102574559184919/Craft-Food" target="_blank" class="game-card" style="--gc:linear-gradient(160deg,#0a1a00,#2d4a00)">
-        <div class="game-emoji">🍳</div>
-        <div class="game-naam">Craft Food</div>
-        <div class="game-sub">500+ recepten ontdekken!</div>
-        <div class="game-tag">🥕 Koken</div>
-      </a>
-
-      <a href="https://www.roblox.com/games/15532962292/Dress-to-Impress" target="_blank" class="game-card" style="--gc:linear-gradient(160deg,#1a001a,#4d004d)">
-        <div class="game-emoji">👗</div>
-        <div class="game-naam">Y2K Outfits / Dress to Impress</div>
-        <div class="game-sub">Stijlen & scoren</div>
-        <div class="game-tag">💅 Fashion</div>
-      </a>
-
-      <a href="https://www.youtube.com/results?search_query=roblox+duel+murderer+vs+sheriff+game+2025" target="_blank" class="game-card" style="--gc:linear-gradient(160deg,#1a0a00,#3d1a00)">
-        <div class="game-emoji">🤠</div>
-        <div class="game-naam">Duels: Murderer vs Sheriff</div>
-        <div class="game-sub">Wie wint het duel?</div>
-        <div class="game-tag">⚔️ Actie</div>
-      </a>
-
-    </div>
-  </div>
-
-  <!-- Y2K OUTFIT CODES voor Brookhaven -->
-  <div style="background:linear-gradient(135deg,#1a0a2e,#2e0a4a);border-radius:var(--radius);padding:22px;margin-bottom:18px">
-    <h2 style="color:white;margin-bottom:4px">👗 Y2K Outfit codes — Brookhaven</h2>
-    <p style="color:rgba(255,255,255,0.5);font-size:0.78rem;margin-bottom:14px">Tik een code in bij Brookhaven → Avatar → Shirt/Pants ID</p>
-    <div class="promo-grid" id="y2kCodes"><!-- JS --></div>
-    <a href="https://www.youtube.com/results?search_query=brookhaven+y2k+outfit+codes+2025+meisjes" target="_blank" class="roblox-link-btn" style="margin-top:12px">
-      👗 Meer Y2K codes op YouTube →
-    </a>
-  </div>
-
-  <!-- PROMO CODES -->
-  <div style="background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);border-radius:var(--radius);padding:22px;margin-bottom:18px">
-    <h2 style="color:white;margin-bottom:6px">🎁 Gratis promo codes</h2>
-    <p style="color:rgba(255,255,255,0.6);font-size:0.78rem;margin-bottom:14px">Inwisselen op <strong style="color:white">roblox.com/promocodes</strong> · ✏️ Bijwerken als codes verlopen</p>
-    <div class="promo-grid" id="promoCodes"></div>
-    <a href="https://www.roblox.com/promocodes" target="_blank" class="roblox-link-btn" style="margin-top:14px">
-      🎁 Codes inwisselen op Roblox.com →
-    </a>
-  </div>
-
-  <!-- ACTUELE EVENTS -->
-  <div style="background:linear-gradient(135deg,#0f3460,#533483);border-radius:var(--radius);padding:22px;margin-bottom:18px">
-    <h2 style="color:white;margin-bottom:6px">🌟 Actuele Events & Updates</h2>
-    <p style="color:rgba(255,255,255,0.6);font-size:0.78rem;margin-bottom:14px">✏️ Bijwerken als er nieuwe events zijn!</p>
-    <div class="event-lijst" id="robloxEvents"></div>
-    <a href="https://www.youtube.com/results?search_query=roblox+events+2025+free+items" target="_blank" class="roblox-link-btn" style="margin-top:14px">
-      📺 Bekijk event video's op YouTube →
-    </a>
-  </div>
-
-  <!-- GRATIS ITEMS -->
-  <div style="background:linear-gradient(135deg,#16213e,#1a3a2a);border-radius:var(--radius);padding:22px;margin-bottom:18px">
-    <h2 style="color:white;margin-bottom:14px">💎 Gratis items scoren</h2>
-    <div class="link-lijst-dark">
-      <a href="https://www.roblox.com/catalog?Category=1&salesTypeFilter=1" target="_blank" class="link-rij-dark">
-        <div class="link-icon">🆓</div>
-        <div><div class="link-titel-dark">Gratis catalog items</div><div class="link-sub-dark">Alle gratis avatar-items op Roblox</div></div>
-        <div class="link-arrow-dark">→</div>
-      </a>
-      <a href="https://www.youtube.com/results?search_query=roblox+free+items+avatar+2025" target="_blank" class="link-rij-dark">
-        <div class="link-icon">▶️</div>
-        <div><div class="link-titel-dark">Gratis items via YouTube</div><div class="link-sub-dark">Actuele video's met gratis items</div></div>
-        <div class="link-arrow-dark">→</div>
-      </a>
-      <a href="https://www.youtube.com/results?search_query=99+nights+in+the+forest+tips+codes+2025" target="_blank" class="link-rij-dark">
-        <div class="link-icon">🌲</div>
-        <div><div class="link-titel-dark">99 Nights — tips & codes</div><div class="link-sub-dark">Overleef alle nachten!</div></div>
-        <div class="link-arrow-dark">→</div>
-      </a>
-      <a href="https://www.youtube.com/results?search_query=scary+shawarma+kiosk+tips+endings+roblox" target="_blank" class="link-rij-dark">
-        <div class="link-icon">🌯</div>
-        <div><div class="link-titel-dark">Shawarma Kiosk — alle endings</div><div class="link-sub-dark">Hoe haal je het goede einde?</div></div>
-        <div class="link-arrow-dark">→</div>
-      </a>
-      <a href="https://www.youtube.com/results?search_query=craft+food+roblox+recipes+guide+2025" target="_blank" class="link-rij-dark">
-        <div class="link-icon">🍳</div>
-        <div><div class="link-titel-dark">Craft Food — alle recepten</div><div class="link-sub-dark">500+ combinaties ontdekken</div></div>
-        <div class="link-arrow-dark">→</div>
-      </a>
-    </div>
-  </div>
-
-  <div class="card accent-mint">
-    <h2>💡 Handige tips</h2>
-    <ul class="creative-list">
-      <li><span class="ci-emoji">🔒</span><div><strong>Veiligheid eerst</strong> — zet chats op "vrienden alleen" in de instellingen.</div></li>
-      <li><span class="ci-emoji">🔔</span><div><strong>Blijf up-to-date</strong> — volg <a href="https://www.youtube.com/results?search_query=roblox+nieuws+updates+2025" target="_blank" style="color:var(--pink);font-weight:700">Roblox nieuws op YouTube</a> voor nieuwe events.</div></li>
-      <li><span class="ci-emoji">👗</span><div><strong>Y2K outfits</strong> — in Brookhaven ga je naar Avatar → gebruik outfit ID codes voor superleuke looks!</div></li>
-      <li><span class="ci-emoji">💰</span><div><strong>Gratis is ook leuk</strong> — gebruik promo codes en gratis catalog items!</div></li>
-      <li><span class="ci-emoji">⏰</span><div><strong>Speeltijd</strong> — zet een timer zodat je de tijd niet vergeet.</div></li>
-    </ul>
-  </div>
-</section>
-
-<!-- ══════════ TEKENBORD ══════════ -->
-<section class="section" id="tekenen">
-  <div class="page-header">
-    <div class="emoji">✏️</div>
-    <h1>Tekenbord</h1>
-    <p>Teken met je vinger of muis!</p>
-  </div>
-  <div class="card accent-yellow">
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center">
-      <!-- Kleurknoppen -->
-      <div id="kleur-kiezer" style="display:flex;gap:6px;flex-wrap:wrap">
-        <button onclick="setTekenKleur('#e63946',this)" style="width:32px;height:32px;border-radius:50%;background:#e63946;border:3px solid #333;cursor:pointer" class="teken-kleur-btn actief-kleur"></button>
-        <button onclick="setTekenKleur('#f7a8c4',this)" style="width:32px;height:32px;border-radius:50%;background:#f7a8c4;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
-        <button onclick="setTekenKleur('#ff9f1c',this)" style="width:32px;height:32px;border-radius:50%;background:#ff9f1c;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
-        <button onclick="setTekenKleur('#2ec4b6',this)" style="width:32px;height:32px;border-radius:50%;background:#2ec4b6;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
-        <button onclick="setTekenKleur('#a8e6cf',this)" style="width:32px;height:32px;border-radius:50%;background:#a8e6cf;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
-        <button onclick="setTekenKleur('#c9b8f0',this)" style="width:32px;height:32px;border-radius:50%;background:#c9b8f0;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
-        <button onclick="setTekenKleur('#1a1a2e',this)" style="width:32px;height:32px;border-radius:50%;background:#1a1a2e;border:3px solid transparent;cursor:pointer" class="teken-kleur-btn"></button>
-      </div>
-      <!-- Gum als aparte knop -->
-      <button onclick="activeerGum(this)" id="gum-knop"
-        style="background:#fff3cd;border:2px solid #ffc107;border-radius:50px;padding:6px 12px;
-        cursor:pointer;font-size:0.85rem;font-weight:800;color:#856404;white-space:nowrap">
-        🧹 Gum
-      </button>
-    </div>
-    <!-- Tweede rij: grootte + wis alles + opslaan -->
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
-      <span style="font-size:0.78rem;font-weight:700;color:var(--muted)">Dikte:</span>
-      <input type="range" min="2" max="30" value="6" id="teken-grootte-slider"
-        oninput="tekenGrootte=parseInt(this.value);updateCursorGrootte()"
-        style="width:80px">
-      <span id="teken-grootte-label" style="font-size:0.78rem;color:var(--muted);min-width:20px">6</span>
-      <button onclick="wisTekenBord()" style="background:#fee2e2;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:7px 14px;border-radius:50px;color:#e63946;font-size:0.82rem">🗑️ Wis alles</button>
-      <button onclick="slaTekeningOp()" style="background:var(--mint);border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:7px 14px;border-radius:50px;color:#2a7a5a;font-size:0.82rem">💾 Opslaan</button>
-    </div>
-    <!-- Potlood cursor die meebeweegt -->
-    <div style="position:relative">
-      <canvas id="tekenCanvas" style="width:100%;border-radius:14px;background:white;touch-action:none;display:block;cursor:none" height="400"></canvas>
-      <div id="potlood-cursor" style="position:absolute;pointer-events:none;font-size:1.5rem;transform:translate(-4px,-100%);display:none;z-index:10;transition:none">✏️</div>
-    </div>
-    <p style="font-size:0.75rem;color:var(--muted);margin-top:8px;text-align:center">Teken met je vinger (telefoon) of muis 🎨 · Gebruik de gum om stukjes weg te halen</p>
-  </div>
-  <div class="card accent-pink" id="opgeslagen-tekeningen-card" style="display:none">
-    <h2>🖼️ Opgeslagen tekeningen</h2>
-    <div id="opgeslagen-tekeningen" style="display:flex;gap:10px;flex-wrap:wrap"></div>
-  </div>
-</section>
-
 <!-- ══════════ DAGBOEK ══════════ -->
 <section class="section" id="dagboek">
   <div class="page-header">
@@ -1936,7 +1646,6 @@ function toon(id, btn) {
   if (btn) btn.classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
   // Initialiseer secties bij eerste bezoek
-  if (id==='tekenen') setTimeout(initTekenbord, 50);
   if (id==='dagboek') laadDagboekEntries();
   if (id==='quiz')    initQuiz();
   if (id==='ouder')   laadOuderDashboard();
@@ -1949,12 +1658,13 @@ function navBtn(id) {
 
 // ── SCHEMA: DAG GRID ──
 // ✏️ PAS HIER DE NAMEN VAN DE JUFFEN AAN
+// Groep 8 — schooljaar 2026-2027
 const SCHEMA = [
-  { dag: 'Maandag',   juf: 'Juf Romy & Marijke', rust: false },
-  { dag: 'Dinsdag',   juf: 'Juf Marijke',       rust: false },
-  { dag: 'Woensdag',  juf: 'Juf Marijke',       rust: false },
-  { dag: 'Donderdag', juf: 'Rustdag 🌿',        rust: true  },
-  { dag: 'Vrijdag',   juf: 'Juf Romy',          rust: false },
+  { dag: 'Maandag',   juf: 'Juf Eva',             gym: true  },
+  { dag: 'Dinsdag',   juf: 'Juf Eva & Stephanie', gym: true  },
+  { dag: 'Woensdag',  juf: 'Juf Stephanie',       gym: false },
+  { dag: 'Donderdag', juf: 'Juf Stephanie',       gym: false },
+  { dag: 'Vrijdag',   juf: 'Juf Stephanie',       gym: false },
 ];
 
 const dagNamen = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'];
@@ -1964,11 +1674,11 @@ const grid = document.getElementById('dagGrid');
 SCHEMA.forEach(item => {
   const isVandaag = item.dag === vandaag;
   const div = document.createElement('div');
-  div.className = 'day-row' + (item.rust ? ' rest' : '') + (isVandaag ? ' today' : '');
+  div.className = 'day-row' + (isVandaag ? ' today' : '');
   div.innerHTML = `
     <span class="dr-day">${item.dag}${isVandaag ? '<span class="vandaag-badge">vandaag</span>' : ''}</span>
     <span class="dr-juf">${item.juf}</span>
-    ${item.rust ? '<span class="dr-badge">Rustdag</span>' : ''}
+    ${item.gym ? '<span class="dr-badge">🏃 Gym</span>' : ''}
   `;
   grid.appendChild(div);
 });
@@ -1999,10 +1709,8 @@ function updateKlok() {
   const isWeekend  = dag === 0 || dag === 6;
   const isVrijdag  = dag === 5;
   const isZaterdag = dag === 6;
-  const isRustdag  = dag === 4; // donderdag
   let badgeTekst = dagNaam;
-  if (isRustdag)          badgeTekst = '🌿 Rustdag!';
-  else if (isZaterdag)    badgeTekst = '🌟 Zaterdag!';
+  if (isZaterdag)    badgeTekst = '🌟 Zaterdag!';
   else if (dag === 0)     badgeTekst = '😴 Zondag';
   else if (isVrijdag)     badgeTekst = '🎒 Vrijdag — bijna weekend!';
   if (badgeEl) badgeEl.textContent = badgeTekst;
@@ -2024,25 +1732,7 @@ function updateKlok() {
 
   const isSchooldag = dag >= 1 && dag <= 5;  // ma t/m vr
 
-  if (isRustdag) {
-    // Donderdag = rustdag
-    if (uur < 7) {
-      emoji = '😴'; titel = 'Nog even slapen!';
-      sub = 'Je wekker gaat om 07:00 uur.'; kleur = '#eee6ff';
-    } else if (uur < 12) {
-      emoji = '🌿'; titel = 'Goedemorgen! Het is jouw rustdag 🎉';
-      sub = 'Geen school vandaag. Geniet ervan!'; kleur = '#f0fff8';
-    } else if (uur < 17) {
-      emoji = '🎨'; titel = 'Rustdag middag ☀️';
-      sub = 'Doe iets leuks — tekenen, bakken of gewoon niets!'; kleur = '#fffbe0';
-    } else if (nuMinuten < bedtijdWerkdag) {
-      emoji = '🌙'; titel = `Bijna bedtijd! Om 19:30 uur naar bed.`;
-      sub = `Nog ${bedtijdWerkdag - nuMinuten} minuten. Leg je tas alvast klaar voor morgen!`; kleur = '#eee6ff';
-    } else {
-      emoji = '🌙'; titel = 'Het is bedtijd! 😴';
-      sub = 'Slaap lekker. Morgen is het vrijdag!'; kleur = '#e8e0ff';
-    }
-  } else if (isSchooldag) {
+  if (isSchooldag) {
     if (nuMinuten < opstaaanTijd) {
       emoji = '😴'; titel = 'Nog even slapen!';
       sub = 'Je wekker gaat om 07:00 uur.'; kleur = '#eee6ff';
@@ -2051,7 +1741,8 @@ function updateKlok() {
       sub = 'Vergeet je tas niet. Fijne schooldag!'; kleur = '#fff8e0';
     } else if (uur < 12) {
       emoji = '✏️'; titel = 'Nu op school!';
-      sub = `Vandaag: ${SCHEMA.find(s=>s.dag===dagNaam)?.juf || 'juf op school'}`; kleur = '#fff0f5';
+      const vandaagItem = SCHEMA.find(s=>s.dag===dagNaam);
+      sub = `Vandaag: ${vandaagItem?.juf || 'juf op school'}${vandaagItem?.gym ? ' · 🏃 Gym!' : ''}`; kleur = '#fff0f5';
     } else if (uur < 14) {
       emoji = '🥪'; titel = 'Lunchtijd!';
       sub = 'Even uitrusten en eten.'; kleur = '#f0fff8';
@@ -2094,6 +1785,12 @@ function updateKlok() {
       emoji = '🌙'; titel = 'Bedtijd! (19:30) 😴';
       sub = 'Morgen begint de week weer. Slaap lekker 🌸'; kleur = '#e8e0ff';
     }
+  }
+
+  // Gym-herinnering: avond voor een gymdag
+  const morgenItem = SCHEMA.find(s => s.dag === WEEKDAGEN[(dag + 1) % 7]);
+  if (morgenItem?.gym && uur >= 17) {
+    sub += ' 🏃 Morgen gym — gymkleren in je tas!';
   }
 
   slimCard.style.background = kleur;
@@ -2729,199 +2426,6 @@ async function laadWeer() {
 laadWeer();
 
 // ════════════════════════════════════════════════════
-//  ✏️ TEKENBORD
-// ════════════════════════════════════════════════════
-let tekenKleur = '#e63946', tekenGrootte = 6, isTekening = false;
-let tekenCanvas = null, tekenCtx = null;
-let isGumModus = false;
-let vorigePos = null;
-
-function initTekenbord() {
-  tekenCanvas = document.getElementById('tekenCanvas');
-  if (!tekenCanvas) return;
-  // Voorkom dubbele event listeners
-  if (tekenCanvas._init) return;
-  tekenCanvas._init = true;
-
-  tekenCanvas.width = tekenCanvas.offsetWidth;
-  tekenCtx = tekenCanvas.getContext('2d');
-  tekenCtx.lineCap = 'round';
-  tekenCtx.lineJoin = 'round';
-
-  const cursor = document.getElementById('potlood-cursor');
-
-  // ── Touch events (iPhone) ──
-  tekenCanvas.addEventListener('touchstart', e => {
-    e.preventDefault();
-    const pos = tekenPos(e.touches[0]);
-    startTekenen(pos);
-    toonCursor(pos, true);
-  }, { passive: false });
-
-  tekenCanvas.addEventListener('touchmove', e => {
-    e.preventDefault();
-    const pos = tekenPos(e.touches[0]);
-    tekenStip(pos);
-    toonCursor(pos, true);
-  }, { passive: false });
-
-  tekenCanvas.addEventListener('touchend', () => {
-    isTekening = false;
-    vorigePos = null;
-    if (cursor) cursor.style.display = 'none';
-  });
-
-  // ── Mouse events (computer) ──
-  tekenCanvas.addEventListener('mouseenter', () => {
-    if (cursor) cursor.style.display = 'block';
-  });
-  tekenCanvas.addEventListener('mouseleave', () => {
-    isTekening = false;
-    vorigePos = null;
-    if (cursor) cursor.style.display = 'none';
-  });
-  tekenCanvas.addEventListener('mousedown', e => {
-    const pos = tekenPos(e);
-    startTekenen(pos);
-    toonCursor(pos, true);
-  });
-  tekenCanvas.addEventListener('mousemove', e => {
-    const pos = tekenPos(e);
-    tekenStip(pos);
-    toonCursor(pos, isTekening);
-  });
-  tekenCanvas.addEventListener('mouseup', () => {
-    isTekening = false;
-    vorigePos = null;
-  });
-
-  laadOpgeslagenTekeningen();
-}
-
-function toonCursor(pos, actief) {
-  const cursor = document.getElementById('potlood-cursor');
-  if (!cursor || !tekenCanvas) return;
-  const rect = tekenCanvas.getBoundingClientRect();
-  const schaalX = rect.width / tekenCanvas.width;
-  const schaalY = rect.height / tekenCanvas.height;
-  const x = pos.x * schaalX;
-  const y = pos.y * schaalY;
-  cursor.style.left = (x - 4) + 'px';
-  cursor.style.top  = (y - 20) + 'px';
-  cursor.style.display = 'block';
-  cursor.textContent = isGumModus ? '🧹' : '✏️';
-  cursor.style.fontSize = isGumModus
-    ? Math.max(16, tekenGrootte * 1.8) + 'px'
-    : '1.5rem';
-}
-
-function tekenPos(e) {
-  const r = tekenCanvas.getBoundingClientRect();
-  return {
-    x: (e.clientX - r.left) * (tekenCanvas.width  / r.width),
-    y: (e.clientY - r.top)  * (tekenCanvas.height / r.height),
-  };
-}
-
-function startTekenen(pos) {
-  isTekening = true;
-  vorigePos = pos;
-  tekenCtx.beginPath();
-  tekenCtx.moveTo(pos.x, pos.y);
-}
-
-function tekenStip(pos) {
-  if (!isTekening || !vorigePos) return;
-
-  if (isGumModus) {
-    // Gum — wis alleen het gebied rondom de cursor
-    const groot = tekenGrootte * 3;
-    tekenCtx.clearRect(
-      pos.x - groot / 2,
-      pos.y - groot / 2,
-      groot, groot
-    );
-  } else {
-    // Normaal tekenen
-    tekenCtx.lineWidth   = tekenGrootte;
-    tekenCtx.strokeStyle = tekenKleur;
-    tekenCtx.globalCompositeOperation = 'source-over';
-    tekenCtx.lineTo(pos.x, pos.y);
-    tekenCtx.stroke();
-    tekenCtx.beginPath();
-    tekenCtx.moveTo(pos.x, pos.y);
-  }
-  vorigePos = pos;
-}
-
-function setTekenKleur(kleur, el) {
-  // Verlaat gummodus
-  isGumModus = false;
-  tekenKleur = kleur;
-  // Reset alle borders
-  document.querySelectorAll('.teken-kleur-btn').forEach(b => b.style.border = '3px solid transparent');
-  if (el) el.style.border = '3px solid #333';
-  // Gum-knop resetten
-  const gk = document.getElementById('gum-knop');
-  if (gk) { gk.style.background = '#fff3cd'; gk.style.borderColor = '#ffc107'; gk.style.color = '#856404'; }
-  // Cursor updaten
-  const cursor = document.getElementById('potlood-cursor');
-  if (cursor) cursor.textContent = '✏️';
-}
-
-function activeerGum(el) {
-  isGumModus = !isGumModus;
-  // Visuele feedback gum-knop
-  if (isGumModus) {
-    el.style.background = '#ffc107';
-    el.style.borderColor = '#856404';
-    el.style.color = 'white';
-    // Deselecteer kleurknopjes
-    document.querySelectorAll('.teken-kleur-btn').forEach(b => b.style.border = '3px solid transparent');
-  } else {
-    el.style.background = '#fff3cd';
-    el.style.borderColor = '#ffc107';
-    el.style.color = '#856404';
-  }
-}
-
-function updateCursorGrootte() {
-  const slider = document.getElementById('teken-grootte-slider');
-  const label  = document.getElementById('teken-grootte-label');
-  if (slider) tekenGrootte = parseInt(slider.value);
-  if (label)  label.textContent = tekenGrootte;
-}
-
-function wisTekenBord() {
-  if (tekenCtx) tekenCtx.clearRect(0, 0, tekenCanvas.width, tekenCanvas.height);
-}
-
-function slaTekeningOp() {
-  if (!tekenCanvas) return;
-  let t = []; try { t = JSON.parse(localStorage.getItem('milou_tekeningen') || '[]'); } catch(e) {}
-  t.unshift({ data: tekenCanvas.toDataURL(), datum: new Date().toLocaleDateString('nl-NL') });
-  if (t.length > 10) t = t.slice(0, 10);
-  localStorage.setItem('milou_tekeningen', JSON.stringify(t));
-  laadOpgeslagenTekeningen();
-  alert('Tekening opgeslagen! 🎨');
-}
-
-function laadOpgeslagenTekeningen() {
-  const c    = document.getElementById('opgeslagen-tekeningen');
-  const card = document.getElementById('opgeslagen-tekeningen-card');
-  if (!c) return;
-  let t = []; try { t = JSON.parse(localStorage.getItem('milou_tekeningen') || '[]'); } catch(e) {}
-  if (!t.length) { if (card) card.style.display = 'none'; return; }
-  if (card) card.style.display = 'block';
-  c.innerHTML = t.map(i =>
-    `<div style="text-align:center">
-      <img src="${i.data}" style="width:100px;height:80px;object-fit:cover;border-radius:10px;border:2px solid var(--pink2)">
-      <div style="font-size:0.7rem;color:var(--muted);margin-top:3px">${i.datum}</div>
-    </div>`
-  ).join('');
-}
-
-// ════════════════════════════════════════════════════
 //  📓 DAGBOEK
 // ════════════════════════════════════════════════════
 (function() {
@@ -3253,7 +2757,7 @@ const BERICHTEN_FALLBACK = [
   { tekst: "Zorgen voelen groot, maar ze gaan ook weer weg. Altijd.", sub: "En er zijn mensen die van je houden 💕" },
   { tekst: "Jij doet het heel goed. Echt.", sub: "Vergeet dat niet 🌟" },
   { tekst: "Elke dag naar school gaan is dapper. Zeker als het moeilijk voelt.", sub: "Trots op je 💪" },
-  { tekst: "Als je rustdag nodig hebt, neem die dan. Rust is geen zwakte.", sub: "Donderdag is er voor jou 🌿" },
+  { tekst: "Groep 8 — jouw laatste jaar op de basisschool. Geniet ervan!", sub: "Je kunt dit echt 🎓" },
   { tekst: "Je bent lief, grappig en slim. Vergeet dat nooit.", sub: "Mama en papa zijn zo trots op je! 💕" },
   { tekst: "Ademen helpt. Probeer het maar.", sub: "In... en uit... alles komt goed 🌬️" },
 ];
