@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Kleurplaten</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink: #f7a8c4; --pink-d: #e0287d; --mint: #a8e6cf; --lav: #c9b8f0;
+    --bg: #fdf6fa; --card: #ffffff; --text: #3a2a3a; --muted: #8a7a8a;
+    --lijn: #2b2233;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Nunito', system-ui, sans-serif; background: var(--bg); color: var(--text);
+    padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+    -webkit-user-select: none; user-select: none;
+  }
+  button { font-family: inherit; touch-action: manipulation; cursor: pointer; border: none; }
+
+  /* Lijnen van de kleurplaten */
+  .r { stroke: var(--lijn); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+  .d { fill: none; stroke: var(--lijn); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+  .dt { fill: none; stroke: var(--lijn); stroke-width: 2; pointer-events: none; }
+
+  /* ── GALERIJ ── */
+  #galerij { max-width: 1100px; margin: 0 auto; padding: 16px 16px 40px; }
+  .gal-top { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .terug {
+    display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px;
+    border-radius: 50%; background: var(--card); color: var(--text); text-decoration: none;
+    font-size: 1.3rem; box-shadow: 0 2px 10px rgba(180,100,140,0.15);
+  }
+  .gal-top h1 { font-family: 'Pacifico', cursive; font-weight: 400; font-size: 2rem; color: var(--pink-d); }
+  .gal-sub { color: var(--muted); font-weight: 700; margin: 0 0 16px 56px; }
+  .tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 14px; }
+  .tab {
+    flex: none; padding: 9px 16px; border-radius: 999px; background: var(--card); color: var(--text);
+    font-weight: 800; font-size: 0.9rem; box-shadow: 0 2px 8px rgba(180,100,140,0.12);
+  }
+  .tab.actief { background: var(--pink-d); color: white; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+  .kaart {
+    content-visibility: auto; contain-intrinsic-size: 200px;
+    background: var(--card); border-radius: 22px; padding: 10px 10px 12px; text-align: center;
+    box-shadow: 0 3px 14px rgba(180,100,140,0.13); transition: transform .15s;
+  }
+  .kaart:active { transform: scale(0.97); }
+  .kaart svg { width: 100%; aspect-ratio: 1; display: block; border-radius: 14px; pointer-events: none; }
+  .kaart .naam { font-weight: 800; margin-top: 8px; font-size: 0.95rem; }
+  .kaart .bezig { font-size: 0.72rem; color: var(--pink-d); font-weight: 800; }
+
+  /* ── VOORTGANG ── */
+  .voortgang { background: var(--card); border-radius: 18px; padding: 12px 16px; margin-bottom: 14px; box-shadow: 0 2px 10px rgba(180,100,140,0.12); }
+  .vg-tekst { font-weight: 900; font-size: 0.95rem; display: flex; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+  .vg-tekst span { color: var(--muted); font-weight: 800; font-size: 0.82rem; }
+  .vg-balk { height: 14px; border-radius: 999px; background: #f6eef4; overflow: hidden; }
+  .vg-balk div { height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, #ff7bb5, #a77bff); transition: width .5s; }
+  .kaart { position: relative; }
+  .kaart.klaar { box-shadow: 0 0 0 3px #5fcf6b, 0 3px 14px rgba(180,100,140,0.13); }
+  .vink-badge {
+    position: absolute; top: 6px; right: 6px; width: 32px; height: 32px; border-radius: 50%;
+    background: #2ea44f; color: white; font-weight: 900; font-size: 1.1rem; display: flex;
+    align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2); z-index: 2;
+  }
+  .tab .tel { opacity: 0.75; font-size: 0.78rem; margin-left: 4px; }
+  #klaarKnop.is-klaar { background: #2ea44f; color: white; }
+  .confetti { position: fixed; top: -12px; width: 10px; height: 14px; border-radius: 2px; z-index: 30; pointer-events: none; animation: vallen 1.8s ease-in forwards; }
+  @keyframes vallen { to { transform: translateY(105vh) rotate(540deg); opacity: 0.8; } }
+
+  /* ── EDITOR ── */
+  #editor {
+    position: fixed; inset: 0; background: var(--bg); display: none; flex-direction: column;
+    padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  #editor.open { display: flex; }
+  .ed-top { display: flex; align-items: center; gap: 8px; padding: 10px 12px; }
+  .ed-top h2 { flex: 1; font-size: 1.05rem; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .knop {
+    height: 44px; min-width: 44px; padding: 0 12px; border-radius: 14px; background: var(--card);
+    color: var(--text); font-weight: 800; font-size: 0.9rem; box-shadow: 0 2px 8px rgba(180,100,140,0.14);
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .knop.roze { background: var(--pink-d); color: white; }
+  .ed-main { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .doek { flex: 1; min-height: 0; padding: 4px 12px; display: flex; align-items: center; justify-content: center; }
+  #plaat {
+    width: 100%; height: 100%; touch-action: none; display: block; overflow: hidden;
+    filter: drop-shadow(0 4px 16px rgba(180,100,140,0.18));
+  }
+  #plaat .pen { pointer-events: none; }
+  #plaat.gum .pen { pointer-events: stroke; }
+
+  .paneel {
+    background: var(--card); border-radius: 24px 24px 0 0; padding: 12px 14px 14px;
+    box-shadow: 0 -4px 20px rgba(180,100,140,0.12); max-height: 46vh; overflow-y: auto;
+  }
+  .rij { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .tool {
+    flex: 1; min-width: 70px; height: 52px; border-radius: 16px; background: #f6eef4; color: var(--text);
+    font-weight: 900; font-size: 0.82rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; line-height: 1.1;
+  }
+  .tool.actief { background: var(--pink-d); color: white; }
+  .dikte { display: flex; align-items: center; gap: 12px; width: 100%; }
+  .dikte label { font-weight: 800; font-size: 0.85rem; color: var(--muted); }
+  .dikte input[type=range] { flex: 1; accent-color: var(--pink-d); height: 28px; }
+  .voorbeeld { width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; flex: none; }
+  .voorbeeld span { border-radius: 50%; display: block; border: 1.5px solid rgba(0,0,0,0.15); }
+  .kleur-nu {
+    width: 46px; height: 46px; border-radius: 50%; border: 3px solid white; flex: none;
+    box-shadow: 0 0 0 2px var(--pink-d);
+  }
+  .eigen {
+    position: relative; height: 46px; padding: 0 14px; border-radius: 16px; background: #f6eef4;
+    font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; overflow: hidden;
+  }
+  .eigen input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+  .palet { display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px; }
+  .vak {
+    aspect-ratio: 1; border-radius: 50%; border: 2px solid rgba(0,0,0,0.08); min-width: 0;
+    transition: transform .1s;
+  }
+  .vak.actief { transform: scale(1.18); box-shadow: 0 0 0 3px white, 0 0 0 5px var(--pink-d); }
+  .speciaal { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+  .speciaal .vak { aspect-ratio: auto; height: 38px; border-radius: 12px; font-size: 0.72rem; font-weight: 900; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.45); }
+
+  .melding {
+    position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%) translateY(20px);
+    background: var(--text); color: white; padding: 10px 18px; border-radius: 999px; font-weight: 800;
+    opacity: 0; transition: all .25s; pointer-events: none; z-index: 20;
+  }
+  .melding.toon { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* iPad liggend / groot scherm: paneel aan de zijkant */
+  @media (min-width: 820px) and (orientation: landscape) {
+    .ed-main { flex-direction: row; }
+    .paneel { width: 340px; flex: none; max-height: none; border-radius: 24px 0 0 24px; margin: 0 0 12px; }
+    .palet { grid-template-columns: repeat(6, 1fr); gap: 8px; }
+  }
+  @media (max-width: 480px) {
+    .palet { grid-template-columns: repeat(8, 1fr); }
+    .knop .tekst { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Speciale vullingen (gedeeld door alle kleurplaten) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs id="specialeDefs"></defs></svg>
+
+<!-- ══════════ GALERIJ ══════════ -->
+<div id="galerij">
+  <div class="gal-top">
+    <a href="index.html" class="terug" aria-label="Terug naar Milou's Wereld">←</a>
+    <h1>Kleurplaten</h1>
+  </div>
+  <p class="gal-sub">Tik op een vlak en het kleurt meteen in 🎨</p>
+  <div class="voortgang">
+    <div class="vg-tekst"><div id="vgTekst"></div><span id="vgSub"></span></div>
+    <div class="vg-balk"><div id="vgVul"></div></div>
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<!-- ══════════ EDITOR ══════════ -->
+<div id="editor">
+  <div class="ed-top">
+    <button class="knop" onclick="sluitEditor()" aria-label="Terug">←</button>
+    <h2 id="edTitel"></h2>
+    <button class="knop" onclick="ongedaan()" aria-label="Ongedaan maken">↩️<span class="tekst">Terug</span></button>
+    <button class="knop" onclick="wisAlles()" aria-label="Opnieuw beginnen">🗑️<span class="tekst">Opnieuw</span></button>
+    <button class="knop" id="klaarKnop" onclick="wisselKlaar()" aria-label="Klaar">✅<span class="tekst">Klaar!</span></button>
+    <button class="knop roze" onclick="opslaan()" aria-label="Opslaan">💾<span class="tekst">Opslaan</span></button>
+  </div>
+  <div class="ed-main">
+    <div class="doek">
+      <svg id="plaat" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+    <div class="paneel">
+      <div class="rij">
+        <button class="tool actief" data-tool="vul" onclick="kiesTool('vul', this)">🪣 Vullen</button>
+        <button class="tool" data-tool="pen" onclick="kiesTool('pen', this)">🖊️ Pen</button>
+        <button class="tool" data-tool="potlood" onclick="kiesTool('potlood', this)">✏️ Potlood</button>
+        <button class="tool" data-tool="gum" onclick="kiesTool('gum', this)">🧽 Gum</button>
+      </div>
+      <div class="rij" id="dikteRij" style="display:none">
+        <div class="dikte">
+          <label for="dikte">Dikte</label>
+          <input type="range" id="dikte" min="2" max="40" value="8" oninput="updateVoorbeeld()">
+          <div class="voorbeeld"><span id="voorbeeldStip"></span></div>
+        </div>
+      </div>
+      <div class="rij">
+        <div class="kleur-nu" id="kleurNu"></div>
+        <label class="eigen">🌈 Eigen kleur<input type="color" id="eigenKleur" value="#ff5fa2" oninput="kiesKleur(this.value, null)"></label>
+      </div>
+      <div class="palet" id="palet"></div>
+      <div class="speciaal" id="speciaal"></div>
+    </div>
+  </div>
+</div>
+
+<div class="melding" id="melding"></div>
+
+<script>
+// ═══════════════════════════════════════
+//  HULPFUNCTIES VOOR TEKENEN
+// ═══════════════════════════════════════
+const f = n => Math.round(n * 10) / 10;
+const R  = s => `<${s} class="r" fill="#ffffff"/>`;
+const D  = s => `<${s} class="d"/>`;
+const C  = (cx, cy, r) => R(`circle cx="${cx}" cy="${cy}" r="${r}"`);
+const E  = (cx, cy, rx, ry, rot) => R(`ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}"${rot ? ` transform="rotate(${rot} ${cx} ${cy})"` : ''}`);
+const P  = d => R(`path d="${d}"`);
+const RT = (x, y, w, h, rx, rot) => R(`rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx || 0}"${rot ? ` transform="rotate(${rot} ${f(x + w / 2)} ${f(y + h / 2)})"` : ''}`);
+const L  = d => D(`path d="${d}"`);
+const BG = () => R('rect x="0" y="0" width="400" height="400"');
+
+function hartPad(x, y, h) {
+  return `M${f(x)} ${f(y + 0.3 * h)} C${f(x)} ${f(y - 0.05 * h)} ${f(x - 0.55 * h)} ${f(y - 0.1 * h)} ${f(x - 0.55 * h)} ${f(y + 0.3 * h)} ` +
+         `C${f(x - 0.55 * h)} ${f(y + 0.6 * h)} ${f(x - 0.1 * h)} ${f(y + 0.8 * h)} ${f(x)} ${f(y + h)} ` +
+         `C${f(x + 0.1 * h)} ${f(y + 0.8 * h)} ${f(x + 0.55 * h)} ${f(y + 0.6 * h)} ${f(x + 0.55 * h)} ${f(y + 0.3 * h)} ` +
+         `C${f(x + 0.55 * h)} ${f(y - 0.1 * h)} ${f(x)} ${f(y - 0.05 * h)} ${f(x)} ${f(y + 0.3 * h)} Z`;
+}
+const hart = (x, y, h) => P(hartPad(x, y, h));
+
+function ster(cx, cy, r1, r2) {
+  let d = '';
+  for (let i = 0; i < 10; i++) {
+    const a = (-90 + i * 36) * Math.PI / 180, r = i % 2 === 0 ? r1 : r2;
+    d += (i === 0 ? 'M' : 'L') + f(cx + Math.cos(a) * r) + ' ' + f(cy + Math.sin(a) * r) + ' ';
+  }
+  return P(d + 'Z');
+}
+function bloem(cx, cy, r) {
+  let s = '';
+  for (let i = 0; i < 5; i++) {
+    const a = (-90 + i * 72) * Math.PI / 180;
+    s += C(f(cx + Math.cos(a) * r * 0.6), f(cy + Math.sin(a) * r * 0.6), f(r * 0.5));
+  }
+  return s + C(cx, cy, f(r * 0.4));
+}
+function wolk(x, y, w) {
+  return P(`M${x} ${y} A${f(w * 0.2)} ${f(w * 0.2)} 0 0 1 ${f(x + w * 0.3)} ${f(y - w * 0.2)} ` +
+           `A${f(w * 0.25)} ${f(w * 0.25)} 0 0 1 ${f(x + w * 0.7)} ${f(y - w * 0.2)} ` +
+           `A${f(w * 0.2)} ${f(w * 0.2)} 0 0 1 ${f(x + w)} ${y} Z`);
+}
+function noot(x, y) {
+  return RT(x + 10, y - 55, 5, 55) +
+         P(`M${x + 15} ${y - 55} q20 10 18 32 q-4 -14 -18 -18 Z`) +
+         E(x + 2, y, 14, 10, -20);
+}
+function blaadje(cx, cy, rot) { return E(cx, cy, 20, 9, rot); }
+function banaan(x, y, rot) {
+  return `<g transform="translate(${x} ${y}) rotate(${rot})">` +
+    P('M0 0 C25 -35 75 -45 105 -22 C101 -14 96 -12 90 -14 C62 -30 30 -22 8 8 Z') +
+    P('M0 0 L-9 4 L-5 13 L8 8 Z') + L('M22 -10 C45 -27 72 -30 96 -18') + '</g>';
+}
+function palmblad(x, y, rot) {
+  return `<g transform="translate(${x} ${y}) rotate(${rot})">` +
+    P('M0 0 C40 -34 110 -34 150 0 C110 14 40 14 0 0 Z') +
+    L('M6 0 L144 0 M40 -12 L52 0 M70 -16 L82 0 M100 -13 L112 0 M45 8 L55 0 M78 9 L88 0') + '</g>';
+}
+// Tekst waarvan je elke letter apart kunt inkleuren
+function naamTekst(tekst, x, y, grootte, spatie) {
+  const letters = tekst.split('').map(ch => ch === ' ' ? ' ' : `<tspan class="r" fill="#ffffff">${ch}</tspan>`).join('');
+  return `<text x="${x}" y="${y}" text-anchor="middle" font-family="Nunito, sans-serif" font-weight="900" font-size="${grootte}" letter-spacing="${spatie || 0}">${letters}</text>`;
+}
+
+// ═══════════════════════════════════════
+//  KLEURPLATEN
+// ═══════════════════════════════════════
+const PLATEN = [
+  // ─────────── MIJN NAAM ───────────
+  { id: 'milou-hartjes', naam: 'Milou met hartjes', cat: 'naam', teken: () =>
+    BG() + hart(55, 30, 60) + hart(345, 40, 50) + hart(60, 320, 50) + hart(340, 315, 56) +
+    ster(120, 60, 16, 7) + ster(285, 330, 14, 6) + ster(40, 200, 12, 5) + ster(365, 200, 12, 5) + ster(200, 365, 12, 5) +
+    P('M128 158 L146 100 L176 134 L200 84 L224 134 L254 100 L272 158 Z') +
+    C(146, 100, 8) + C(200, 84, 9) + C(254, 100, 8) + RT(124, 156, 152, 16, 5) +
+    naamTekst('Milou', 200, 265, 112, 2) +
+    hart(130, 292, 22) + hart(170, 292, 22) + hart(210, 292, 22) + hart(250, 292, 22) + hart(290, 292, 22)
+  },
+  { id: 'milou-regenboog', naam: 'Milou met regenboog', cat: 'naam', teken: () => {
+    let s = BG();
+    const rb = [180, 167, 154, 141, 128, 115];
+    for (let i = 0; i < 5; i++) {
+      const a = rb[i], b = rb[i + 1];
+      s += P(`M${200 - a} 235 A${a} ${a} 0 0 1 ${200 + a} 235 L${200 + b} 235 A${b} ${b} 0 0 0 ${200 - b} 235 Z`);
+    }
+    s += wolk(0, 250, 110) + wolk(290, 250, 110) + C(200, 170, 34) +
+         ster(40, 50, 16, 7) + ster(360, 50, 16, 7) + ster(200, 70, 10, 4) +
+         naamTekst('Milou', 200, 345, 98, 2) + hart(60, 360, 26) + hart(340, 360, 26);
+    return s;
+  }},
+  { id: 'sterrekijker', naam: 'De Sterrekijker', cat: 'naam', teken: () => {
+    let s = BG() + C(345, 55, 32) + C(360, 47, 27) +
+      ster(40, 40, 14, 6) + ster(115, 30, 9, 4) + ster(280, 25, 10, 4) + ster(30, 200, 11, 5) + ster(370, 205, 12, 5) + ster(190, 215, 9, 4) + ster(240, 205, 7, 3) +
+      naamTekst('De', 200, 98, 50, 1) + naamTekst('Sterrekijker', 200, 172, 56, -1) +
+      P('M0 345 Q200 300 400 345 L400 400 L0 400 Z') +
+      RT(40, 265, 160, 85) + P('M30 268 L120 215 L210 268 Z') + ster(120, 245, 13, 6) +
+      RT(55, 282, 30, 26, 3) + RT(155, 282, 30, 26, 3) + RT(104, 300, 32, 50, 3) + C(128, 327, 3) +
+      L('M70 282 L70 308 M55 295 L85 295 M170 282 L170 308 M155 295 L185 295') +
+      P('M300 292 L272 352 L280 355 L304 300 Z') + P('M300 292 L302 356 L310 356 L306 292 Z') + P('M306 292 L336 350 L344 346 L312 290 Z') +
+      RT(248, 240, 116, 28, 12, -35) + E(252, 300, 10, 16, -35) + C(302, 290, 10) +
+      ster(215, 250, 10, 4) + L('M230 260 L240 268 M372 196 L380 188');
+    return s;
+  }},
+
+  // ─────────── DIEREN ───────────
+  { id: 'aap', naam: 'Aap met bananen', cat: 'dieren', teken: () =>
+    BG() + C(200, 40, 26) +
+    palmblad(0, 25, 18) + palmblad(0, 70, 38) + palmblad(400, 12, 170) +
+    P('M0 350 Q200 322 400 350 L400 400 L0 400 Z') +
+    banaan(12, 342, -30) + banaan(20, 354, -12) + banaan(30, 364, 6) +
+    P('M255 310 C320 320 342 260 312 230 C297 215 275 225 285 240 C295 250 305 262 300 275 C292 295 270 298 255 290 Z') +
+    E(200, 282, 62, 70) + E(200, 297, 38, 46) +
+    E(165, 350, 30, 15) + E(235, 350, 30, 15) +
+    P('M152 245 C126 262 120 292 138 308 L150 298 C138 284 146 266 166 255 Z') + C(143, 305, 13) +
+    P('M246 242 C276 222 292 192 287 166 L271 164 C273 188 259 210 236 226 Z') +
+    banaan(282, 160, -78) + C(279, 163, 14) +
+    C(132, 152, 25) + C(132, 152, 14) + C(268, 152, 25) + C(268, 152, 14) +
+    C(200, 158, 68) +
+    P('M192 94 C190 76 204 72 204 88 C212 78 222 84 212 96 Z') +
+    P('M152 165 C148 122 194 124 200 140 C206 124 252 122 248 165 C262 204 236 226 200 226 C164 226 138 204 152 165 Z') +
+    C(180, 158, 9) + C(220, 158, 9) + C(182, 155, 3) + C(222, 155, 3) +
+    E(194, 186, 3.5, 2.5) + E(206, 186, 3.5, 2.5) + C(165, 195, 7) + C(235, 195, 7) +
+    L('M181 201 Q200 216 219 201')
+  },
+  // ─────────── DIEREN ───────────
+  { id: 'poes', naam: 'Poes met strik', cat: 'dieren', teken: () =>
+    BG() + RT(0, 300, 400, 100) +
+    hart(55, 50, 36) + hart(345, 70, 28) + ster(80, 150, 16, 7) + ster(330, 160, 14, 6) +
+    P('M250 330 C330 330 350 250 320 200 C310 185 292 195 303 212 C322 245 308 300 250 305 Z') +
+    P('M130 360 C110 300 140 228 200 225 C260 228 290 300 270 360 Z') +
+    E(200, 312, 42, 46) +
+    E(168, 360, 26, 14) + E(232, 360, 26, 14) +
+    L('M160 360 L160 368 M170 360 L170 369 M224 360 L224 369 M234 360 L234 368') +
+    P('M135 125 L150 45 L195 95 Z') + P('M265 125 L250 45 L205 95 Z') +
+    E(200, 150, 76, 66) +
+    P('M150 108 L156 68 L180 97 Z') + P('M250 108 L244 68 L220 97 Z') +
+    E(172, 145, 13, 16) + E(228, 145, 13, 16) +
+    E(172, 147, 5, 10) + E(228, 147, 5, 10) +
+    C(156, 174, 9) + C(244, 174, 9) +
+    P('M191 168 L209 168 L200 179 Z') +
+    L('M200 179 Q193 192 182 188 M200 179 Q207 192 218 188') +
+    L('M150 165 L110 158 M150 175 L108 178 M250 165 L290 158 M250 175 L292 178') +
+    P('M200 222 L163 204 L163 242 Z') + P('M200 222 L237 204 L237 242 Z') + C(200, 222, 10)
+  },
+  { id: 'puppy', naam: 'Puppy', cat: 'dieren', teken: () =>
+    BG() + P('M0 330 Q100 310 200 330 T400 330 L400 400 L0 400 Z') +
+    wolk(30, 80, 90) + wolk(280, 60, 90) + bloem(40, 360, 18) + bloem(355, 365, 16) +
+    E(200, 318, 90, 60) +
+    E(160, 368, 28, 16) + E(240, 368, 28, 16) +
+    P('M140 110 C95 100 85 190 110 230 C125 245 150 220 150 190 Z') +
+    P('M260 110 C305 100 315 190 290 230 C275 245 250 220 250 190 Z') +
+    E(200, 160, 70, 65) +
+    E(228, 145, 25, 23) +
+    C(175, 150, 10) + C(228, 150, 10) + C(178, 146, 3) + C(231, 146, 3) +
+    E(200, 197, 38, 28) +
+    P('M192 210 Q200 234 208 210 Z') +
+    E(200, 184, 14, 10) +
+    L('M200 194 L200 207 M200 207 Q190 215 182 209 M200 207 Q210 215 218 209') +
+    P('M150 222 Q200 246 250 222 L252 236 Q200 262 148 236 Z') + C(200, 258, 10) +
+    C(305, 358, 9) + C(305, 374, 9) + C(365, 358, 9) + C(365, 374, 9) + RT(305, 358, 60, 16)
+  },
+  { id: 'eenhoorn', naam: 'Eenhoorn', cat: 'dieren', teken: () => {
+    let s = BG();
+    const rb = [185, 172, 159, 146, 133, 120];
+    for (let i = 0; i < 5; i++) {
+      const a = rb[i], b = rb[i + 1];
+      s += P(`M${200 - a} 250 A${a} ${a} 0 0 1 ${200 + a} 250 L${200 + b} 250 A${b} ${b} 0 0 0 ${200 - b} 250 Z`);
+    }
+    s += wolk(5, 262, 95) + wolk(300, 262, 95) + ster(40, 60, 16, 7) + ster(360, 50, 14, 6) + ster(330, 330, 12, 5) + ster(70, 330, 12, 5);
+    [[140,125,26],[122,168,26],[118,212,26],[124,256,25],[140,296,22]].forEach(c => {
+      s += C(c[0], c[1], c[2]) + C(400 - c[0], c[1], c[2]);
+    });
+    s += P('M152 135 L145 72 L185 115 Z') + P('M248 135 L255 72 L215 115 Z') +
+         P('M145 150 C145 105 255 105 255 150 L250 265 C248 325 152 325 150 265 Z') +
+         P('M157 126 L153 90 L176 113 Z') + P('M243 126 L247 90 L224 113 Z') +
+         P('M188 110 L200 30 L212 110 Z') + L('M190 96 L210 86 M193 76 L207 68 M196 56 L205 50') +
+         P('M170 122 C175 96 225 96 230 122 C218 113 210 126 200 118 C190 126 182 113 170 122 Z') +
+         bloem(128, 112, 13) +
+         E(200, 285, 50, 36) + E(183, 283, 6, 9) + E(217, 283, 6, 9) +
+         L('M185 304 Q200 314 215 304') +
+         L('M163 200 Q175 188 187 200 M213 200 Q225 188 237 200 M165 198 L160 191 M175 193 L175 185 M235 198 L240 191 M225 193 L225 185') +
+         C(166, 232, 10) + C(234, 232, 10);
+    return s;
+  }},
+  { id: 'vlinder', naam: 'Vlinder', cat: 'dieren', teken: () => {
+    let s = BG() + ster(50, 50, 14, 6) + ster(350, 40, 12, 5) + hart(345, 330, 26) + hart(50, 300, 24);
+    s += P('M195 190 C150 90 60 70 55 130 C50 190 120 215 195 205 Z') +
+         P('M205 190 C250 90 340 70 345 130 C350 190 280 215 205 205 Z') +
+         P('M195 210 C140 215 85 250 100 300 C115 340 175 300 195 240 Z') +
+         P('M205 210 C260 215 315 250 300 300 C285 340 225 300 205 240 Z');
+    [[112,130,22],[152,165,12],[88,168,10],[135,275,16],[168,248,8],[118,300,7]].forEach(c => {
+      s += C(c[0], c[1], c[2]) + C(400 - c[0], c[1], c[2]);
+    });
+    s += E(200, 225, 10, 56) + L('M191 205 L209 205 M191 225 L209 225 M192 245 L208 245') +
+         L('M196 150 Q180 110 165 100 M204 150 Q220 110 235 100') + C(165, 100, 6) + C(235, 100, 6) +
+         C(200, 160, 14) +
+         bloem(70, 360, 22) + bloem(200, 362, 20) + bloem(330, 362, 22);
+    return s;
+  }},
+  { id: 'uil', naam: 'Uil op een tak', cat: 'dieren', teken: () => {
+    let s = BG() + C(320, 70, 35) + ster(60, 50, 14, 6) + ster(110, 110, 9, 4) + ster(370, 150, 10, 4) + ster(260, 40, 8, 3);
+    s += P('M0 300 C100 290 250 310 400 285 L400 305 C250 330 100 312 0 322 Z') +
+         blaadje(50, 290, -30) + blaadje(80, 318, 25) + blaadje(330, 282, -20) + blaadje(365, 305, 30) +
+         P('M140 120 L130 60 L180 100 Z') + P('M260 120 L270 60 L220 100 Z') +
+         E(200, 190, 80, 105) +
+         P('M125 170 C95 200 100 270 140 290 C150 250 150 200 125 170 Z') +
+         P('M275 170 C305 200 300 270 260 290 C250 250 250 200 275 170 Z') +
+         E(200, 238, 48, 55) +
+         L('M172 212 q7 8 14 0 q7 8 14 0 q7 8 14 0 q7 8 14 0 M165 235 q7 8 14 0 q7 8 14 0 q7 8 14 0 q7 8 14 0 q7 8 14 0 M172 258 q7 8 14 0 q7 8 14 0 q7 8 14 0 q7 8 14 0') +
+         C(168, 150, 32) + C(232, 150, 32) + C(168, 150, 18) + C(232, 150, 18) +
+         C(170, 152, 8) + C(234, 152, 8) + C(165, 146, 3) + C(229, 146, 3) +
+         P('M190 175 L210 175 L200 196 Z') +
+         E(178, 300, 6, 10) + E(190, 302, 6, 10) + E(210, 302, 6, 10) + E(222, 300, 6, 10);
+    return s;
+  }},
+
+  // ─────────── K-POP & MUZIEK ───────────
+  { id: 'idool', naam: 'K-pop ster op het podium', cat: 'kpop', teken: () =>
+    BG() +
+    P('M30 0 L80 0 L180 330 L40 330 Z') + P('M320 0 L370 0 L360 330 L220 330 Z') +
+    RT(0, 330, 400, 70) + RT(35, 0, 50, 16, 4) + RT(315, 0, 50, 16, 4) +
+    ster(40, 110, 16, 7) + ster(360, 150, 14, 6) + ster(95, 260, 10, 4) + ster(320, 270, 11, 5) + ster(130, 40, 9, 4) +
+    noot(62, 200) + noot(325, 230) +
+    P('M155 100 C150 45 250 45 245 100 L265 215 C235 225 165 225 135 215 Z') +
+    RT(190, 135, 20, 28) +
+    P('M162 168 L136 222 L148 232 L174 182 Z') + C(141, 229, 9) +
+    P('M238 168 L262 128 L274 136 L250 180 Z') +
+    P('M262 124 L278 92 L287 97 L272 128 Z') + C(284, 88, 12) + C(268, 129, 9) +
+    P('M172 300 L190 300 L189 348 L174 348 Z') + P('M210 300 L228 300 L226 348 L211 348 Z') +
+    P('M171 340 L192 340 L193 378 L158 378 C156 368 163 362 171 358 Z') +
+    P('M208 340 L229 340 L242 358 C250 362 252 372 248 378 L207 378 Z') +
+    P('M162 158 L238 158 L248 232 L152 232 Z') + hart(200, 172, 26) +
+    P('M152 232 L248 232 L272 300 L128 300 Z') +
+    L('M176 232 L166 300 M200 232 L200 300 M224 232 L234 300') +
+    E(200, 100, 36, 42) +
+    P('M164 96 C166 55 234 55 236 96 C224 80 212 78 200 86 C188 78 176 80 164 96 Z') +
+    hart(234, 56, 18) + ster(166, 124, 6, 3) + ster(234, 124, 6, 3) +
+    E(186, 104, 5, 7) + E(214, 104, 5, 7) + C(178, 117, 5) + C(222, 117, 5) +
+    L('M192 122 Q200 129 208 122')
+  },
+  { id: 'lightstick', naam: 'Lightstick & hartjes', cat: 'kpop', teken: () => {
+    let s = BG();
+    for (let i = 0; i < 8; i++) {
+      const a = i * 45, a1 = (a - 9) * Math.PI / 180, a2 = (a + 9) * Math.PI / 180;
+      s += P(`M200 150 L${f(200 + Math.cos(a1) * 300)} ${f(150 + Math.sin(a1) * 300)} L${f(200 + Math.cos(a2) * 300)} ${f(150 + Math.sin(a2) * 300)} Z`);
+    }
+    s += hart(40, 40, 30) + hart(355, 60, 26) + hart(330, 330, 32) + ster(60, 250, 14, 6) + ster(350, 220, 12, 5) + noot(300, 380) +
+         RT(180, 235, 40, 135, 18) + RT(176, 255, 48, 12, 6) + RT(176, 335, 48, 12, 6) + C(200, 298, 8) +
+         hart(200, 78, 172) + hart(200, 118, 100) +
+         ster(170, 150, 9, 4) + ster(232, 138, 7, 3) +
+         P('M30 340 L160 340 L160 380 L30 380 L46 360 Z') +
+         '<text x="95" y="370" text-anchor="middle" class="dt" font-family="Pacifico, cursive" font-size="24">K-POP</text>';
+    return s;
+  }},
+  { id: 'koptelefoon', naam: 'Koptelefoon & muziek', cat: 'kpop', teken: () =>
+    BG() + ster(50, 50, 14, 6) + ster(350, 40, 12, 5) + hart(345, 350, 26) + hart(50, 340, 24) +
+    noot(185, 150) + noot(160, 345) + noot(240, 330) +
+    P('M60 215 A140 140 0 0 1 340 215 L318 215 A118 118 0 0 0 82 215 Z') +
+    RT(150, 70, 100, 26, 13) +
+    E(104, 250, 18, 48) + E(296, 250, 18, 48) +
+    E(72, 250, 36, 60) + E(328, 250, 36, 60) +
+    hart(72, 230, 34) + ster(328, 250, 18, 8)
+  },
+
+  // ─────────── MEIDENDINGEN ───────────
+  { id: 'bubbletea', naam: 'Bubble tea', cat: 'meiden', teken: () =>
+    BG() + hart(55, 60, 30) + hart(345, 80, 26) + ster(60, 300, 14, 6) + ster(345, 310, 14, 6) + C(80, 200, 8) + C(320, 210, 10) +
+    P('M230 20 L248 24 L222 152 L204 148 Z') +
+    P('M120 150 C120 95 280 95 280 150 Z') + RT(110, 148, 180, 16, 8) +
+    P('M122 164 L278 164 L255 370 L145 370 Z') +
+    P('M126 200 Q163 190 200 200 T274 200 L255 370 L145 370 Z') +
+    C(165, 345, 10) + C(188, 352, 10) + C(211, 348, 10) + C(234, 342, 10) + C(176, 325, 10) + C(199, 330, 10) + C(222, 325, 10) +
+    C(175, 255, 7) + C(225, 255, 7) + E(162, 270, 8, 5) + E(238, 270, 8, 5) +
+    L('M190 268 Q200 278 210 268')
+  },
+  { id: 'cupcake', naam: 'Cupcake', cat: 'meiden', teken: () => {
+    let s = BG() + ster(50, 60, 16, 7) + ster(350, 70, 14, 6) + hart(60, 300, 28) + hart(345, 290, 30) + ster(330, 370, 10, 4) + ster(65, 375, 10, 4);
+    for (let i = 0; i < 6; i++) {
+      const t0 = 110 + i * 30, t1 = t0 + 30, b0 = f(135 + i * 130 / 6), b1 = f(135 + (i + 1) * 130 / 6);
+      s += P(`M${t0} 230 L${t1} 230 L${b1} 370 L${b0} 370 Z`);
+    }
+    s += P('M95 235 C80 205 110 185 135 190 C140 160 260 160 265 190 C290 185 320 205 305 235 Z') +
+         P('M125 190 C115 160 150 140 170 148 C180 120 225 120 235 148 C255 140 285 160 275 190 Z') +
+         P('M155 150 C150 120 180 105 200 110 C220 105 250 120 245 150 Z') +
+         C(200, 94, 18) + L('M200 76 Q205 58 220 50');
+    [[140,215,30],[172,206,-20],[230,211,40],[262,221,-30],[118,224,10],[160,176,50],[200,162,-40],[242,172,20],[185,134,-10],[216,130,30],[288,220,60]].forEach(p => {
+      s += RT(p[0] - 7, p[1] - 2.5, 14, 5, 2.5, p[2]);
+    });
+    return s;
+  }},
+  { id: 'sneaker', naam: 'Sneaker', cat: 'meiden', teken: () =>
+    BG() + ster(60, 60, 16, 7) + ster(340, 80, 14, 6) + hart(330, 360, 24) + hart(60, 360, 24) + ster(200, 50, 10, 4) +
+    P('M150 170 C150 140 175 130 195 140 L205 205 C185 200 165 190 150 170 Z') +
+    P('M50 295 C45 240 60 200 90 180 L150 170 C175 200 215 215 260 225 C320 235 355 250 355 295 Z') +
+    P('M50 295 C45 240 60 200 90 180 L100 200 C85 230 85 265 95 295 Z') +
+    P('M290 230 C330 238 355 255 355 295 L285 295 C300 270 300 250 290 230 Z') +
+    ster(200, 260, 24, 10) +
+    C(168, 194, 5) + C(188, 204, 5) + C(210, 212, 5) + C(232, 219, 5) +
+    L('M168 194 L210 212 M188 204 L232 219 M168 194 L162 176 M188 204 L178 180') +
+    P('M45 290 L355 290 L360 305 L42 305 Z') +
+    P('M40 305 L360 305 C375 305 380 330 360 336 L50 336 C30 336 28 305 40 305 Z') +
+    L('M70 322 L90 322 M110 322 L130 322 M150 322 L170 322 M190 322 L210 322 M230 322 L250 322 M270 322 L290 322 M310 322 L330 322')
+  },
+  { id: 'beauty', naam: 'Nagellak & lipstick', cat: 'meiden', teken: () =>
+    BG() + ster(370, 40, 14, 6) + ster(200, 230, 12, 5) + hart(200, 290, 40) + ster(30, 40, 10, 4) + ster(370, 380, 10, 4) +
+    RT(70, 90, 50, 80, 8) + RT(80, 165, 30, 22) +
+    P('M55 185 L135 185 C150 185 155 200 155 215 L155 330 C155 345 145 355 130 355 L60 355 C45 355 35 345 35 330 L35 215 C35 200 40 185 55 185 Z') +
+    P('M45 240 L145 240 L145 330 C145 338 138 345 130 345 L60 345 C52 345 45 338 45 330 Z') +
+    hart(95, 262, 44) +
+    C(190, 120, 55) + C(190, 120, 42) + L('M168 102 L182 88 M172 118 L200 90') +
+    RT(250, 250, 70, 110, 6) + RT(258, 200, 54, 55, 4) +
+    P('M262 200 L262 140 L308 110 L308 200 Z') + L('M250 300 L320 300')
+  },
+
+  // ─────────── PATRONEN ───────────
+  { id: 'mandala', naam: 'Mandala', cat: 'patronen', teken: () => {
+    let s = BG();
+    const ring = (n, d, rx, ry, off) => {
+      let t = '';
+      for (let i = 0; i < n; i++) {
+        const a = off + i * 360 / n, rad = a * Math.PI / 180;
+        t += E(f(200 + Math.cos(rad) * d), f(200 + Math.sin(rad) * d), rx, ry, f(a + 90));
+      }
+      return t;
+    };
+    s += ring(16, 150, 22, 42, 0) + C(200, 200, 128);
+    for (let i = 0; i < 24; i++) {
+      const rad = (i * 15) * Math.PI / 180;
+      s += C(f(200 + Math.cos(rad) * 116), f(200 + Math.sin(rad) * 116), 8);
+    }
+    s += ring(12, 88, 18, 30, 15) + C(200, 200, 64) + ring(8, 44, 13, 22, 0) + C(200, 200, 22) + C(200, 200, 10);
+    [[25,25],[375,25],[25,375],[375,375]].forEach(p => { s += ster(p[0], p[1], 16, 7); });
+    return s;
+  }},
+  { id: 'leeg', naam: 'Leeg vel (vrij tekenen)', cat: 'patronen', teken: () => BG() },
+  { id: 'hartjes', naam: 'Hartjespatroon', cat: 'patronen', teken: () => {
+    let s = BG();
+    for (let r = 0; r < 6; r++) {
+      for (let k = 0; k < 6; k++) {
+        const x = 35 + k * 66 + (r % 2 ? 33 : 0), y = 8 + r * 66, groot = (r + k) % 2 === 0;
+        s += groot ? hart(x, y, 48) : ster(x, y + 22, 18, 8);
+      }
+    }
+    return s;
+  }},
+];
+
+// ═══════════════════════════════════════
+//  EXTRA HULPFUNCTIES
+// ═══════════════════════════════════════
+function rng(seed) {
+  return function () {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+// Hoek 0 = boven, met de klok mee
+function pol(cx, cy, a, r) { const g = a * Math.PI / 180; return [f(cx + Math.sin(g) * r), f(cy - Math.cos(g) * r)]; }
+function gezicht(cx, cy, w, blos) {
+  const r = f(w * 0.3);
+  let s = C(f(cx - w), cy, r) + C(f(cx + w), cy, r) +
+    C(f(cx - w + r * 0.35), f(cy - r * 0.35), f(r * 0.38)) + C(f(cx + w + r * 0.35), f(cy - r * 0.35), f(r * 0.38)) +
+    L(`M${f(cx - w * 0.35)} ${f(cy + w * 0.5)} Q${cx} ${f(cy + w * 0.9)} ${f(cx + w * 0.35)} ${f(cy + w * 0.5)}`);
+  if (blos !== false) s += E(f(cx - w * 1.6), f(cy + w * 0.6), f(w * 0.38), f(w * 0.24)) + E(f(cx + w * 1.6), f(cy + w * 0.6), f(w * 0.38), f(w * 0.24));
+  return s;
+}
+function blob(cx, cy, r, amp, n, fase) {
+  let d = ''; const N = n * 10;
+  for (let i = 0; i <= N; i++) {
+    const a = i / N * 2 * Math.PI, rr = r + amp * Math.sin(n * a + (fase || 0));
+    d += (i ? 'L' : 'M') + f(cx + Math.cos(a) * rr) + ' ' + f(cy + Math.sin(a) * rr) + ' ';
+  }
+  return P(d + 'Z');
+}
+function ellipsStreep(cx, cy, rx, ry, x1, x2) {
+  const boven = [], onder = [];
+  for (let k = 0; k <= 12; k++) {
+    const x = x1 + (x2 - x1) * k / 12, q = (x - cx) / rx, dy = ry * Math.sqrt(Math.max(0, 1 - q * q));
+    boven.push(f(x) + ' ' + f(cy - dy)); onder.unshift(f(x) + ' ' + f(cy + dy));
+  }
+  return P('M' + boven.join(' L') + ' L' + onder.join(' L') + ' Z');
+}
+function sector(cx, cy, r1, r2, a0, a1) {
+  const g = a1 - a0 > 180 ? 1 : 0, p0 = pol(cx, cy, a0, r2), p1 = pol(cx, cy, a1, r2);
+  if (!r1) return P(`M${cx} ${cy} L${p0[0]} ${p0[1]} A${r2} ${r2} 0 ${g} 1 ${p1[0]} ${p1[1]} Z`);
+  const q0 = pol(cx, cy, a0, r1), q1 = pol(cx, cy, a1, r1);
+  return P(`M${p0[0]} ${p0[1]} A${r2} ${r2} 0 ${g} 1 ${p1[0]} ${p1[1]} L${q1[0]} ${q1[1]} A${r1} ${r1} 0 ${g} 0 ${q0[0]} ${q0[1]} Z`);
+}
+function lint(x, y0, y1, w, amp, golf) {
+  const l = [], r = [];
+  for (let y = y0; y <= y1; y += 6) {
+    const t = (y - y0) / (y1 - y0), xc = x + amp * Math.sin((y - y0) / golf * 2 * Math.PI), hw = w / 2 * (1 - 0.65 * t);
+    l.push(f(xc - hw) + ' ' + y); r.unshift(f(xc + hw) + ' ' + y);
+  }
+  return P('M' + l.join(' L') + ' L' + r.join(' L') + ' Z');
+}
+function golfBand(y, h, amp, n) {
+  let d = `M0 ${y}`;
+  for (let i = 0; i < n; i++) { const w = 400 / n, x = i * w; d += ` Q${f(x + w / 4)} ${y - amp} ${f(x + w / 2)} ${y} T${f(x + w)} ${y}`; }
+  return P(d + ` L400 ${y + h} L0 ${y + h} Z`);
+}
+function glazuur(x, y, w, h, n) {
+  let d = `M${x} ${y} L${x + w} ${y} L${x + w} ${y + h}`;
+  for (let i = n - 1; i >= 0; i--) {
+    const a = x + (i + 1) * w / n, b = x + i * w / n, diep = i % 2 ? h * 1.3 : h * 0.6;
+    d += ` Q${f((a + b) / 2)} ${f(y + h + diep)} ${f(b)} ${y + h}`;
+  }
+  return P(d + ' Z');
+}
+function hartRot(cx, cy, s, rot) { return `<g transform="rotate(${f(rot)} ${cx} ${cy})">` + hart(cx, f(cy - s / 2), s) + '</g>'; }
+function vis(x, y, s, spiegel) {
+  const k = spiegel ? -1 : 1;
+  return P(`M${f(x + 18 * s * k)} ${y} L${f(x + 32 * s * k)} ${f(y - 11 * s)} L${f(x + 32 * s * k)} ${f(y + 11 * s)} Z`) +
+    E(x, y, f(22 * s), f(13 * s)) + C(f(x - 10 * s * k), f(y - 3 * s), f(3 * s));
+}
+function hoekSterren() { return ster(28, 28, 14, 6) + ster(372, 28, 14, 6); }
+function grond(y) { return P(`M0 ${y} Q200 ${y - 30} 400 ${y} L400 400 L0 400 Z`); }
+function vlam(x, y, s) { return P(`M${x} ${y} C${f(x - 10 * s)} ${f(y - 12 * s)} ${f(x - 4 * s)} ${f(y - 22 * s)} ${x} ${f(y - 30 * s)} C${f(x + 4 * s)} ${f(y - 22 * s)} ${f(x + 10 * s)} ${f(y - 12 * s)} ${x} ${y} Z`); }
+function ballon(cx, cy, rx, ry, letter) {
+  return P(`M${cx} ${cy + ry - 2} L${cx - 7} ${cy + ry + 10} L${cx + 7} ${cy + ry + 10} Z`) + E(cx, cy, rx, ry) +
+    (letter ? naamTekst(letter, cx, f(cy + ry * 0.35), f(ry * 0.95), 0) : '') + L(`M${cx - 18} ${cy - ry * 0.45} Q${cx - 14} ${cy - ry * 0.7} ${cx - 4} ${cy - ry * 0.78}`);
+}
+function tulp(x, y, s) {
+  return RT(f(x - 3 * s), y, f(6 * s), f(70 * s)) + E(f(x + 14 * s), f(y + 45 * s), f(16 * s), f(6 * s), -40) +
+    P(`M${f(x - 18 * s)} ${f(y - 30 * s)} L${f(x - 9 * s)} ${f(y - 14 * s)} L${x} ${f(y - 32 * s)} L${f(x + 9 * s)} ${f(y - 14 * s)} L${f(x + 18 * s)} ${f(y - 30 * s)} C${f(x + 20 * s)} ${f(y - 5 * s)} ${f(x + 12 * s)} ${f(y + 2 * s)} ${x} ${f(y + 2 * s)} C${f(x - 12 * s)} ${f(y + 2 * s)} ${f(x - 20 * s)} ${f(y - 5 * s)} ${f(x - 18 * s)} ${f(y - 30 * s)} Z`);
+}
+function zonnebloem(x, y, r) {
+  let s = '';
+  for (let i = 0; i < 14; i++) { const a = i * 360 / 14, p = pol(x, y, a, r * 0.95); s += E(p[0], p[1], f(r * 0.22), f(r * 0.5), f(a)); }
+  return s + C(x, y, f(r * 0.6)) + C(x, y, f(r * 0.35));
+}
+function cadeau(x, y, w, h) {
+  return RT(x, y, w, h, 4) + RT(f(x - 5), f(y - 16), f(w + 10), 18, 4) + RT(f(x + w / 2 - 7), f(y - 16), 14, f(h + 16)) +
+    E(f(x + w / 2 - 14), f(y - 22), 14, 8, 20) + E(f(x + w / 2 + 14), f(y - 22), 14, 8, -20) + C(f(x + w / 2), f(y - 20), 6);
+}
+function mandala(lagen) {
+  let s = BG();
+  const cx = 200, cy = 200;
+  lagen.forEach(l => {
+    const t = l[0];
+    if (t === 'c') s += C(cx, cy, l[1]);
+    if (t === 'p') for (let i = 0; i < l[1]; i++) { const a = (l[5] || 0) + i * 360 / l[1], p = pol(cx, cy, a, l[2]); s += E(p[0], p[1], l[3], l[4], f(a)); }
+    if (t === 'd') for (let i = 0; i < l[1]; i++) { const p = pol(cx, cy, (l[4] || 0) + i * 360 / l[1], l[2]); s += C(p[0], p[1], l[3]); }
+    if (t === 'h') for (let i = 0; i < l[1]; i++) { const a = (l[4] || 0) + i * 360 / l[1], p = pol(cx, cy, a, l[2]); s += hartRot(p[0], p[1], l[3], a); }
+    if (t === 't') for (let i = 0; i < l[1]; i++) {
+      const a = (l[4] || 0) + i * 360 / l[1], h = 180 / l[1], b0 = pol(cx, cy, a - h, l[2]), b1 = pol(cx, cy, a + h, l[2]), tp = pol(cx, cy, a, l[3]);
+      s += P(`M${b0[0]} ${b0[1]} L${tp[0]} ${tp[1]} L${b1[0]} ${b1[1]} Z`);
+    }
+    if (t === 's') s += ster5n(cx, cy, l[2], l[3], l[1]);
+    if (t === 'ring') for (let i = 0; i < l[1]; i++) { const a = (l[4] || 0) + i * 360 / l[1]; s += sector(cx, cy, l[2], l[3], a, a + 360 / l[1]); }
+  });
+  return s;
+}
+function ster5n(cx, cy, r1, r2, n) {
+  let d = '';
+  for (let i = 0; i < n * 2; i++) { const p = pol(cx, cy, i * 180 / n, i % 2 ? r2 : r1); d += (i ? 'L' : 'M') + p[0] + ' ' + p[1] + ' '; }
+  return P(d + 'Z');
+}
+
+// ═══════════════════════════════════════
+//  81 EXTRA KLEURPLATEN
+// ═══════════════════════════════════════
+PLATEN.push(
+
+  // ─────────── MIJN NAAM ───────────
+  { id: 'milou-12', naam: 'Milou wordt 12', cat: 'naam', teken: () =>
+    BG() + hoekSterren() + hart(40, 170, 30) + hart(360, 170, 30) + ster(60, 300, 12, 5) + ster(345, 300, 12, 5) +
+    naamTekst('Milou', 200, 92, 80, 2) +
+    E(200, 364, 150, 18) +
+    RT(90, 270, 220, 90, 10) + glazuur(90, 270, 220, 14, 8) +
+    RT(130, 190, 140, 82, 10) + glazuur(130, 190, 140, 12, 6) +
+    naamTekst('12', 200, 255, 50, 2) +
+    RT(170, 146, 12, 44, 3) + RT(218, 146, 12, 44, 3) + vlam(176, 144, 1) + vlam(224, 144, 1) +
+    C(120, 325, 8) + C(160, 330, 8) + C(200, 325, 8) + C(240, 330, 8) + C(280, 325, 8)
+  },
+  { id: 'milou-sterren', naam: 'Milou tussen de sterren', cat: 'naam', teken: () => {
+    let s = BG() + C(320, 80, 40) + C(338, 70, 34);
+    const r = rng(11);
+    [[50,50],[130,40],[220,60],[60,130],[150,120],[250,140],[370,160],[40,300],[120,320],[300,320],[360,260],[200,330]].forEach(p => {
+      s += ster(p[0], p[1], f(10 + r() * 10), f(5 + r() * 3));
+    });
+    return s + naamTekst('Milou', 200, 250, 112, 2) + wolk(20, 390, 120) + wolk(150, 395, 100) + wolk(260, 390, 130);
+  }},
+  { id: 'milou-bloemen', naam: 'Milou met bloemen', cat: 'naam', teken: () => {
+    let s = BG();
+    [[40,40,26],[120,35,20],[200,40,24],[280,35,20],[360,40,26],[40,130,20],[360,130,20],[40,280,20],[360,280,20],[40,360,26],[120,365,20],[200,360,24],[280,365,20],[360,360,26]].forEach((b, i) => {
+      s += blaadje(b[0] + (i % 2 ? 22 : -22), b[1] + 14, i % 2 ? 30 : -30) + bloem(b[0], b[1], b[2]);
+    });
+    return s + naamTekst('Milou', 200, 235, 110, 2) + hart(200, 262, 28);
+  }},
+  { id: 'milou-ballonnen', naam: 'Milou ballonnen', cat: 'naam', teken: () => {
+    let s = BG() + wolk(20, 380, 100) + wolk(290, 385, 100) + ster(30, 30, 12, 5) + ster(370, 30, 12, 5);
+    const b = [[70, 150, 'M'], [135, 110, 'i'], [200, 140, 'l'], [265, 105, 'o'], [330, 145, 'u']];
+    b.forEach(p => { s += L(`M${p[0]} ${p[1] + 62} Q${f((p[0] + 200) / 2 + 10)} 300 200 340`); });
+    b.forEach(p => { s += ballon(p[0], p[1], 40, 52, p[2]); });
+    return s + E(188, 340, 14, 8, 20) + E(212, 340, 14, 8, -20) + C(200, 340, 6);
+  }},
+  { id: 'groep8', naam: 'Groep 8', cat: 'naam', teken: () =>
+    BG() + hoekSterren() +
+    RT(60, 40, 180, 26, 6, -12) + P('M240 30 L275 39 L241 57 Z') + RT(45, 50, 22, 26, 3, -12) +
+    naamTekst('Groep 8', 200, 190, 82, 2) + hart(200, 205, 26) +
+    RT(40, 250, 130, 28, 4) + RT(50, 278, 120, 30, 4) + RT(35, 308, 140, 32, 4) + L('M150 250 L150 278 M160 278 L160 308 M155 308 L155 340') +
+    RT(200, 335, 180, 30, 3) + L('M215 335 L215 348 M235 335 L235 345 M255 335 L255 348 M275 335 L275 345 M295 335 L295 348 M315 335 L315 345 M335 335 L335 348 M355 335 L355 345') +
+    C(310, 280, 38) + P('M310 244 Q318 225 330 222 L332 230 Q320 234 316 246 Z') + E(292, 238, 16, 8, -30)
+  },
+  { id: 'milou-kpop', naam: 'Milou op het podium', cat: 'naam', teken: () =>
+    BG() + P('M0 0 L60 0 L150 300 L20 300 Z') + P('M340 0 L400 0 L380 300 L250 300 Z') + RT(0, 300, 400, 100) +
+    L('M40 40 L110 70 M360 40 L290 70') +
+    P('M70 70 L330 70 L320 190 L200 175 L80 190 Z') + naamTekst('Milou', 200, 160, 78, 2) +
+    RT(55, 250, 18, 90, 8) + hart(64, 200, 56) + RT(327, 250, 18, 90, 8) + hart(336, 200, 56) +
+    ster(200, 250, 26, 11) + ster(140, 230, 12, 5) + ster(260, 230, 12, 5) + hart(120, 330, 30) + hart(280, 330, 30) + noot(185, 360)
+  },
+  { id: 'sterrekijker-badge', naam: 'De Sterrekijker badge', cat: 'naam', teken: () =>
+    BG() + C(200, 200, 175) + C(200, 200, 150) +
+    ster(200, 92, 40, 17) + ster(120, 125, 14, 6) + ster(280, 125, 14, 6) +
+    P('M10 190 L60 190 L50 220 L60 250 L10 250 Z') + P('M390 190 L340 190 L350 220 L340 250 L390 250 Z') +
+    RT(40, 180, 320, 80, 10) + naamTekst('Sterrekijker', 200, 238, 46, -1) + naamTekst('De', 200, 170, 32, 1) +
+    RT(170, 300, 80, 20, 8, -30) + E(172, 322, 7, 11, -30) + P('M215 318 L200 355 L206 357 L218 322 Z') + P('M218 318 L232 356 L238 354 L222 318 Z')
+  },
+
+  // ─────────── DIEREN ───────────
+  { id: 'konijn', naam: 'Konijn', cat: 'dieren', teken: () =>
+    BG() + grond(340) + bloem(50, 330, 18) + bloem(355, 335, 18) + hoekSterren() +
+    E(165, 90, 20, 58, -10) + E(235, 90, 20, 58, 10) + E(165, 95, 10, 42, -10) + E(235, 95, 10, 42, 10) +
+    E(200, 285, 75, 78) + E(200, 300, 44, 50) + E(160, 358, 32, 14) + E(240, 358, 32, 14) +
+    C(200, 175, 62) + gezicht(200, 170, 20) + P('M194 184 L206 184 L200 191 Z') +
+    L('M150 185 L118 180 M150 193 L118 197 M250 185 L282 180 M250 193 L282 197') +
+    P('M272 250 L318 262 L280 300 Z') + P('M300 262 L312 236 L318 262 Z') + P('M308 262 L330 244 L320 268 Z')
+  },
+  { id: 'vos', naam: 'Vos', cat: 'dieren', teken: () =>
+    BG() + grond(345) + blaadje(50, 330, -20) + blaadje(80, 345, 20) + blaadje(350, 335, 20) + hoekSterren() +
+    P('M240 340 C340 340 370 240 320 190 C305 245 285 280 240 300 Z') + P('M320 190 C335 205 345 225 345 245 C335 230 322 222 312 222 Z') +
+    P('M140 360 C128 290 160 238 200 234 C240 238 272 290 260 360 Z') +
+    P('M172 248 L200 330 L228 248 C218 268 182 268 172 248 Z') +
+    RT(165, 320, 24, 42, 10) + RT(211, 320, 24, 42, 10) +
+    P('M135 145 L145 70 L187 122 Z') + P('M265 145 L255 70 L213 122 Z') + P('M147 130 L151 92 L173 120 Z') + P('M253 130 L249 92 L227 120 Z') +
+    P('M128 140 C150 110 250 110 272 140 C262 175 225 205 200 232 C175 205 138 175 128 140 Z') +
+    P('M128 140 C150 172 178 196 200 232 C188 190 168 165 128 140 Z') + P('M272 140 C250 172 222 196 200 232 C212 190 232 165 272 140 Z') +
+    C(176, 158, 7) + C(224, 158, 7) + C(200, 224, 8)
+  },
+  { id: 'teddybeer', naam: 'Teddybeer', cat: 'dieren', teken: () =>
+    BG() + hoekSterren() + L('M300 170 Q320 110 330 90') + hart(330, 20, 76) +
+    C(145, 110, 28) + C(255, 110, 28) + C(145, 110, 15) + C(255, 110, 15) +
+    E(150, 350, 34, 30) + E(250, 350, 34, 30) + E(150, 354, 17, 15) + E(250, 354, 17, 15) +
+    E(200, 290, 72, 72) + E(200, 298, 42, 45) + hart(200, 282, 30) +
+    E(130, 270, 24, 40, 25) + E(270, 270, 24, 40, -25) +
+    C(200, 160, 68) + E(200, 188, 30, 22) + E(200, 178, 11, 7) + L('M200 185 L200 195 M200 195 Q190 203 184 197 M200 195 Q210 203 216 197') +
+    C(175, 150, 7) + C(225, 150, 7) +
+    P('M200 226 L175 214 L175 240 Z') + P('M200 226 L225 214 L225 240 Z') + C(200, 227, 7)
+  },
+  { id: 'panda', naam: 'Panda met bamboe', cat: 'dieren', teken: () =>
+    BG() + grond(345) +
+    RT(305, 40, 20, 90, 4) + RT(305, 132, 20, 90, 4) + RT(305, 224, 20, 110, 4) + E(345, 110, 28, 9, -30) + E(340, 200, 28, 9, 30) + E(285, 160, 26, 8, 30) +
+    C(142, 108, 28) + C(258, 108, 28) +
+    E(150, 350, 34, 26) + E(250, 350, 34, 26) +
+    E(200, 285, 75, 72) + E(200, 295, 44, 45) +
+    E(128, 268, 26, 42, 25) + E(272, 268, 26, 42, -25) +
+    C(200, 160, 70) + E(172, 158, 17, 22, -30) + E(228, 158, 17, 22, 30) + C(174, 156, 7) + C(226, 156, 7) + C(176, 153, 2.5) + C(228, 153, 2.5) +
+    E(200, 188, 11, 7) + L('M200 195 L200 202 M200 202 Q192 210 185 205 M200 202 Q208 210 215 205') + E(160, 190, 8, 5) + E(240, 190, 8, 5)
+  },
+  { id: 'pinguin', naam: 'Pinguïn met muts', cat: 'dieren', teken: () =>
+    BG() + P('M0 365 L400 365 L400 400 L0 400 Z') + ster(40, 60, 12, 5) + ster(360, 80, 12, 5) + ster(60, 250, 9, 4) + ster(345, 250, 9, 4) +
+    E(165, 372, 26, 10) + E(235, 372, 26, 10) +
+    P('M112 210 C85 250 90 300 112 320 C122 290 124 250 124 220 Z') + P('M288 210 C315 250 310 300 288 320 C278 290 276 250 276 220 Z') +
+    E(200, 245, 90, 128) + E(200, 268, 62, 100) +
+    C(175, 175, 9) + C(225, 175, 9) + C(178, 172, 3) + C(228, 172, 3) + P('M188 192 L212 192 L200 208 Z') + E(160, 200, 9, 6) + E(240, 200, 9, 6) +
+    P('M122 225 Q200 250 278 225 L282 245 Q200 272 118 245 Z') + P('M250 240 L262 300 L240 302 L232 250 Z') +
+    P('M130 140 C130 80 270 80 270 140 Z') + RT(122, 132, 156, 18, 9) + C(200, 76, 16)
+  },
+  { id: 'olifant', naam: 'Olifant', cat: 'dieren', teken: () =>
+    BG() + grond(345) + C(340, 60, 30) + wolk(30, 90, 90) +
+    RT(245, 290, 30, 60, 10) + RT(290, 285, 30, 62, 10) +
+    E(230, 250, 110, 78) + L('M338 245 Q355 260 350 285') +
+    RT(150, 290, 32, 62, 10) + RT(195, 295, 32, 58, 10) +
+    E(175, 190, 50, 60) + E(180, 193, 34, 44) +
+    C(130, 195, 58) +
+    P('M85 220 C60 255 55 305 75 335 C85 350 105 345 100 330 C85 305 92 265 110 243 Z') +
+    C(112, 180, 8) + C(114, 177, 3) + E(140, 210, 10, 6) + P('M112 230 C118 243 128 249 140 247 C130 243 122 237 118 227 Z') +
+    C(62, 110, 9) + C(78, 88, 7) + C(50, 85, 6)
+  },
+  { id: 'giraf', naam: 'Giraf', cat: 'dieren', teken: () =>
+    BG() + C(340, 60, 32) + wolk(20, 90, 90) + grond(385) +
+    RT(132, 300, 20, 85, 8) + RT(162, 305, 20, 82, 8) + RT(248, 305, 20, 82, 8) + RT(278, 300, 20, 85, 8) +
+    P('M300 290 C325 300 330 330 322 350 L316 348 C320 330 316 305 296 298 Z') +
+    E(215, 292, 90, 38) +
+    P('M178 318 L186 125 L226 125 L236 312 Z') +
+    RT(182, 50, 8, 26, 3) + RT(212, 50, 8, 26, 3) + C(186, 48, 8) + C(216, 48, 8) +
+    E(152, 92, 18, 9, -20) + E(250, 92, 18, 9, 20) +
+    E(201, 100, 42, 32) + E(201, 125, 30, 20) + C(186, 92, 6) + C(216, 92, 6) + E(192, 128, 3.5, 2.5) + E(210, 128, 3.5, 2.5) + L('M192 138 Q201 144 210 138') +
+    E(200, 170, 12, 16, 20) + E(214, 220, 10, 14, -10) + E(198, 270, 13, 16, 15) + E(160, 290, 18, 13, 10) + E(250, 280, 16, 12, -10) + E(280, 305, 14, 10, 20) + E(205, 312, 15, 11)
+  },
+  { id: 'schildpad', naam: 'Schildpad', cat: 'dieren', teken: () =>
+    BG() + grond(340) + bloem(50, 345, 18) + bloem(350, 350, 16) + hoekSterren() + C(200, 60, 28) +
+    E(120, 305, 24, 16) + E(270, 305, 24, 16) + P('M85 285 L60 295 L85 298 Z') +
+    P('M300 270 C320 240 350 230 360 255 C368 275 350 290 320 290 Z') + C(340, 255, 30) + C(350, 248, 5) + L('M332 268 Q342 274 352 268') +
+    P('M90 285 C90 170 310 170 310 285 Z') +
+    E(200, 238, 42, 30) + E(138, 258, 26, 20) + E(262, 258, 26, 20) + E(160, 205, 24, 17, -20) + E(240, 205, 24, 17, 20) + E(200, 190, 20, 12) +
+    RT(84, 280, 232, 16, 8)
+  },
+  { id: 'vissen', naam: 'Vissen in de zee', cat: 'dieren', teken: () =>
+    BG() + P('M0 360 Q100 345 200 360 T400 360 L400 400 L0 400 Z') + lint(40, 250, 360, 26, 10, 60) + lint(360, 230, 360, 28, 12, 70) +
+    P('M300 200 L370 140 L360 200 L370 260 Z') + P('M170 138 C200 100 250 110 262 142 Z') + P('M180 262 C200 295 240 290 250 258 Z') +
+    P('M90 200 C140 120 270 120 310 200 C270 280 140 280 90 200 Z') +
+    P('M170 138 C158 170 158 230 170 262 L195 266 C183 230 183 170 195 134 Z') + P('M235 136 C223 170 223 230 235 264 L258 256 C247 225 247 175 258 144 Z') +
+    C(130, 190, 14) + C(127, 187, 6) + L('M100 212 Q112 220 122 214') +
+    vis(90, 70, 1) + vis(320, 320, 0.9, true) + C(70, 150, 8) + C(60, 125, 6) + C(80, 105, 5) + C(330, 90, 7) + C(345, 70, 5)
+  },
+  { id: 'dolfijn', naam: 'Dolfijn', cat: 'dieren', teken: () =>
+    BG() + C(320, 70, 36) + wolk(20, 80, 100) +
+    golfBand(300, 100, 18, 4) + golfBand(340, 60, 14, 5) +
+    P('M85 330 L55 300 L95 305 Z') + P('M85 330 L60 350 L100 340 Z') +
+    P('M195 150 L215 95 L240 160 Z') +
+    P('M80 320 C100 220 190 140 290 150 C320 153 340 165 350 178 C338 185 322 184 310 182 C300 200 280 205 260 200 C200 200 140 250 105 330 Z') +
+    P('M170 230 L150 270 L195 245 Z') + C(300, 168, 6) + L('M318 184 Q330 192 342 186') + P('M140 262 C170 215 220 190 260 198 C215 212 175 240 150 280 Z')
+  },
+  { id: 'kwal', naam: 'Kwal', cat: 'dieren', teken: () => {
+    let s = BG() + P('M0 370 Q200 350 400 370 L400 400 L0 400 Z') + C(60, 80, 10) + C(340, 110, 12) + C(80, 300, 8) + C(330, 290, 9) + vis(80, 200, 0.8) + vis(330, 200, 0.8, true);
+    [125, 158, 190, 222, 254, 284].forEach((x, i) => { s += lint(x, 200, 350 - (i % 2) * 30, 18, 9, 55 + i * 5); });
+    return s + P('M100 205 C100 90 300 90 300 205 C282 218 262 200 245 214 C228 200 212 216 200 206 C188 216 172 200 155 214 C138 200 118 218 100 205 Z') +
+      gezicht(200, 160, 22) + C(150, 120, 10) + C(250, 125, 8);
+  }},
+  { id: 'octopus', naam: 'Octopus', cat: 'dieren', teken: () => {
+    let s = BG() + P('M0 365 Q200 345 400 365 L400 400 L0 400 Z') + C(50, 60, 10) + C(70, 30, 7) + C(350, 50, 9) + ster(60, 330, 18, 8);
+    [[95, -1], [140, -1], [180, 1], [220, -1], [260, 1], [305, 1]].forEach((t, i) => {
+      const x = t[0], k = t[1];
+      s += P(`M${x - 14} 210 C${x - 14 + k * 10} 260 ${x - 30 * k} 300 ${x + 20 * k} 330 C${x + 45 * k} 345 ${x + 50 * k} 320 ${x + 35 * k} 310 C${x + 30 * k} 325 ${x + 15 * k} 325 ${x + 10 * k} 310 C${x - 5 * k} 290 ${x + 14} 255 ${x + 14} 210 Z`);
+    });
+    return s + P('M110 215 C80 60 320 60 290 215 Z') + gezicht(200, 165, 26) + C(150, 110, 10) + C(250, 110, 8) + C(270, 140, 6);
+  }},
+  { id: 'egel', naam: 'Egel', cat: 'dieren', teken: () => {
+    let d = '';
+    for (let i = 0; i <= 26; i++) { const a = -90 + i * 180 / 26, r = i % 2 ? 118 : 96, p = pol(215, 300, a, r); d += (i ? 'L' : 'M') + p[0] + ' ' + p[1] + ' '; }
+    return BG() + grond(345) + blaadje(40, 340, -20) + blaadje(360, 340, 20) + hoekSterren() +
+      P(d + 'Z') + E(222, 305, 88, 55) +
+      P('M60 300 C60 250 110 225 150 238 L165 310 C120 322 70 318 60 300 Z') + C(58, 298, 9) + C(105, 268, 7) + C(107, 265, 2.5) + E(118, 292, 9, 6) +
+      E(150, 345, 16, 8) + E(260, 345, 16, 8) +
+      C(240, 190, 26) + P('M240 164 Q244 150 254 146 L256 152 Q248 156 246 166 Z') + E(262, 160, 12, 6, -30);
+  }},
+  { id: 'lieveheersbeestje', naam: 'Lieveheersbeestje', cat: 'dieren', teken: () =>
+    BG() + P('M40 330 C60 180 220 60 370 60 C360 220 220 350 40 330 Z') + L('M60 315 C150 250 250 160 350 80 M150 250 L130 190 M200 205 L260 215 M250 160 L230 110') +
+    L('M175 115 Q160 80 140 75 M225 115 Q240 80 260 75') + C(140, 75, 7) + C(260, 75, 7) +
+    P('M150 140 C150 100 250 100 250 140 Z') +
+    P('M200 140 C140 140 100 180 100 230 C100 290 150 320 200 320 Z') + P('M200 140 C260 140 300 180 300 230 C300 290 250 320 200 320 Z') +
+    C(150, 190, 16) + C(135, 250, 14) + C(170, 290, 12) + C(250, 190, 16) + C(265, 250, 14) + C(230, 290, 12) + C(200, 160, 10) +
+    C(185, 122, 5) + C(215, 122, 5)
+  },
+  { id: 'bij', naam: 'Bij', cat: 'dieren', teken: () =>
+    BG() + bloem(60, 340, 28) + bloem(330, 340, 24) + bloem(200, 360, 18) + hoekSterren() + L('M300 120 q20 -20 40 0 t40 0') +
+    E(185, 135, 38, 55, -25) + E(245, 135, 38, 55, 25) +
+    P('M300 220 L330 212 L300 238 Z') +
+    E(210, 225, 95, 65) + ellipsStreep(210, 225, 95, 65, 175, 205) + ellipsStreep(210, 225, 95, 65, 230, 258) +
+    L('M100 170 Q90 130 70 120 M130 168 Q130 125 118 108') + C(70, 120, 7) + C(118, 108, 7) +
+    C(120, 218, 50) + gezicht(120, 212, 16)
+  },
+  { id: 'slak', naam: 'Slak', cat: 'dieren', teken: () =>
+    BG() + grond(345) + hoekSterren() + RT(320, 290, 18, 40, 6) + P('M290 295 C290 250 370 250 370 295 Z') + C(315, 278, 6) + C(342, 272, 7) +
+    P('M50 330 C50 280 80 255 115 262 L140 320 L320 322 C335 330 330 342 310 342 L70 342 C58 342 50 338 50 330 Z') +
+    L('M78 262 L70 215 M100 258 L104 212') + C(70, 213, 7) + C(104, 210, 7) + gezicht(88, 292, 12) +
+    C(215, 235, 88) + C(222, 240, 62) + C(228, 244, 38) + C(232, 247, 16)
+  },
+  { id: 'hamster', naam: 'Hamster', cat: 'dieren', teken: () =>
+    BG() + P('M0 350 L400 350 L400 400 L0 400 Z') + hoekSterren() + E(60, 350, 30, 10) + E(340, 352, 26, 9) +
+    C(135, 160, 22) + C(265, 160, 22) + C(135, 160, 12) + C(265, 160, 12) +
+    E(200, 255, 112, 98) + E(200, 285, 66, 55) +
+    E(150, 345, 24, 11) + E(250, 345, 24, 11) +
+    gezicht(200, 220, 26) + E(200, 238, 8, 5) +
+    E(200, 282, 14, 22) + E(178, 290, 14, 11) + E(222, 290, 14, 11)
+  },
+  { id: 'flamingo', naam: 'Flamingo', cat: 'dieren', teken: () =>
+    BG() + C(80, 70, 34) + E(200, 365, 170, 28) + RT(330, 250, 6, 110, 3) + RT(345, 270, 6, 90, 3) + E(333, 250, 7, 18) + E(348, 270, 7, 18) +
+    RT(222, 225, 7, 140, 3) + P('M232 228 L240 285 L210 300 L208 292 L232 282 L226 230 Z') + P('M214 362 L238 362 L240 368 L212 368 Z') +
+    E(240, 195, 72, 45, -10) + P('M225 175 C255 165 290 180 300 205 C280 200 255 205 235 210 Z') + P('M300 180 L330 170 L318 200 Z') +
+    P('M180 185 C150 155 140 110 160 80 C170 65 192 62 200 75 L188 84 C178 78 170 90 166 100 C158 125 174 155 196 172 Z') +
+    C(188, 72, 20) + P('M200 70 C220 66 228 78 222 92 L214 86 C216 80 212 78 206 80 Z') + C(184, 68, 4)
+  },
+  { id: 'pony', naam: 'Pony', cat: 'dieren', teken: () =>
+    BG() + grond(350) + wolk(250, 80, 110) + hoekSterren() + bloem(60, 350, 16) +
+    RT(240, 270, 22, 80, 8) + RT(290, 265, 22, 82, 8) +
+    P('M300 215 C350 210 370 260 350 310 C340 280 325 255 300 245 Z') +
+    E(245, 240, 82, 52) +
+    RT(185, 270, 22, 80, 8) + RT(215, 275, 22, 75, 8) + RT(183, 342, 26, 14, 4) + RT(213, 342, 26, 14, 4) + RT(238, 342, 26, 14, 4) + RT(288, 342, 26, 14, 4) +
+    P('M150 150 L200 140 L215 230 L180 245 Z') +
+    E(130, 150, 36, 48, -55) + E(98, 175, 22, 18, -20) + E(92, 172, 3, 2.5) + C(128, 138, 7) + C(130, 135, 2.5) +
+    P('M140 108 L150 80 L162 110 Z') +
+    P('M150 110 C175 100 190 120 185 140 C205 150 215 175 205 200 C220 215 220 240 212 250 C200 230 190 200 180 185 C175 165 160 130 150 110 Z') +
+    hart(245, 222, 30)
+  },
+  { id: 'koala', naam: 'Koala', cat: 'dieren', teken: () =>
+    BG() + hoekSterren() +
+    P('M0 270 C120 255 280 255 400 275 L400 300 C280 282 120 282 0 296 Z') + E(40, 250, 24, 10, -20) + E(360, 250, 24, 10, 20) + E(80, 300, 22, 9, 20) + E(330, 305, 22, 9, -20) +
+    E(200, 300, 64, 66) + E(200, 310, 38, 42) +
+    E(150, 280, 22, 34, 45) + E(250, 280, 22, 34, -45) +
+    C(122, 130, 40) + C(278, 130, 40) + C(122, 130, 24) + C(278, 130, 24) +
+    E(200, 168, 78, 66) + E(200, 182, 19, 25) + C(168, 158, 8) + C(232, 158, 8) + C(170, 155, 3) + C(234, 155, 3) + L('M190 214 Q200 222 210 214') +
+    E(155, 190, 10, 6) + E(245, 190, 10, 6)
+  },
+
+  // ─────────── K-POP & MUZIEK ───────────
+  { id: 'microfoon', naam: 'Microfoon', cat: 'kpop', teken: () =>
+    BG() + hoekSterren() + hart(70, 90, 40) + hart(330, 110, 36) + noot(70, 280) + noot(320, 300) + ster(80, 200, 12, 5) + ster(325, 210, 12, 5) +
+    E(200, 360, 72, 16) + RT(193, 262, 14, 98, 4) +
+    P('M168 170 L232 170 L215 268 L185 268 Z') + RT(154, 150, 92, 22, 8) +
+    RT(160, 45, 80, 115, 40) + L('M160 80 L240 80 M160 105 L240 105 M160 130 L240 130 M182 48 L182 158 M200 45 L200 160 M218 48 L218 158') +
+    hart(200, 188, 36)
+  },
+  { id: 'gitaar', naam: 'Elektrische gitaar', cat: 'kpop', teken: () =>
+    BG() + hoekSterren() + noot(60, 340) + noot(320, 90) + ster(60, 130, 14, 6) + ster(340, 300, 14, 6) + hart(310, 330, 30) +
+    '<g transform="rotate(-30 200 200)">' +
+    RT(188, 45, 24, 150, 3) + P('M183 45 L217 45 L224 12 L176 12 Z') + C(172, 20, 5) + C(172, 36, 5) + C(228, 20, 5) + C(228, 36, 5) +
+    P('M200 175 C245 175 262 205 250 235 C300 250 290 360 200 372 C110 360 100 250 150 235 C138 205 155 175 200 175 Z') +
+    RT(170, 250, 60, 14, 4) + RT(170, 280, 60, 14, 4) + RT(175, 320, 50, 10, 3) + C(245, 318, 8) + C(235, 344, 8) + hart(150, 300, 26) +
+    L('M193 20 L193 325 M198 20 L198 325 M203 20 L203 325 M208 20 L208 325') + '</g>'
+  },
+  { id: 'piano', naam: 'Keyboard', cat: 'kpop', teken: () => {
+    let s = BG() + noot(80, 110) + noot(200, 80) + noot(310, 120) + ster(40, 40, 12, 5) + ster(360, 40, 12, 5) + hart(150, 130, 26) + hart(260, 140, 24) +
+      RT(25, 170, 350, 175, 14) + RT(40, 182, 320, 26, 6) + C(60, 195, 7) + C(84, 195, 7) + RT(250, 187, 90, 16, 5);
+    for (let i = 0; i < 10; i++) s += RT(40 + i * 32, 215, 32, 118, 3);
+    [0, 1, 3, 4, 5, 7, 8].forEach(i => { s += RT(40 + i * 32 + 22, 215, 20, 72, 3); });
+    return s + RT(70, 350, 22, 40) + RT(308, 350, 22, 40);
+  }},
+  { id: 'cassette', naam: 'Cassettebandje', cat: 'kpop', teken: () =>
+    BG() + hoekSterren() + hart(50, 340, 34) + hart(350, 340, 30) + noot(90, 380) +
+    RT(55, 100, 290, 190, 18) + C(75, 120, 5) + C(325, 120, 5) + C(75, 270, 5) + C(325, 270, 5) +
+    RT(85, 118, 230, 70, 8) + '<text x="200" y="165" text-anchor="middle" class="dt" font-family="Pacifico, cursive" font-size="30">My Mix</text>' +
+    RT(125, 200, 150, 50, 24) + C(165, 225, 18) + C(235, 225, 18) + ster(165, 225, 10, 5) + ster(235, 225, 10, 5) +
+    P('M120 290 L140 258 L260 258 L280 290 Z') + C(165, 275, 6) + C(235, 275, 6)
+  },
+  { id: 'platenspeler', naam: 'Platenspeler', cat: 'kpop', teken: () =>
+    BG() + noot(60, 80) + noot(310, 60) + ster(200, 50, 14, 6) + hart(130, 60, 26) + hart(360, 110, 24) +
+    RT(40, 130, 320, 210, 18) + RT(40, 320, 320, 30, 10) +
+    C(170, 235, 92) + D('circle cx="170" cy="235" r="75"') + D('circle cx="170" cy="235" r="58"') + C(170, 235, 32) + hart(170, 216, 30) +
+    C(305, 165, 16) + P('M300 170 L310 170 L300 270 L270 300 L262 292 L290 265 Z') + RT(255, 288, 22, 14, 3, 45) +
+    C(300, 300, 9) + C(330, 300, 9) + RT(285, 200, 50, 12, 6)
+  },
+  { id: 'concertkaartje', naam: 'Concertkaartje', cat: 'kpop', teken: () =>
+    BG() + hoekSterren() + hart(60, 360, 30) + hart(340, 360, 30) + ster(200, 370, 14, 6) +
+    '<g transform="rotate(8 200 200)">' + P('M60 70 L360 70 L360 125 A14 14 0 0 0 360 153 L360 210 L60 210 L60 153 A14 14 0 0 0 60 125 Z') + '</g>' +
+    P('M40 130 L360 130 L360 195 A15 15 0 0 0 360 225 L360 290 L40 290 L40 225 A15 15 0 0 0 40 195 Z') +
+    L('M280 140 L280 150 M280 160 L280 170 M280 180 L280 190 M280 200 L280 210 M280 220 L280 230 M280 240 L280 250 M280 260 L280 270') +
+    naamTekst('CONCERT', 160, 205, 42, 1) + ster(95, 245, 14, 6) + ster(160, 250, 18, 8) + ster(225, 245, 14, 6) +
+    naamTekst('VIP', 322, 225, 34, 0) + hart(322, 150, 30)
+  },
+  { id: 'photocards', naam: 'Fotokaartjes', cat: 'kpop', teken: () =>
+    BG() + ster(200, 200, 18, 8) +
+    RT(55, 30, 130, 165, 12) + RT(67, 42, 106, 141, 8) + hart(120, 80, 60) +
+    RT(215, 30, 130, 165, 12) + RT(227, 42, 106, 141, 8) + ster(280, 112, 42, 18) +
+    RT(55, 210, 130, 165, 12) + RT(67, 222, 106, 141, 8) + noot(110, 318) + C(160, 250, 8) +
+    RT(215, 210, 130, 165, 12) + RT(227, 222, 106, 141, 8) + E(262, 292, 22, 30, -20) + E(298, 292, 22, 30, 20) + E(280, 295, 5, 30) +
+    C(90, 175, 6) + C(310, 60, 6) + hart(310, 340, 18)
+  },
+
+  // ─────────── MEIDENDINGEN ───────────
+  { id: 'jurk', naam: 'Jurkje', cat: 'meiden', teken: () =>
+    BG() + hoekSterren() + hart(50, 250, 30) + hart(350, 250, 30) +
+    L('M200 20 Q215 20 215 32 Q215 44 200 48') + P('M200 48 L110 90 L118 96 L200 60 L282 96 L290 90 Z') +
+    P('M160 90 L240 90 L250 190 L150 190 Z') + P('M160 90 L150 70 L178 88 Z') + P('M240 90 L250 70 L222 88 Z') +
+    P('M150 190 L250 190 L320 340 L80 340 Z') +
+    glazuur(80, 330, 240, 14, 10) +
+    P('M200 190 L170 175 L170 205 Z') + P('M200 190 L230 175 L230 205 Z') + C(200, 190, 8) +
+    C(160, 250, 8) + C(210, 240, 8) + C(250, 270, 8) + C(140, 300, 8) + C(195, 290, 8) + C(270, 310, 8) + C(230, 320, 7)
+  },
+  { id: 'handtas', naam: 'Handtas', cat: 'meiden', teken: () =>
+    BG() + hoekSterren() + ster(60, 330, 12, 5) + ster(340, 330, 12, 5) +
+    P('M120 160 A80 80 0 0 1 280 160 L262 160 A62 62 0 0 0 138 160 Z') +
+    P('M80 160 L320 160 L345 340 L55 340 Z') + P('M80 160 L320 160 L310 250 Q200 280 90 250 Z') +
+    C(200, 262, 14) + C(200, 262, 6) + L('M200 276 L200 300') + hart(200, 298, 36) +
+    L('M70 190 L330 190')
+  },
+  { id: 'zonnebril', naam: 'Hartjes zonnebril', cat: 'meiden', teken: () =>
+    BG() + C(200, 60, 36) + ster(40, 40, 12, 5) + ster(360, 40, 12, 5) + golfBand(320, 80, 12, 4) +
+    P('M30 170 L60 150 L66 158 L40 178 Z') + P('M370 170 L340 150 L334 158 L360 178 Z') +
+    hartRot(118, 200, 150, -8) + hartRot(282, 200, 150, 8) + hartRot(112, 190, 90, -8) + hartRot(288, 190, 90, 8) +
+    P('M175 160 Q200 145 225 160 L222 172 Q200 160 178 172 Z') + L('M85 165 L110 145 M250 165 L275 145')
+  },
+  { id: 'rugzak', naam: 'Rugzak', cat: 'meiden', teken: () =>
+    BG() + hoekSterren() + hart(50, 300, 30) + ster(350, 310, 14, 6) +
+    P('M170 90 C170 50 230 50 230 90 L218 90 C218 65 182 65 182 90 Z') +
+    RT(95, 85, 30, 200, 14) + RT(275, 85, 30, 200, 14) +
+    RT(110, 85, 180, 270, 55) + P('M110 150 C110 110 150 85 200 85 C250 85 290 110 290 150 L290 175 Q200 200 110 175 Z') +
+    RT(135, 235, 130, 100, 22) + L('M140 260 L260 260') + RT(190, 252, 20, 10, 4) +
+    hart(160, 200, 26) + ster(240, 210, 14, 6) + C(290, 305, 10) + L('M290 295 L290 280')
+  },
+  { id: 'telefoon', naam: 'Telefoon met stickers', cat: 'meiden', teken: () => {
+    let s = BG() + hoekSterren() + hart(55, 330, 36) + ster(345, 330, 16, 7) + hart(345, 180, 26) + ster(55, 180, 14, 6) +
+      RT(115, 30, 170, 340, 28) + RT(128, 56, 144, 280, 14) + C(200, 44, 5) + RT(170, 348, 60, 8, 4);
+    for (let r = 0; r < 4; r++) for (let k = 0; k < 3; k++) s += RT(142 + k * 44, 76 + r * 50, 30, 30, 8);
+    return s + hart(162, 83, 16) + ster(201, 91, 10, 4) + noot(236, 102) + C(157, 141, 8) + RT(137, 290, 126, 32, 12);
+  }},
+  { id: 'makeup', naam: 'Make-up palet', cat: 'meiden', teken: () => {
+    let s = BG() + hoekSterren() + hart(200, 330, 40) +
+      RT(40, 70, 320, 200, 20) + RT(56, 86, 288, 168, 12);
+    for (let r = 0; r < 3; r++) for (let k = 0; k < 5; k++) s += C(90 + k * 55, 118 + r * 52, 20);
+    return s + RT(60, 300, 110, 14, 7, -20) + P('M168 285 C185 268 205 270 210 280 C200 292 185 300 170 300 Z') +
+      RT(270, 290, 34, 60, 5) + RT(276, 262, 22, 30, 3) + P('M278 262 L278 240 L296 228 L296 262 Z');
+  }},
+  { id: 'haarstrik', naam: 'Haarstrik & speldjes', cat: 'meiden', teken: () =>
+    BG() + hoekSterren() +
+    P('M200 130 C150 70 70 70 75 140 C80 200 150 190 200 150 Z') + P('M200 130 C250 70 330 70 325 140 C320 200 250 190 200 150 Z') +
+    P('M185 150 L150 240 L175 232 L190 252 L200 158 Z') + P('M215 150 L250 240 L225 232 L210 252 L200 158 Z') + E(200, 140, 22, 26) +
+    RT(40, 270, 120, 26, 12) + hart(80, 272, 22) + ster(125, 283, 10, 4) +
+    RT(240, 270, 120, 26, 12) + C(270, 283, 8) + C(300, 283, 8) + C(330, 283, 8) +
+    blob(110, 350, 36, 4, 12) + C(110, 350, 16) + RT(220, 325, 140, 22, 6) + L('M232 347 L232 370 M246 347 L246 370 M260 347 L260 370 M274 347 L274 370 M288 347 L288 370 M302 347 L302 370 M316 347 L316 370 M330 347 L330 370 M344 347 L344 370')
+  },
+  { id: 'parfum', naam: 'Parfumflesje', cat: 'meiden', teken: () =>
+    BG() + hoekSterren() + ster(60, 200, 16, 7) + ster(345, 200, 14, 6) + ster(90, 300, 10, 4) + ster(320, 310, 10, 4) +
+    P('M150 60 L250 60 L270 90 L200 120 L130 90 Z') + L('M130 90 L270 90 M170 60 L185 90 L200 120 M230 60 L215 90 L200 120') +
+    RT(180, 120, 40, 36, 4) +
+    hart(200, 150, 210) + hart(200, 200, 110) + RT(165, 255, 70, 22, 6)
+  },
+  { id: 'sieraden', naam: 'Sieradendoosje', cat: 'meiden', teken: () => {
+    let s = BG() + hoekSterren() + ster(200, 50, 14, 6) +
+      P('M90 200 L310 200 L340 110 L120 110 Z') + P('M100 190 L302 190 L325 122 L128 122 Z') +
+      RT(80, 200, 240, 140, 12) + RT(95, 210, 210, 40, 10) + RT(180, 270, 40, 22, 6);
+    for (let i = 0; i < 11; i++) { const x = 105 + i * 16, y = 215 + Math.sin(i / 10 * Math.PI) * 60; s += C(x, f(y + 40), 7); }
+    return s + hart(200, 305, 34) + C(60, 330, 22) + C(60, 330, 13) + ster5n(60, 304, 12, 6, 4) + C(345, 330, 20) + C(345, 330, 12) + C(345, 306, 8);
+  }},
+
+  // ─────────── LEKKER ETEN ───────────
+  { id: 'donut', naam: 'Donut', cat: 'eten', teken: () => {
+    let s = BG() + hoekSterren() + hart(40, 330, 30) + hart(360, 330, 30) + C(200, 205, 150) + blob(200, 200, 128, 8, 9) + C(200, 200, 42);
+    [[120,120,30],[160,95,-20],[240,95,40],[285,130,-30],[300,200,70],[280,265,20],[230,295,-40],[160,295,30],[110,260,-10],[95,190,60],[150,160,10],[250,160,-50],[250,240,30],[150,240,-60]].forEach(p => {
+      s += RT(p[0] - 9, p[1] - 3, 18, 6, 3, p[2]);
+    });
+    return s + gezicht(200, 250, 18, true);
+  }},
+  { id: 'ijsje', naam: 'IJsje', cat: 'eten', teken: () =>
+    BG() + hoekSterren() + hart(60, 300, 30) + hart(340, 300, 30) + ster(60, 150, 12, 5) + ster(340, 150, 12, 5) +
+    '<defs><clipPath id="kp-hoorn"><path d="M135 230 L265 230 L200 385 Z"/></clipPath></defs>' +
+    P('M135 230 L265 230 L200 385 Z') +
+    '<g clip-path="url(#kp-hoorn)">' + L('M120 250 L250 380 M120 290 L230 400 M150 230 L270 350 M190 230 L280 320 M280 250 L150 380 M280 290 L170 400 M250 230 L130 350 M210 230 L120 320') + '</g>' +
+    C(200, 132, 55) + C(200, 70, 18) + L('M200 52 Q205 36 218 30') +
+    P('M125 220 C110 180 150 160 200 165 C250 160 290 180 275 220 C262 240 250 222 240 240 C228 225 215 245 200 232 C185 245 170 225 160 240 C150 222 138 240 125 220 Z') +
+    gezicht(200, 195, 16, true)
+  },
+  { id: 'pizza', naam: 'Pizzapunt', cat: 'eten', teken: () =>
+    BG() + hoekSterren() + ster(60, 330, 12, 5) + ster(340, 330, 12, 5) +
+    P('M200 375 L80 95 C160 65 240 65 320 95 Z') + P('M80 95 C160 65 240 65 320 95 L306 128 C230 102 170 102 94 128 Z') +
+    P('M112 170 C140 190 150 220 170 225 C185 250 175 280 200 300 C220 270 215 240 235 225 C260 215 265 190 290 170 C240 150 160 150 112 170 Z') +
+    C(160, 170, 18) + C(240, 175, 18) + C(200, 235, 16) + C(175, 280, 10) + C(215, 205, 7) + C(150, 215, 6) + C(250, 215, 6)
+  },
+  { id: 'watermeloen', naam: 'Watermeloen', cat: 'eten', teken: () =>
+    BG() + hoekSterren() + C(340, 90, 30) +
+    P('M30 180 A170 170 0 0 0 370 180 Z') + P('M50 180 A150 150 0 0 0 350 180 Z') + P('M66 180 A134 134 0 0 0 334 180 Z') +
+    E(120, 215, 5, 9, -30) + E(160, 240, 5, 9, -15) + E(240, 240, 5, 9, 15) + E(280, 215, 5, 9, 30) + E(200, 280, 5, 9) + E(140, 275, 5, 9, -20) + E(260, 275, 5, 9, 20) +
+    gezicht(200, 215, 18, true) +
+    P('M60 380 L110 300 L160 380 Z') + P('M72 380 L110 318 L148 380 Z') + P('M290 380 A60 60 0 0 1 390 380 Z')
+  },
+  { id: 'aardbei', naam: 'Aardbei', cat: 'eten', teken: () => {
+    let s = BG() + hoekSterren() + hart(50, 320, 28) + hart(350, 320, 28) +
+      P('M200 370 C120 330 70 250 90 170 C105 120 160 115 200 130 C240 115 295 120 310 170 C330 250 280 330 200 370 Z');
+    [[140,170],[190,160],[240,165],[275,200],[120,215],[165,215],[235,220],[140,265],[200,250],[260,260],[175,305],[225,305],[200,340]].forEach(p => { s += E(p[0], p[1], 4, 7); });
+    return s + P('M200 130 L150 95 L175 125 L130 125 L175 140 L200 150 L225 140 L270 125 L225 125 L250 95 Z') + RT(193, 70, 14, 40, 5) +
+      gezicht(200, 205, 22, true);
+  }},
+  { id: 'macarons', naam: 'Macarons', cat: 'eten', teken: () => {
+    const mac = (x, y, w) => RT(x, y + 36, w, 26, 13) + RT(x + 6, y + 26, w - 12, 14, 5) + RT(x, y, w, 30, 15);
+    return BG() + hoekSterren() + E(200, 360, 170, 20) +
+      mac(100, 270, 200) + mac(115, 190, 170) + mac(135, 110, 130) + mac(160, 40, 80) +
+      ster(60, 200, 14, 6) + ster(340, 200, 14, 6) + hart(60, 280, 26) + hart(340, 280, 26);
+  }},
+  { id: 'pannenkoeken', naam: 'Pannenkoeken', cat: 'eten', teken: () =>
+    BG() + hoekSterren() + E(200, 350, 175, 32) + E(200, 345, 140, 22) +
+    E(200, 320, 130, 26) + E(200, 290, 130, 26) + E(200, 260, 130, 26) + E(200, 230, 130, 26) +
+    P('M90 222 C120 205 280 205 310 222 C312 240 298 250 290 262 C282 250 280 238 270 236 C260 240 262 275 250 280 C240 270 245 245 230 240 C210 240 180 245 160 240 C150 245 152 270 140 272 C130 262 140 240 120 238 C110 245 100 250 92 240 Z') +
+    RT(180, 195, 40, 24, 5) + hart(120, 150, 40) + hart(270, 140, 36) + E(120, 140, 8, 4) + E(270, 131, 8, 4)
+  },
+  { id: 'sushi', naam: 'Sushi', cat: 'eten', teken: () =>
+    BG() + hoekSterren() + RT(40, 320, 320, 22, 8) +
+    C(115, 230, 70) + C(115, 230, 55) + C(115, 230, 26) + gezicht(115, 262, 10, false) +
+    RT(210, 225, 150, 70, 30) + P('M205 235 C215 190 355 190 365 235 C355 245 215 245 205 235 Z') + RT(270, 210, 20, 90, 4) + gezicht(285, 265, 10, true) +
+    RT(40, 80, 280, 12, 6, -8) + RT(60, 110, 280, 12, 6, -8)
+  },
+  { id: 'popcorn', naam: 'Popcorn', cat: 'eten', teken: () => {
+    let s = BG() + hoekSterren() + ster(50, 300, 12, 5) + ster(350, 300, 12, 5);
+    const r = rng(5);
+    for (let i = 0; i < 18; i++) { const x = 120 + r() * 160, y = 75 + r() * 80; s += blob(f(x), f(y), f(20 + r() * 8), 4, 5, r() * 6); }
+    for (let i = 0; i < 6; i++) {
+      const t0 = 105 + i * 190 / 6, t1 = t0 + 190 / 6, b0 = f(140 + i * 120 / 6), b1 = f(140 + (i + 1) * 120 / 6);
+      s += P(`M${f(t0)} 150 L${f(t1)} 150 L${b1} 370 L${b0} 370 Z`);
+    }
+    return s + RT(95, 140, 210, 22, 8) + ster(200, 260, 34, 15) + blob(60, 360, 18, 3, 5) + blob(340, 365, 18, 3, 5);
+  }},
+  { id: 'lolly', naam: 'Lolly', cat: 'eten', teken: () => {
+    let s = BG() + hoekSterren() + hart(60, 320, 30) + hart(340, 320, 30) + RT(190, 280, 20, 110, 6);
+    const cx = 200, cy = 170, r = 120, n = 8;
+    for (let i = 0; i < n; i++) {
+      const a0 = i * 360 / n, a1 = a0 + 360 / n, p0 = pol(cx, cy, a0, r), p1 = pol(cx, cy, a1, r), c0 = pol(cx, cy, a0 - 50, r * 0.6), c1 = pol(cx, cy, a1 - 50, r * 0.6);
+      s += P(`M${cx} ${cy} Q${c0[0]} ${c0[1]} ${p0[0]} ${p0[1]} A${r} ${r} 0 0 1 ${p1[0]} ${p1[1]} Q${c1[0]} ${c1[1]} ${cx} ${cy} Z`);
+    }
+    return s + P('M200 300 L165 280 L165 322 Z') + P('M200 300 L235 280 L235 322 Z') + C(200, 300, 8);
+  }},
+  { id: 'milkshake', naam: 'Milkshake', cat: 'eten', teken: () =>
+    BG() + hoekSterren() + ster(60, 250, 12, 5) + ster(340, 250, 12, 5) +
+    RT(215, 20, 16, 120, 6, 15) +
+    P('M120 150 L280 150 L250 370 L150 370 Z') + P('M126 190 L274 190 L268 235 L132 235 Z') + P('M137 280 L263 280 L257 325 L143 325 Z') +
+    blob(160, 140, 30, 3, 6) + blob(240, 140, 30, 3, 6) + blob(200, 115, 34, 3, 6) + C(200, 70, 16) + L('M200 54 Q206 38 220 34') +
+    hart(200, 240, 34)
+  },
+  { id: 'ijslolly', naam: 'IJslolly', cat: 'eten', teken: () =>
+    BG() + hoekSterren() + C(340, 330, 26) + ster(60, 330, 14, 6) +
+    RT(115, 270, 26, 90, 10) + P('M78 280 L78 110 C78 50 178 50 178 110 L178 280 C160 290 150 272 140 290 C128 272 110 292 98 278 C92 285 84 285 78 280 Z') +
+    P('M78 200 L178 170 L178 230 L78 260 Z') + gezicht(128, 130, 14, true) +
+    RT(260, 270, 26, 90, 10) + P('M222 280 L222 110 C222 50 322 50 322 110 L322 280 Z') +
+    P('M222 110 C222 50 322 50 322 110 L322 140 L222 140 Z') + P('M222 190 L322 190 L322 230 L222 230 Z') + P('M300 60 C320 70 322 90 316 96 C305 95 295 80 300 60 Z')
+  },
+
+  // ─────────── NATUUR & FANTASIE ───────────
+  { id: 'kasteel', naam: 'Kasteel', cat: 'natuur', teken: () =>
+    BG() + wolk(20, 90, 90) + wolk(290, 70, 90) + grond(360) +
+    RT(40, 150, 70, 210) + P('M30 150 L75 70 L120 150 Z') + RT(290, 150, 70, 210) + P('M280 150 L325 70 L370 150 Z') +
+    RT(74, 30, 3, 42) + P('M77 30 L100 38 L77 46 Z') + RT(324, 30, 3, 42) + P('M327 30 L350 38 L327 46 Z') +
+    RT(110, 200, 180, 160) + RT(110, 186, 22, 18) + RT(146, 186, 22, 18) + RT(182, 186, 22, 18) + RT(218, 186, 22, 18) + RT(254, 186, 22, 18) +
+    RT(160, 120, 80, 80) + P('M150 120 L200 50 L250 120 Z') + RT(199, 20, 3, 34) + P('M202 20 L222 27 L202 34 Z') +
+    P('M170 360 L170 300 A30 30 0 0 1 230 300 L230 360 Z') + C(200, 160, 16) +
+    RT(60, 200, 30, 40, 14) + RT(310, 200, 30, 40, 14) + hart(200, 230, 34)
+  },
+  { id: 'paddenstoel', naam: 'Paddenstoelhuisje', cat: 'natuur', teken: () =>
+    BG() + grond(355) + bloem(50, 350, 18) + bloem(350, 355, 18) + hoekSterren() +
+    RT(135, 200, 130, 160, 30) + P('M180 360 L180 300 A20 20 0 0 1 220 300 L220 360 Z') + C(212, 330, 3) +
+    C(160, 250, 14) + C(240, 250, 14) +
+    P('M50 215 C50 90 350 90 350 215 C300 232 100 232 50 215 Z') + C(120, 170, 20) + C(200, 130, 24) + C(280, 170, 20) + C(160, 205, 10) + C(245, 205, 10) +
+    C(150, 375, 10) + C(175, 385, 9) + C(200, 378, 10)
+  },
+  { id: 'zeemeermin', naam: 'Zeemeermin', cat: 'natuur', teken: () =>
+    BG() + P('M0 370 Q200 350 400 370 L400 400 L0 400 Z') + C(60, 60, 10) + C(80, 30, 7) + C(340, 50, 9) + vis(330, 130, 0.9, true) + ster(60, 330, 20, 9) + lint(360, 250, 370, 26, 8, 60) +
+    P('M90 370 C80 320 120 300 200 305 C290 300 330 330 320 370 Z') +
+    P('M168 235 C160 290 190 330 250 338 C280 342 300 330 305 320 L300 350 C270 365 180 360 150 300 C140 270 145 250 150 235 Z') +
+    P('M300 320 C320 290 350 290 360 300 C345 310 335 320 330 332 C345 335 360 345 360 360 C340 358 320 350 303 344 Z') +
+    L('M170 260 q10 8 20 0 M178 285 q10 8 20 0 M195 305 q10 8 20 0 M220 322 q10 8 20 0') +
+    P('M150 85 C145 35 250 35 245 85 L262 200 C240 208 160 208 138 200 Z') +
+    RT(190, 120, 20, 22) + P('M168 138 L232 138 L240 200 L160 200 Z') + P('M160 200 L240 200 L245 240 L150 240 Z') +
+    P('M168 150 L140 200 L152 206 L176 162 Z') + P('M232 150 L260 200 L248 206 L224 162 Z') + C(146, 205, 8) + C(254, 205, 8) +
+    E(200, 90, 34, 40) + P('M166 86 C168 48 232 48 234 86 C222 70 210 68 200 76 C190 68 178 70 166 86 Z') +
+    E(187, 95, 4.5, 6) + E(213, 95, 4.5, 6) + L('M192 112 Q200 118 208 112') + C(180, 106, 5) + C(220, 106, 5) + ster(235, 58, 12, 5) +
+    hart(200, 160, 24)
+  },
+  { id: 'zonnebloemen', naam: 'Zonnebloemen', cat: 'natuur', teken: () =>
+    BG() + C(360, 40, 26) + grond(365) +
+    RT(95, 170, 12, 200, 5) + RT(197, 120, 12, 250, 5) + RT(297, 190, 12, 180, 5) +
+    E(130, 270, 30, 12, -30) + E(170, 240, 30, 12, 30) + E(230, 300, 30, 12, -30) + E(270, 290, 30, 12, 30) + E(330, 300, 28, 11, -30) + E(75, 320, 28, 11, 30) +
+    zonnebloem(101, 160, 52) + zonnebloem(203, 105, 62) + zonnebloem(303, 180, 48)
+  },
+  { id: 'molen', naam: 'Molen & tulpen', cat: 'natuur', teken: () => {
+    let s = BG() + wolk(20, 70, 90) + C(350, 50, 26) + grond(300) +
+      P('M150 290 L170 130 L230 130 L250 290 Z') + P('M160 132 C165 95 235 95 240 132 Z') + P('M185 290 L185 250 A15 15 0 0 1 215 250 L215 290 Z') + C(200, 180, 12) +
+      '<g transform="rotate(20 200 115)">' + RT(196, 5, 8, 220, 3) + RT(90, 111, 220, 8, 3) +
+      RT(204, 15, 34, 90, 2) + RT(110, 119, 90, 34, 2) + RT(162, 125, 34, 90, 2) + RT(210, 77, 90, 34, 2) + '</g>' + C(200, 115, 10);
+    [30, 75, 120, 280, 325, 370].forEach((x, i) => { s += tulp(x, 320 + (i % 2) * 15, 0.9); });
+    return s;
+  }},
+  { id: 'cactussen', naam: 'Cactussen', cat: 'natuur', teken: () =>
+    BG() + hoekSterren() + C(200, 50, 26) + RT(20, 350, 360, 30, 6) +
+    RT(60, 180, 50, 120, 25) + RT(30, 210, 30, 50, 15) + RT(38, 250, 30, 16, 8) + E(85, 175, 14, 9) + P('M50 290 L120 290 L110 350 L60 350 Z') + RT(45, 280, 80, 16, 6) +
+    RT(170, 110, 60, 190, 30) + RT(130, 160, 30, 70, 15) + RT(240, 140, 30, 80, 15) + RT(145, 215, 30, 16, 8) + RT(225, 205, 30, 16, 8) + bloem(200, 108, 18) + P('M155 290 L245 290 L235 350 L165 350 Z') + RT(148, 280, 104, 18, 6) +
+    E(320, 250, 45, 40) + E(305, 205, 20, 18) + E(340, 210, 18, 16) + P('M280 290 L360 290 L352 350 L288 350 Z') + RT(272, 280, 96, 16, 6) +
+    L('M80 200 l6 -4 M80 230 l6 -4 M80 260 l6 -4 M190 150 l6 -4 M210 190 l6 -4 M190 230 l6 -4 M210 260 l6 -4 M310 240 l6 -4 M330 260 l6 -4')
+  },
+  { id: 'boeket', naam: 'Bloemen in een vaas', cat: 'natuur', teken: () =>
+    BG() + hoekSterren() + RT(40, 360, 320, 20, 6) +
+    L('M200 250 L140 120 M200 250 L200 90 M200 250 L260 120 M200 250 L110 190 M200 250 L290 190') +
+    E(160, 190, 30, 11, -40) + E(240, 185, 30, 11, 40) + E(180, 140, 26, 10, -60) +
+    bloem(140, 115, 36) + tulp(200, 90, 1.1) + bloem(262, 115, 34) + C(110, 190, 26) + C(110, 190, 16) + C(110, 190, 7) + C(290, 190, 26) + C(290, 190, 16) + C(290, 190, 7) +
+    P('M150 250 L250 250 C260 290 280 320 250 360 L150 360 C120 320 140 290 150 250 Z') + RT(142, 240, 116, 18, 8) + hart(200, 285, 40)
+  },
+  { id: 'luchtballon', naam: 'Luchtballon', cat: 'natuur', teken: () =>
+    BG() + wolk(10, 300, 110) + wolk(280, 260, 110) + wolk(250, 380, 100) + L('M40 90 q10 -10 20 0 q10 -10 20 0 M320 60 q8 -8 16 0 q8 -8 16 0') +
+    P('M120 205 L280 205 L232 268 L168 268 Z') +
+    ellipsStreep(200, 150, 115, 120, 85, 125) + ellipsStreep(200, 150, 115, 120, 125, 162) + ellipsStreep(200, 150, 115, 120, 162, 200) +
+    ellipsStreep(200, 150, 115, 120, 200, 238) + ellipsStreep(200, 150, 115, 120, 238, 275) + ellipsStreep(200, 150, 115, 120, 275, 315) +
+    L('M170 268 L175 310 M230 268 L225 310') + RT(165, 305, 70, 50, 8) + L('M165 322 L235 322') + hart(200, 120, 44)
+  },
+  { id: 'raket', naam: 'Raket & planeten', cat: 'natuur', teken: () => {
+    let s = BG();
+    const r = rng(21);
+    for (let i = 0; i < 14; i++) s += ster(f(20 + r() * 360), f(20 + r() * 360), f(6 + r() * 6), 3);
+    return s + C(320, 90, 45) + E(320, 90, 82, 16, -15) + '<g transform="rotate(-15 320 90)">' + P('M275 90 A45 45 0 0 1 365 90 A82 16 0 0 0 275 90 Z') + '</g>' +
+      C(70, 320, 34) + C(60, 310, 8) + C(80, 335, 6) + C(330, 330, 20) +
+      P('M150 290 L120 340 L165 320 Z') + P('M250 290 L280 340 L235 320 Z') +
+      vlam(200, 380, 2.2) + vlam(200, 370, 1.3) +
+      P('M160 330 L160 170 C160 110 200 60 200 60 C200 60 240 110 240 170 L240 330 Z') +
+      P('M163 150 C170 110 200 70 200 70 C200 70 230 110 237 150 Z') +
+      C(200, 210, 26) + C(200, 210, 17) + RT(160, 280, 80, 16) + P('M195 330 L205 330 L208 355 L192 355 Z');
+  }},
+  { id: 'onderwater', naam: 'Onderwaterwereld', cat: 'natuur', teken: () =>
+    BG() + P('M0 350 Q100 330 200 350 T400 345 L400 400 L0 400 Z') +
+    lint(40, 200, 355, 28, 12, 70) + lint(80, 250, 355, 22, 10, 50) + lint(355, 190, 355, 30, 12, 80) +
+    P('M270 350 L275 290 L255 250 L265 245 L282 280 L290 230 L300 232 L296 280 L320 255 L326 262 L300 300 L298 350 Z') +
+    vis(170, 110, 1.3) + vis(270, 180, 1.1, true) + vis(130, 230, 1) + vis(320, 90, 0.8, true) +
+    ster(160, 355, 22, 10) + P('M210 370 C210 340 250 340 250 370 Z') + L('M220 368 L225 346 M230 368 L230 342 M240 368 L235 346') +
+    C(60, 60, 9) + C(75, 40, 6) + C(220, 60, 8) + C(230, 38, 5) + C(340, 250, 7)
+  },
+  { id: 'strand', naam: 'Strand', cat: 'natuur', teken: () =>
+    BG() + C(330, 60, 36) + wolk(20, 70, 90) +
+    golfBand(210, 70, 10, 5) + P('M0 270 Q200 250 400 270 L400 400 L0 400 Z') +
+    RT(118, 150, 8, 200, 3) + sector(122, 160, 0, 100, 270, 306) + sector(122, 160, 0, 100, 306, 342) + sector(122, 160, 0, 100, 342, 378) + sector(122, 160, 0, 100, 18, 54) + sector(122, 160, 0, 100, 54, 90) +
+    C(290, 330, 42) + sector(290, 330, 0, 42, 0, 60) + sector(290, 330, 0, 42, 120, 180) + sector(290, 330, 0, 42, 240, 300) + C(290, 330, 8) +
+    P('M170 320 L230 320 L222 375 L178 375 Z') + L('M175 320 Q200 290 225 320') + RT(236, 290, 8, 60, 3, 20) + P('M238 345 L262 345 L256 375 L244 375 Z') +
+    P('M40 360 C40 330 80 330 80 360 Z') + L('M50 358 L55 338 M60 358 L60 334 M70 358 L65 338') + ster(360, 380, 14, 6)
+  },
+  { id: 'sneeuwpop', naam: 'Sneeuwpop', cat: 'natuur', teken: () => {
+    let s = BG() + P('M0 350 Q200 320 400 350 L400 400 L0 400 Z');
+    [[40,50],[120,90],[330,40],[370,140],[50,200],[350,250],[80,300]].forEach(p => { s += ster5n(p[0], p[1], 12, 5, 6); });
+    return s + C(200, 290, 80) + C(200, 175, 58) + C(200, 90, 44) +
+      L('M140 170 L80 130 M95 140 L85 120 M260 170 L320 130 M305 140 L318 118') +
+      RT(150, 40, 100, 14, 5) + RT(165, 0, 70, 44, 5) + RT(165, 30, 70, 10) +
+      P('M150 125 Q200 145 250 125 L252 140 Q200 162 148 140 Z') + P('M225 138 L240 200 L218 200 L212 142 Z') +
+      C(184, 82, 5) + C(216, 82, 5) + P('M198 94 L240 104 L198 104 Z') + L('M185 112 Q200 120 215 112') +
+      C(200, 170, 7) + C(200, 195, 7) + C(200, 260, 8) + C(200, 290, 8);
+  }},
+  { id: 'pompoen', naam: 'Pompoen', cat: 'natuur', teken: () =>
+    BG() + hoekSterren() + E(200, 350, 170, 20) +
+    blaadje(60, 330, -30) + blaadje(340, 330, 30) + E(70, 340, 30, 24) + RT(66, 308, 8, 12, 3) +
+    RT(190, 110, 22, 50, 6, 10) + E(240, 125, 30, 12, 20) +
+    E(128, 250, 45, 80) + E(272, 250, 45, 80) + E(165, 250, 48, 90) + E(235, 250, 48, 90) + E(200, 250, 50, 95) +
+    gezicht(200, 250, 26, true)
+  },
+  { id: 'kerstboom', naam: 'Kerstboom', cat: 'natuur', teken: () =>
+    BG() + RT(180, 320, 40, 50) +
+    P('M200 200 L330 330 L70 330 Z') + P('M200 130 L300 250 L100 250 Z') + P('M200 60 L270 170 L130 170 Z') +
+    ster(200, 55, 30, 13) +
+    C(160, 150, 9) + C(235, 145, 8) + C(140, 230, 10) + C(200, 215, 9) + C(260, 230, 10) + C(120, 310, 10) + C(180, 290, 9) + C(240, 300, 10) + C(290, 312, 9) +
+    cadeau(40, 330, 70, 50) + cadeau(290, 330, 70, 50) +
+    ster5n(50, 60, 12, 5, 6) + ster5n(350, 70, 12, 5, 6) + ster5n(70, 200, 9, 4, 6) + ster5n(340, 200, 9, 4, 6)
+  },
+  { id: 'vuurtoren', naam: 'Vuurtoren', cat: 'natuur', teken: () =>
+    BG() + P('M165 80 L20 30 L20 130 Z') + P('M235 80 L380 30 L380 130 Z') + L('M60 180 q8 -8 16 0 q8 -8 16 0 M300 200 q8 -8 16 0 q8 -8 16 0') +
+    golfBand(320, 80, 12, 5) +
+    P('M100 350 C110 310 150 300 180 310 L230 310 C260 300 300 315 305 350 Z') +
+    P('M160 310 L172 130 L228 130 L240 310 Z') + P('M166 250 L234 250 L237 290 L163 290 Z') + P('M170 170 L230 170 L232 210 L168 210 Z') +
+    RT(155, 118, 90, 14, 4) + RT(170, 70, 60, 48, 6) + P('M162 70 L200 35 L238 70 Z') + C(200, 32, 6) + C(200, 94, 14) +
+    P('M186 310 L186 285 A14 14 0 0 1 214 285 L214 310 Z')
+  },
+
+  // ─────────── PATRONEN ───────────
+  { id: 'mandala-bloem', naam: 'Bloemenmandala', cat: 'patronen', teken: () =>
+    mandala([['p', 12, 150, 30, 48, 0], ['c', 122], ['p', 12, 118, 16, 30, 15], ['c', 100], ['t', 24, 78, 100, 0], ['c', 78], ['d', 12, 66, 7, 0], ['p', 8, 44, 14, 24, 22.5], ['c', 26], ['s', 8, 24, 11], ['c', 7]]) +
+    ster(25, 25, 14, 6) + ster(375, 25, 14, 6) + ster(25, 375, 14, 6) + ster(375, 375, 14, 6)
+  },
+  { id: 'mandala-hart', naam: 'Hartjesmandala', cat: 'patronen', teken: () =>
+    mandala([['h', 12, 150, 52, 0], ['c', 118], ['h', 12, 96, 34, 15], ['c', 72], ['p', 10, 52, 11, 20, 0], ['c', 32], ['h', 6, 18, 12, 0], ['c', 8]]) +
+    hart(25, 5, 36) + hart(375, 5, 36) + hart(25, 360, 36) + hart(375, 360, 36)
+  },
+  { id: 'mandala-ster', naam: 'Sterrenmandala', cat: 'patronen', teken: () =>
+    mandala([['s', 8, 190, 125], ['c', 118], ['s', 12, 115, 82], ['c', 78], ['d', 16, 66, 7, 0], ['p', 8, 42, 12, 22, 0], ['c', 22], ['s', 5, 20, 9]])
+  },
+  { id: 'mandala-zon', naam: 'Zonnemandala', cat: 'patronen', teken: () =>
+    mandala([['t', 32, 140, 188, 0], ['c', 140], ['d', 32, 128, 6, 0], ['c', 116], ['p', 16, 94, 12, 26, 0], ['c', 72], ['t', 16, 50, 70, 11.25], ['c', 50], ['p', 8, 30, 9, 16, 22.5], ['c', 13]])
+  },
+  { id: 'caleidoscoop', naam: 'Caleidoscoop', cat: 'patronen', teken: () =>
+    mandala([['ring', 12, 150, 195, 0], ['ring', 12, 110, 150, 15], ['ring', 12, 70, 110, 0], ['ring', 6, 30, 70, 30], ['c', 30], ['s', 6, 26, 12]]) +
+    ster(25, 25, 14, 6) + ster(375, 25, 14, 6) + ster(25, 375, 14, 6) + ster(375, 375, 14, 6)
+  },
+  { id: 'sterrenpatroon', naam: 'Sterrenpatroon', cat: 'patronen', teken: () => {
+    let s = BG(); const r = rng(3);
+    for (let y = 0; y < 5; y++) for (let x = 0; x < 5; x++) {
+      s += ster(f(40 + x * 80 + (y % 2) * 40 - 20), f(40 + y * 80), f(24 + r() * 10), f(11 + r() * 3));
+      s += C(f(80 + x * 80 + (y % 2) * 40 - 20), f(80 + y * 80), 5);
+    }
+    return s;
+  }},
+  { id: 'bloemenpatroon', naam: 'Bloemenpatroon', cat: 'patronen', teken: () => {
+    let s = BG();
+    for (let y = 0; y < 5; y++) for (let x = 0; x < 5; x++) {
+      const cx = 40 + x * 80 + (y % 2 ? 40 : 0), cy = 40 + y * 80;
+      s += blaadje(cx + 28, cy + 22, 35) + bloem(cx, cy, 30);
+    }
+    return s;
+  }},
+  { id: 'schubben', naam: 'Zeemeerminschubben', cat: 'patronen', teken: () => {
+    let s = BG();
+    for (let y = 0; y < 16; y++) for (let x = -1; x < 8; x++) s += C(f(x * 60 + (y % 2) * 30), -10 + y * 28, 32);
+    return s;
+  }},
+  { id: 'honingraat', naam: 'Honingraat', cat: 'patronen', teken: () => {
+    let s = BG(); const r = 34, w = Math.sqrt(3) * r;
+    for (let y = 0; y < 9; y++) for (let x = -1; x < 8; x++) {
+      const cx = x * w + (y % 2) * w / 2, cy = y * r * 1.5;
+      let d = '';
+      for (let i = 0; i < 6; i++) { const p = pol(cx, cy, i * 60, r - 3); d += (i ? 'L' : 'M') + p[0] + ' ' + p[1] + ' '; }
+      s += P(d + 'Z');
+    }
+    return s + '';
+  }},
+  { id: 'glas-in-lood', naam: 'Glas-in-lood', cat: 'patronen', teken: () => {
+    let s = BG(); const r = rng(8), n = 6, st = 400 / n, pt = [];
+    for (let y = 0; y <= n; y++) { pt.push([]); for (let x = 0; x <= n; x++) {
+      const rand = x === 0 || x === n || y === 0 || y === n;
+      pt[y].push([f(x * st + (rand ? 0 : (r() - 0.5) * st * 0.6)), f(y * st + (rand ? 0 : (r() - 0.5) * st * 0.6))]);
+    } }
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
+      const a = pt[y][x], b = pt[y][x + 1], c = pt[y + 1][x + 1], d = pt[y + 1][x];
+      if ((x + y) % 2) { s += P(`M${a[0]} ${a[1]} L${b[0]} ${b[1]} L${c[0]} ${c[1]} Z`) + P(`M${a[0]} ${a[1]} L${c[0]} ${c[1]} L${d[0]} ${d[1]} Z`); }
+      else { s += P(`M${a[0]} ${a[1]} L${b[0]} ${b[1]} L${d[0]} ${d[1]} Z`) + P(`M${b[0]} ${b[1]} L${c[0]} ${c[1]} L${d[0]} ${d[1]} Z`); }
+    }
+    return s;
+  }},
+  { id: 'bubbels', naam: 'Bubbels', cat: 'patronen', teken: () => {
+    let s = BG(); const r = rng(14), c = [];
+    for (let i = 0; i < 1500 && c.length < 70; i++) {
+      const rr = 10 + r() * 38, x = r() * 400, y = r() * 400;
+      if (c.every(q => Math.hypot(q[0] - x, q[1] - y) > q[2] + rr + 4)) c.push([f(x), f(y), f(rr)]);
+    }
+    c.forEach(q => { s += C(q[0], q[1], q[2]); if (q[2] > 24) s += C(f(q[0] - q[2] * 0.4), f(q[1] - q[2] * 0.4), f(q[2] * 0.2)); });
+    return s;
+  }}
+);
+
+
+const CATS = [
+  { id: 'alles', naam: 'Alles ✨' },
+  { id: 'naam', naam: 'Mijn naam ⭐' },
+  { id: 'dieren', naam: 'Dieren 🐱' },
+  { id: 'kpop', naam: 'K-pop & muziek 🎤' },
+  { id: 'meiden', naam: 'Meidendingen 💅' },
+  { id: 'eten', naam: 'Lekker eten 🍩' },
+  { id: 'natuur', naam: 'Natuur & fantasie 🌈' },
+  { id: 'patronen', naam: 'Patronen & vrij 🌸' },
+];
+
+// ═══════════════════════════════════════
+//  KLEUREN
+// ═══════════════════════════════════════
+const KLEUREN = [
+  '#ffe0ee','#ffb3d4','#ff7bb5','#ff3d8f','#d81b6a','#9c0f4a',
+  '#ffd6cc','#ff9a8a','#ff5a4f','#e8261f','#ffb066','#ff7a1a',
+  '#fff6c2','#ffe76b','#ffd21f','#f2b705','#d99a00','#fff0d6',
+  '#dcf7d4','#a6e89a','#5fcf6b','#2ea44f','#1f7a4d','#b8f2e6',
+  '#d6efff','#9fd7ff','#4db3ff','#1f7ae0','#0d47a1','#7fe3f0',
+  '#eee0ff','#cfb3ff','#a77bff','#7c3aed','#5b21b6','#e3a6ff',
+  '#fde4cf','#f5c9a3','#e0a878','#b87a4b','#8a5230','#5c3a21',
+  '#ffffff','#e6e1e8','#bdb5c2','#8c8394','#4d4552','#1e1a22',
+];
+const SPECIAAL = [
+  { id: 'sp-regenboog', naam: 'Regenboog', css: 'linear-gradient(135deg,#ff5a4f,#ffb066,#ffe76b,#5fcf6b,#4db3ff,#a77bff)' },
+  { id: 'sp-glitter',   naam: 'Glitter',   css: 'radial-gradient(circle at 30% 30%,#fff 0 2px,transparent 3px),radial-gradient(circle at 70% 60%,#ffe0ee 0 2px,transparent 3px),#ff7bb5' },
+  { id: 'sp-goud',      naam: 'Goud',      css: 'linear-gradient(135deg,#fff3b0,#e6b422,#fff3b0,#c9971c)' },
+  { id: 'sp-galaxy',    naam: 'Galaxy',    css: 'radial-gradient(circle,#ff9ae0,#7b4fd6 55%,#1c1a4a)' },
+];
+const SPECIALE_DEFS = `
+  <linearGradient id="sp-regenboog" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#ff5a4f"/><stop offset=".2" stop-color="#ffb066"/><stop offset=".4" stop-color="#ffe76b"/>
+    <stop offset=".6" stop-color="#5fcf6b"/><stop offset=".8" stop-color="#4db3ff"/><stop offset="1" stop-color="#a77bff"/>
+  </linearGradient>
+  <linearGradient id="sp-goud" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#fff3b0"/><stop offset=".35" stop-color="#e6b422"/><stop offset=".6" stop-color="#fff3b0"/><stop offset="1" stop-color="#c9971c"/>
+  </linearGradient>
+  <radialGradient id="sp-galaxy">
+    <stop offset="0" stop-color="#ff9ae0"/><stop offset=".55" stop-color="#7b4fd6"/><stop offset="1" stop-color="#1c1a4a"/>
+  </radialGradient>
+  <filter id="potlood-korrel" filterUnits="userSpaceOnUse" x="0" y="0" width="400" height="400">
+    <feTurbulence type="fractalNoise" baseFrequency="1.5" numOctaves="1" seed="7" result="ruis"/>
+    <feDisplacementMap in="SourceGraphic" in2="ruis" scale="2.5" result="rafel"/>
+    <feColorMatrix in="ruis" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1.8 -0.1" result="korrel"/>
+    <feComposite in="rafel" in2="korrel" operator="in"/>
+  </filter>
+  <pattern id="sp-glitter" width="16" height="16" patternUnits="userSpaceOnUse">
+    <rect width="16" height="16" fill="#ff7bb5"/>
+    <circle cx="4" cy="4" r="1.6" fill="#ffffff"/><circle cx="12" cy="10" r="1.2" fill="#ffe0ee"/>
+    <circle cx="9" cy="3" r="0.8" fill="#ffffff"/><circle cx="3" cy="13" r="1" fill="#fff6c2"/>
+  </pattern>`;
+const SVG_STIJL = '<style>.r{stroke:#2b2233;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}.d{fill:none;stroke:#2b2233;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.dt{fill:none;stroke:#2b2233;stroke-width:2}</style>';
+
+document.getElementById('specialeDefs').innerHTML = SPECIALE_DEFS;
+
+// ═══════════════════════════════════════
+//  OPSLAAN IN DE BROWSER
+// ═══════════════════════════════════════
+function laadStaat(id) {
+  try { const t = localStorage.getItem('kleurplaat-' + id); return t ? JSON.parse(t) : null; }
+  catch (e) { return null; }
+}
+function bewaarStaat() {
+  if (!huidig) return;
+  const fills = Array.from(plaat.querySelectorAll('.r')).map(el => {
+    const v = el.getAttribute('fill'); return v === '#ffffff' ? '' : v;
+  });
+  const pen = Array.from(plaat.querySelectorAll('.pen')).map(el =>
+    [el.getAttribute('d'), el.getAttribute('stroke'), el.getAttribute('stroke-width'), el.classList.contains('potlood') ? 'potlood' : 'pen']);
+  try { localStorage.setItem('kleurplaat-' + huidig.id, JSON.stringify({ f: fills, p: pen })); } catch (e) {}
+}
+function pasStaatToe(svg, staat) {
+  if (!staat) return;
+  const regs = svg.querySelectorAll('.r');
+  (staat.f || []).forEach((v, i) => { if (v && regs[i]) regs[i].setAttribute('fill', v); });
+  (staat.p || []).forEach(p => {
+    svg.querySelector(p[3] === 'potlood' ? '.potloodlaag' : '.penlaag').appendChild(maakPenPad(p[0], p[1], p[2], p[3]));
+  });
+}
+function maakPenPad(d, kleur, dikte, soort) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  el.setAttribute('class', soort === 'potlood' ? 'pen potlood' : 'pen'); el.setAttribute('d', d); el.setAttribute('fill', 'none');
+  el.setAttribute('stroke', kleur); el.setAttribute('stroke-width', dikte);
+  el.setAttribute('stroke-linecap', 'round'); el.setAttribute('stroke-linejoin', 'round');
+  return el;
+}
+
+// ═══════════════════════════════════════
+//  AFVINKEN
+// ═══════════════════════════════════════
+function laadKlaar() {
+  try { return JSON.parse(localStorage.getItem('kleurplaten-klaar') || '[]'); } catch (e) { return []; }
+}
+function isKlaar(id) { return laadKlaar().indexOf(id) > -1; }
+function zetKlaar(id, klaar) {
+  let lijst = laadKlaar().filter(x => x !== id);
+  if (klaar) lijst.push(id);
+  try { localStorage.setItem('kleurplaten-klaar', JSON.stringify(lijst)); } catch (e) {}
+  return lijst.length;
+}
+function updateKlaarKnop() {
+  const k = document.getElementById('klaarKnop'), klaar = huidig && isKlaar(huidig.id);
+  k.classList.toggle('is-klaar', !!klaar);
+  k.innerHTML = klaar ? '✔️<span class="tekst">Klaar</span>' : '✅<span class="tekst">Klaar!</span>';
+}
+function wisselKlaar() {
+  if (!huidig) return;
+  const nu = !isKlaar(huidig.id), aantal = zetKlaar(huidig.id, nu);
+  bewaarStaat(); updateKlaarKnop();
+  if (nu) {
+    confetti();
+    const mijlpalen = { 10: '10 kleurplaten af! 🌟', 25: 'Al 25 klaar! Super! 🎉', 50: 'Halverwege: 50 klaar! 🏆', 75: '75 klaar, bijna alles! 🚀', 100: 'ALLE 100 KLAAR! Jij bent een kleurkampioen! 👑' };
+    melding(mijlpalen[aantal] || `Afgevinkt! ${aantal} van ${PLATEN.length} klaar ✅`);
+  } else {
+    melding('Vinkje weggehaald');
+  }
+}
+function confetti() {
+  const kl = ['#ff7bb5', '#ffd21f', '#4db3ff', '#5fcf6b', '#a77bff', '#ff7a1a'];
+  for (let i = 0; i < 40; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.background = kl[i % kl.length];
+    c.style.animationDelay = Math.random() * 0.6 + 's';
+    document.body.appendChild(c);
+    setTimeout(function () { c.remove(); }, 2600);
+  }
+}
+function updateVoortgang() {
+  const klaar = laadKlaar().filter(id => PLATEN.some(p => p.id === id)).length, totaal = PLATEN.length;
+  document.getElementById('vgTekst').textContent = `✅ ${klaar} van de ${totaal} kleurplaten klaar`;
+  document.getElementById('vgSub').textContent = klaar === totaal ? 'Alles af! 👑' : `nog ${totaal - klaar} te gaan`;
+  document.getElementById('vgVul').style.width = (klaar / totaal * 100) + '%';
+}
+
+// ═══════════════════════════════════════
+//  GALERIJ
+// ═══════════════════════════════════════
+let actieveCat = 'alles';
+function bouwTabs() {
+  const klaar = laadKlaar();
+  document.getElementById('tabs').innerHTML = CATS.map(c => {
+    const platen = PLATEN.filter(p => c.id === 'alles' || p.cat === c.id);
+    const af = platen.filter(p => klaar.indexOf(p.id) > -1).length;
+    return `<button class="tab${c.id === actieveCat ? ' actief' : ''}" onclick="kiesCat('${c.id}')">${c.naam}<span class="tel">${af}/${platen.length}</span></button>`;
+  }).join('');
+  updateVoortgang();
+}
+function kiesCat(id) { actieveCat = id; bouwTabs(); bouwGrid(); }
+function bouwGrid() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  PLATEN.filter(p => actieveCat === 'alles' || p.cat === actieveCat).forEach(p => {
+    const staat = laadStaat(p.id);
+    const kaart = document.createElement('button');
+    const af = isKlaar(p.id);
+    kaart.className = 'kaart' + (af ? ' klaar' : '');
+    kaart.innerHTML = `<svg viewBox="0 0 400 400">${p.teken()}<g class="potloodlaag" filter="url(#potlood-korrel)"></g><g class="penlaag"></g></svg>
+      ${af ? '<div class="vink-badge">✓</div>' : ''}<div class="naam">${p.naam}</div>${af ? '<div class="bezig" style="color:#2ea44f">✅ Klaar</div>' : staat ? '<div class="bezig">✨ Mee bezig</div>' : ''}`;
+    pasStaatToe(kaart.querySelector('svg'), staat);
+    kaart.addEventListener('click', function () { openEditor(p); });
+    grid.appendChild(kaart);
+  });
+}
+
+// ═══════════════════════════════════════
+//  EDITOR
+// ═══════════════════════════════════════
+const plaat = document.getElementById('plaat');
+let huidig = null, tool = 'vul', kleur = '#ff7bb5', geschiedenis = [];
+let penGezien = false, lijn = null, punten = [], gumBezig = false, actievePointer = null;
+
+function openEditor(p) {
+  huidig = p; geschiedenis = [];
+  plaat.innerHTML = SVG_STIJL + '<defs>' + SPECIALE_DEFS + '</defs>' + p.teken() + '<g class="potloodlaag" filter="url(#potlood-korrel)"></g><g class="penlaag"></g>';
+  pasStaatToe(plaat, laadStaat(p.id));
+  document.getElementById('edTitel').textContent = p.naam;
+  updateKlaarKnop();
+  document.getElementById('editor').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function sluitEditor() {
+  bewaarStaat();
+  document.getElementById('editor').classList.remove('open');
+  document.body.style.overflow = '';
+  huidig = null; bouwTabs(); bouwGrid();
+}
+
+function kiesTool(t, knop) {
+  tool = t;
+  document.querySelectorAll('.tool').forEach(b => b.classList.toggle('actief', b === knop));
+  document.getElementById('dikteRij').style.display = (t === 'pen' || t === 'potlood') ? 'flex' : 'none';
+  plaat.classList.toggle('gum', t === 'gum');
+}
+function kiesKleur(k, knop) {
+  kleur = k;
+  document.querySelectorAll('.vak').forEach(b => b.classList.toggle('actief', b === knop));
+  const sp = SPECIAAL.find(s => 'url(#' + s.id + ')' === k);
+  document.getElementById('kleurNu').style.background = sp ? sp.css : k;
+  if (tool === 'gum') kiesTool('vul', document.querySelector('[data-tool="vul"]'));
+  updateVoorbeeld();
+}
+function updateVoorbeeld() {
+  const d = document.getElementById('dikte').value, stip = document.getElementById('voorbeeldStip');
+  const sp = SPECIAAL.find(s => 'url(#' + s.id + ')' === kleur);
+  const px = Math.max(4, Math.min(44, d * 1.1));
+  stip.style.width = px + 'px'; stip.style.height = px + 'px';
+  stip.style.background = sp ? sp.css : kleur;
+}
+
+// Palet opbouwen
+(function bouwPalet() {
+  const palet = document.getElementById('palet');
+  KLEUREN.forEach(k => {
+    const b = document.createElement('button');
+    b.className = 'vak'; b.style.background = k; b.setAttribute('aria-label', k);
+    b.addEventListener('click', function () { kiesKleur(k, this); });
+    palet.appendChild(b);
+  });
+  const sp = document.getElementById('speciaal');
+  SPECIAAL.forEach(s => {
+    const b = document.createElement('button');
+    b.className = 'vak'; b.style.background = s.css; b.textContent = s.naam;
+    b.addEventListener('click', function () { kiesKleur('url(#' + s.id + ')', this); });
+    sp.appendChild(b);
+  });
+  kiesKleur('#ff7bb5', palet.children[2]);
+})();
+
+// Coördinaten omrekenen naar de kleurplaat
+function svgPunt(e) {
+  const pt = plaat.createSVGPoint();
+  pt.x = e.clientX; pt.y = e.clientY;
+  const p = pt.matrixTransform(plaat.getScreenCTM().inverse());
+  return [f(p.x), f(p.y)];
+}
+function padVanPunten(p) {
+  if (p.length === 1) return `M${p[0][0]} ${p[0][1]} L${f(p[0][0] + 0.1)} ${p[0][1]}`;
+  let d = `M${p[0][0]} ${p[0][1]}`;
+  for (let i = 1; i < p.length - 1; i++) {
+    const mx = f((p[i][0] + p[i + 1][0]) / 2), my = f((p[i][1] + p[i + 1][1]) / 2);
+    d += ` Q${p[i][0]} ${p[i][1]} ${mx} ${my}`;
+  }
+  const l = p[p.length - 1];
+  return d + ` L${l[0]} ${l[1]}`;
+}
+
+function vul(el) {
+  const oud = el.getAttribute('fill');
+  if (oud === kleur) return;
+  el.setAttribute('fill', kleur);
+  geschiedenis.push({ type: 'vul', el: el, oud: oud });
+  bewaarStaat();
+}
+function gumOp(e) {
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  if (!el || !plaat.contains(el)) return;
+  if (el.classList.contains('pen')) {
+    geschiedenis.push({ type: 'wis', el: el, ouder: el.parentNode, volgende: el.nextSibling });
+    el.remove(); bewaarStaat();
+  } else if (!gumBezig && el.classList.contains('r') && el.getAttribute('fill') !== '#ffffff') {
+    geschiedenis.push({ type: 'vul', el: el, oud: el.getAttribute('fill') });
+    el.setAttribute('fill', '#ffffff'); bewaarStaat();
+  }
+}
+
+plaat.addEventListener('pointerdown', function (e) {
+  if (e.pointerType === 'pen') penGezien = true;
+  // Handpalm negeren zodra de Apple Pencil gebruikt is
+  if (penGezien && e.pointerType === 'touch') return;
+  if (actievePointer !== null) return;
+  e.preventDefault();
+  if (tool === 'vul') {
+    const el = e.target.closest ? e.target.closest('.r') : null;
+    if (el) vul(el);
+    return;
+  }
+  actievePointer = e.pointerId;
+  try { plaat.setPointerCapture(e.pointerId); } catch (err) {}
+  if (tool === 'gum') { gumOp(e); gumBezig = true; return; }
+  punten = [svgPunt(e)];
+  lijn = maakPenPad(padVanPunten(punten), kleur, document.getElementById('dikte').value, tool);
+  plaat.querySelector(tool === 'potlood' ? '.potloodlaag' : '.penlaag').appendChild(lijn);
+});
+plaat.addEventListener('pointermove', function (e) {
+  if (e.pointerId !== actievePointer) return;
+  e.preventDefault();
+  const events = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+  if (tool === 'gum') { (events.length ? events : [e]).forEach(gumOp); return; }
+  if (!lijn) return;
+  (events.length ? events : [e]).forEach(ev => {
+    const p = svgPunt(ev), l = punten[punten.length - 1];
+    if (Math.abs(p[0] - l[0]) + Math.abs(p[1] - l[1]) > 0.8) punten.push(p);
+  });
+  lijn.setAttribute('d', padVanPunten(punten));
+});
+function stopPointer(e) {
+  if (e.pointerId !== actievePointer) return;
+  actievePointer = null; gumBezig = false;
+  if (lijn) { geschiedenis.push({ type: 'pen', el: lijn }); lijn = null; bewaarStaat(); }
+}
+plaat.addEventListener('pointerup', stopPointer);
+plaat.addEventListener('pointercancel', stopPointer);
+
+function ongedaan() {
+  const a = geschiedenis.pop();
+  if (!a) { melding('Niets meer om terug te doen'); return; }
+  if (a.type === 'vul') a.el.setAttribute('fill', a.oud);
+  else if (a.type === 'pen') a.el.remove();
+  else if (a.type === 'wis') a.ouder.insertBefore(a.el, a.volgende && a.volgende.parentNode === a.ouder ? a.volgende : null);
+  else if (a.type === 'reset') {
+    const regs = plaat.querySelectorAll('.r');
+    a.fills.forEach((v, i) => regs[i].setAttribute('fill', v));
+    a.pen.forEach(el => plaat.querySelector(el.classList.contains('potlood') ? '.potloodlaag' : '.penlaag').appendChild(el));
+  }
+  bewaarStaat();
+}
+function wisAlles() {
+  if (!confirm('Wil je deze kleurplaat helemaal opnieuw beginnen?')) return;
+  const regs = Array.from(plaat.querySelectorAll('.r'));
+  const pen = Array.from(plaat.querySelectorAll('.pen'));
+  geschiedenis.push({ type: 'reset', fills: regs.map(r => r.getAttribute('fill')), pen: pen });
+  regs.forEach(r => r.setAttribute('fill', '#ffffff'));
+  pen.forEach(el => el.remove());
+  bewaarStaat();
+  melding('Weer helemaal leeg 🧼');
+}
+
+// Lettertype insluiten zodat namen er in het plaatje hetzelfde uitzien
+let fontCssCache = null;
+async function haalFontCss() {
+  if (fontCssCache !== null) return fontCssCache;
+  try {
+    const css = await (await fetch('https://fonts.googleapis.com/css2?family=Nunito:wght@900&text=' + encodeURIComponent('MilouDeSterkij'))).text();
+    const url = (css.match(/url\(([^)]+)\)/) || [])[1];
+    const blob = await (await fetch(url)).blob();
+    const data = await new Promise(function (res) { const r = new FileReader(); r.onload = function () { res(r.result); }; r.readAsDataURL(blob); });
+    fontCssCache = "@font-face{font-family:'Nunito';font-weight:900;src:url(" + data + ")}";
+  } catch (e) { fontCssCache = ''; }
+  return fontCssCache;
+}
+
+// Opslaan als plaatje (naar Foto's via delen)
+async function opslaan() {
+  bewaarStaat();
+  const kloon = plaat.cloneNode(true);
+  if (kloon.querySelector('text')) {
+    const css = await haalFontCss();
+    if (css) { const st = document.createElementNS('http://www.w3.org/2000/svg', 'style'); st.textContent = css; kloon.insertBefore(st, kloon.firstChild); }
+  }
+  kloon.setAttribute('width', '1200'); kloon.setAttribute('height', '1200');
+  kloon.removeAttribute('class');
+  const tekst = new XMLSerializer().serializeToString(kloon);
+  const img = new Image();
+  img.onload = function () {
+    const c = document.createElement('canvas');
+    c.width = 1200; c.height = 1200;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, 1200, 1200);
+    ctx.drawImage(img, 0, 0, 1200, 1200);
+    c.toBlob(async function (blob) {
+      const naam = 'kleurplaat-' + huidig.id + '.png';
+      try {
+        const bestand = new File([blob], naam, { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [bestand] })) {
+          await navigator.share({ files: [bestand], title: 'Mijn kleurplaat' });
+          return;
+        }
+      } catch (err) { if (err && err.name === 'AbortError') return; }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = naam; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+      melding('Opgeslagen! 💾');
+    }, 'image/png');
+  };
+  img.onerror = function () { melding('Opslaan lukte niet, probeer opnieuw'); };
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(tekst);
+}
+
+let meldTimer = null;
+function melding(t) {
+  const m = document.getElementById('melding');
+  m.textContent = t; m.classList.add('toon');
+  clearTimeout(meldTimer); meldTimer = setTimeout(function () { m.classList.remove('toon'); }, 2000);
+}
+
+bouwTabs(); bouwGrid();
+</script>
+</body>
+</html>

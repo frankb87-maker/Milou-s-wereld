@@ -1,0 +1,2813 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Milou's Wereld 🌸</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
+<!-- EmailJS voor wekelijkse stemmingsmail — async zodat het de pagina nooit blokkeert -->
+<script>
+  // EmailJS veilig laden — als het mislukt werkt de rest van de app gewoon door
+  function laadEmailJS() {
+    try {
+      const s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+      s.onload = () => {
+        try { emailjs.init('WTRRhFmease4280Ro'); } catch(e) {}
+      };
+      s.onerror = () => { console.log('EmailJS niet geladen — geen probleem, app werkt gewoon.'); };
+      document.head.appendChild(s);
+    } catch(e) {}
+  }
+  // Laad EmailJS pas NA het laden van de pagina zodat het niets blokkeert
+  window.addEventListener('load', laadEmailJS);
+</script>
+<style>
+  :root {
+    --pink:    #f7a8c4;
+    --pink2:   #f9c9d8;
+    --mint:    #a8e6cf;
+    --lavender:#c9b8f0;
+    --yellow:  #ffe49a;
+    --sky:     #a8d8f0;
+    --bg:      #fdf6fa;
+    --card:    #ffffff;
+    --text:    #3a2a3a;
+    --muted:   #8a7a8a;
+    --radius:  20px;
+    --shadow:  0 4px 24px rgba(180,100,140,0.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(253,246,250,0.92);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-bottom: 2px solid var(--pink2);
+    padding: 12px 20px;
+    display: flex; align-items: center; gap: 8px;
+    overflow-x: auto;
+  }
+  nav .logo {
+    font-family: 'Pacifico', cursive;
+    font-size: 1.2rem;
+    color: var(--pink);
+    white-space: nowrap;
+    margin-right: 12px;
+  }
+  nav button {
+    border: none; background: none; cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.85rem; font-weight: 700;
+    padding: 7px 14px; border-radius: 50px;
+    color: var(--muted); white-space: nowrap;
+    transition: all .2s;
+  }
+  nav button:hover { background: var(--pink2); color: var(--text); }
+  nav button.active { background: var(--pink); color: white; }
+
+  /* ─── MAIN ─── */
+  main { padding: 24px 16px 60px; max-width: 700px; margin: 0 auto; }
+
+  /* ─── SECTIONS ─── */
+  .section { display: none; animation: fadeIn .35s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+  /* ─── PAGE HEADER ─── */
+  .page-header {
+    text-align: center; margin-bottom: 28px;
+  }
+  .page-header .emoji { font-size: 3rem; }
+  .page-header h1 {
+    font-family: 'Pacifico', cursive;
+    font-size: 1.9rem; color: var(--text);
+    margin: 6px 0 8px;
+  }
+  .page-header p { color: var(--muted); font-size: 0.95rem; }
+
+  /* ─── CARDS ─── */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 22px;
+    margin-bottom: 18px;
+  }
+  .card h2 {
+    font-size: 1.1rem; font-weight: 800; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .accent-pink { border-top: 4px solid var(--pink); }
+  .accent-mint  { border-top: 4px solid var(--mint); }
+  .accent-lav   { border-top: 4px solid var(--lavender); }
+  .accent-sky   { border-top: 4px solid var(--sky); }
+  .accent-yellow{ border-top: 4px solid var(--yellow); }
+
+  /* ─── HOME ─── */
+  .home-hero {
+    background: linear-gradient(135deg, var(--pink2) 0%, var(--lavender) 50%, var(--sky) 100%);
+    border-radius: 24px;
+    padding: 36px 24px;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .home-hero h1 {
+    font-family: 'Pacifico', cursive;
+    font-size: 2.4rem; color: white;
+    text-shadow: 0 2px 8px rgba(100,60,120,.25);
+    margin-bottom: 8px;
+  }
+  .home-hero p { color: rgba(255,255,255,0.85); font-size: 1rem; font-weight: 600; }
+
+  .home-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  .home-tile {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 22px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform .2s, box-shadow .2s;
+    border: none; width: 100%; font-family: 'Nunito', sans-serif;
+  }
+  .home-tile:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(180,100,140,.15); }
+  .home-tile .tile-emoji { font-size: 2.4rem; margin-bottom: 8px; }
+  .home-tile .tile-label { font-weight: 800; font-size: 0.95rem; color: var(--text); }
+  .home-tile .tile-sub   { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+
+  /* ─── SCHEMA ─── */
+  .time-card {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 18px;
+    border-radius: 14px;
+    margin-bottom: 10px;
+    font-weight: 700;
+  }
+  .time-card .tc-emoji { font-size: 1.8rem; }
+  .time-card .tc-label { color: var(--muted); font-size: 0.82rem; font-weight: 600; }
+  .time-card .tc-value { font-size: 1.4rem; font-weight: 900; }
+  .tc-sleep  { background: #eee6ff; }
+  .tc-wake   { background: #fff8e0; }
+
+  .day-grid { display: flex; flex-direction: column; gap: 8px; }
+  .day-row {
+    display: flex; align-items: center; gap: 12px;
+    background: #fafafa; border-radius: 12px; padding: 12px 16px;
+    border-left: 4px solid transparent;
+  }
+  .day-row.today { border-left-color: var(--pink); background: #fff0f5; }
+  .day-row.rest  { border-left-color: var(--mint); background: #f0fff8; }
+  .day-row .dr-day  { font-weight: 800; min-width: 90px; }
+  .day-row .dr-juf  { color: var(--muted); font-size: 0.9rem; }
+  .day-row .dr-badge {
+    margin-left: auto;
+    font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 20px;
+    background: var(--mint); color: #2a7a5a;
+  }
+
+  /* ─── RECEPTEN ─── */
+  .recipe-grid {
+    display: grid; grid-template-columns: 1fr; gap: 8px;
+  }
+  .recipe-pill {
+    background: var(--bg); border-radius: 14px; padding: 14px 16px;
+    font-weight: 700; font-size: 0.92rem;
+    display: flex; align-items: center; gap: 12px;
+    border: 2px solid transparent;
+    cursor: pointer; transition: all .15s;
+    width: 100%; text-align: left;
+    min-height: 52px;
+  }
+  .recipe-pill:hover, .recipe-pill.actief { border-color: var(--pink); background: #fff0f5; }
+  .recipe-pill .rp-emoji { font-size: 1.5rem; flex-shrink: 0; }
+  .recipe-pill .rp-naam  { flex: 1; }
+  .recipe-pill .rp-pijl  { color: var(--muted); font-size: 1rem; transition: transform .2s; }
+  .recipe-pill.actief .rp-pijl { transform: rotate(90deg); color: var(--pink); }
+  .recipe-detail {
+    display: none;
+    background: #fff8fb; border-radius: 14px; padding: 18px;
+    margin-top: 4px; margin-bottom: 4px;
+    border: 2px solid var(--pink2);
+    animation: fadeIn .25s ease;
+  }
+  .recipe-detail.open { display: block; }
+  .recipe-detail h3 { margin-bottom: 10px; font-size: 1rem; }
+  .recipe-detail ul { padding-left: 18px; color: var(--muted); font-size: 0.9rem; line-height: 1.8; }
+  .recipe-detail .stappen { margin-top: 12px; font-size: 0.9rem; line-height: 1.9; color: var(--text); }
+
+  /* ─── BLACKPINK ─── */
+  .bp-members { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .bp-card {
+    border-radius: 16px; padding: 18px 16px; text-align: center;
+    transition: transform .2s;
+  }
+  .bp-card:hover { transform: translateY(-3px); }
+  .bp-card .bp-emoji { font-size: 2.4rem; }
+  .bp-card .bp-name  { font-weight: 900; font-size: 1rem; margin: 6px 0 4px; }
+  .bp-card .bp-info  { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+  .bp-jisoo  { background: #fff0f5; }
+  .bp-jennie { background: #fff8e0; }
+  .bp-rose   { background: #f0f8ff; }
+  .bp-lisa   { background: #f0fff8; }
+
+  .bp-funfacts { margin-top: 6px; }
+  .bp-fact {
+    background: var(--bg); border-radius: 12px; padding: 12px 16px;
+    margin-bottom: 8px; font-size: 0.88rem; line-height: 1.6;
+    border-left: 3px solid var(--pink);
+  }
+
+  /* ─── CREATIEF ─── */
+  .creative-list { list-style: none; }
+  .creative-list li {
+    padding: 10px 0; border-bottom: 1px solid #f0e8f0;
+    display: flex; gap: 12px; font-size: 0.93rem; align-items: flex-start;
+  }
+  .creative-list li:last-child { border-bottom: none; }
+  .creative-list .ci-emoji { font-size: 1.3rem; margin-top: 1px; }
+
+  .kleur-grid { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+  .kleur-dot {
+    width: 44px; height: 44px; border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,.1);
+    cursor: pointer; transition: transform .15s;
+  }
+  .kleur-dot:hover { transform: scale(1.15); }
+
+  /* ─── RUST THEMA GRID ─── */
+  .rust-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .rust-tile {
+    border-radius: 16px; padding: 16px 14px; transition: transform .2s;
+  }
+  .rust-tile:hover { transform: translateY(-2px); }
+  .rt-emoji { font-size: 1.8rem; margin-bottom: 6px; }
+  .rt-titel { font-weight: 900; font-size: 0.88rem; color: var(--text); margin-bottom: 4px; }
+  .rt-tekst { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+
+  /* ─── LIVE KLOK ─── */
+  .klok-card {
+    background: linear-gradient(135deg, #2d1b4e, #1a1a3e, #0d2137);
+    border-radius: 24px; padding: 28px 20px;
+    text-align: center; margin-bottom: 14px;
+    box-shadow: 0 8px 32px rgba(60,20,100,0.3);
+  }
+  .klok-tijd {
+    font-family: 'Nunito', monospace;
+    font-size: 3.8rem; font-weight: 900;
+    color: white; letter-spacing: 2px;
+    line-height: 1; margin-bottom: 6px;
+    text-shadow: 0 0 20px rgba(200,160,255,0.5);
+  }
+  .klok-datum {
+    font-size: 1rem; font-weight: 700;
+    color: rgba(255,255,255,0.75); margin-bottom: 10px;
+  }
+  .klok-dag-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: white; font-weight: 800; font-size: 0.85rem;
+    padding: 5px 16px; border-radius: 50px;
+    backdrop-filter: blur(4px);
+  }
+
+  /* ─── SLIMME MELDING ─── */
+  .slim-card {
+    border-radius: 18px; padding: 16px 18px;
+    margin-bottom: 18px;
+    display: flex; align-items: center; gap: 14px;
+    font-weight: 700;
+  }
+  .slim-emoji { font-size: 2.2rem; flex-shrink: 0; }
+  .slim-titel { font-size: 1rem; font-weight: 900; color: var(--text); }
+  .slim-sub   { font-size: 0.82rem; color: var(--muted); margin-top: 2px; line-height: 1.5; }
+  .adem-box {
+    text-align: center;
+    padding: 28px 20px;
+    background: linear-gradient(135deg, #e8f8f0, #f0ecff);
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .adem-circle {
+    width: 120px; height: 120px; border-radius: 50%;
+    background: rgba(168,230,207,0.4);
+    border: 4px solid var(--mint);
+    margin: 0 auto 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem;
+    transition: transform 4s ease-in-out;
+  }
+  .adem-circle.grow { transform: scale(1.5); }
+  .adem-circle.shrink { transform: scale(1); }
+  #adem-tekst { font-weight: 800; font-size: 1.1rem; color: #4a7a6a; margin-bottom: 14px; }
+  #adem-btn {
+    background: var(--mint); border: none; cursor: pointer;
+    font-family: 'Nunito', sans-serif; font-weight: 800;
+    padding: 10px 28px; border-radius: 50px; font-size: 0.95rem;
+    color: #2a6a4a;
+    transition: background .2s;
+  }
+  #adem-btn:hover { background: #8adcbe; }
+
+  .positief-kaart {
+    background: var(--card); border-radius: 16px; padding: 20px;
+    text-align: center; box-shadow: var(--shadow);
+    margin-bottom: 10px;
+  }
+  .positief-kaart .pk-tekst {
+    font-size: 1.1rem; font-weight: 700; line-height: 1.6;
+    color: var(--text); margin-bottom: 8px;
+  }
+  .positief-kaart .pk-sub {
+    font-size: 0.82rem; color: var(--muted);
+  }
+  #nieuw-bericht-btn {
+    width: 100%; background: var(--lavender);
+    border: none; cursor: pointer;
+    font-family: 'Nunito', sans-serif; font-weight: 800;
+    padding: 12px; border-radius: 14px; font-size: 0.95rem;
+    color: #5a4a9a; margin-top: 6px;
+    transition: background .2s;
+  }
+  #nieuw-bericht-btn:hover { background: #b8a8e8; }
+
+  .geruststelling {
+    background: #fff8e0; border-radius: 14px; padding: 16px 18px;
+    border-left: 4px solid var(--yellow); font-size: 0.88rem; line-height: 1.75;
+    color: var(--text); margin-bottom: 10px;
+  }
+  .geruststelling strong { font-weight: 900; }
+
+  /* ─── TODAY BADGE ─── */
+  .vandaag-badge {
+    display: inline-block;
+    background: var(--pink); color: white;
+    font-size: 0.7rem; font-weight: 800; padding: 2px 8px;
+    border-radius: 10px; margin-left: 8px; vertical-align: middle;
+  }
+
+  /* ─── GAME GRID ─── */
+  .game-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .game-card {
+    background: var(--gc, linear-gradient(160deg,#1a1a2e,#2a2a4e));
+    border-radius: 14px; padding: 14px 12px;
+    text-decoration: none; display: flex; flex-direction: column;
+    gap: 4px; transition: transform .2s, box-shadow .2s;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .game-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+  .game-emoji { font-size: 2rem; margin-bottom: 2px; }
+  .game-naam  { font-weight: 900; font-size: 0.82rem; color: white; line-height: 1.3; }
+  .game-sub   { font-size: 0.72rem; color: rgba(255,255,255,0.6); }
+  .game-tag   {
+    margin-top: 6px; display: inline-block;
+    background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.85);
+    font-size: 0.68rem; font-weight: 800; padding: 2px 8px;
+    border-radius: 20px; align-self: flex-start;
+  }
+  .bp-members-big { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .bp-big-card {
+    position: relative; border-radius: 16px; overflow: hidden;
+    aspect-ratio: 4/3; display: block; text-decoration: none;
+    transition: transform .2s; background: #222;
+  }
+  .bp-big-card:hover { transform: scale(1.03); }
+  .bp-big-card img { width:100%; height:100%; object-fit:cover; display:block; }
+  .bp-avatar {
+    width:100%; height:100%;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:6px;
+  }
+  .bp-avatar-letter {
+    font-family:'Pacifico',cursive; font-size:2rem; color:white;
+    text-shadow:0 2px 8px rgba(0,0,0,0.3);
+  }
+  .bp-avatar-deco { font-size:1.1rem; letter-spacing:4px; }
+  .bp-big-overlay {
+    position: absolute; bottom:0; left:0; right:0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    padding: 24px 12px 12px; color: white;
+  }
+  .bp-big-name  { font-weight: 900; font-size: 1rem; }
+  .bp-big-role  { font-size: 0.72rem; opacity: 0.85; }
+  .bp-big-info  { font-size: 0.7rem; opacity: 0.7; margin-top: 2px; }
+  .bp-jisoo  { border: 3px solid #f9c9d8; }
+  .bp-jennie { border: 3px solid #ffe49a; }
+  .bp-rose   { border: 3px solid #a8d8f0; }
+  .bp-lisa   { border: 3px solid #a8e6cf; }
+
+  /* ─── YOUTUBE GRID ─── */
+  .yt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .yt-card {
+    position: relative; border-radius: 12px; overflow: hidden;
+    display: block; text-decoration: none; background: #111;
+    transition: transform .2s;
+  }
+  .yt-card:hover { transform: scale(1.03); }
+  .yt-card img { width:100%; display:block; aspect-ratio:16/9; object-fit:cover; }
+  .yt-play {
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-60%);
+    background:rgba(255,0,0,0.85); color:white;
+    width:36px; height:36px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:0.9rem; font-weight:900;
+  }
+  .yt-label {
+    position:absolute; bottom:0; left:0; right:0;
+    background:rgba(0,0,0,0.75); color:white;
+    font-size:0.72rem; font-weight:700; padding:5px 8px;
+  }
+  .yt-tutorial { aspect-ratio: unset; background: none; }
+  .yt-tutorial-inner {
+    padding: 16px 10px; text-align: center; border-radius: 12px;
+    background: linear-gradient(135deg,#f0fff8,#a8e6cf);
+    height: 100%;
+  }
+  .yt-sub { font-size:0.7rem; color:var(--muted); margin-top:2px; }
+
+  /* ─── SOCIAL BUTTONS ─── */
+  .social-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+  .social-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 18px; border-radius: 50px; color: white;
+    text-decoration: none; font-weight: 800; font-size: 0.88rem;
+    transition: opacity .2s;
+  }
+  .social-btn:hover { opacity: 0.85; }
+
+  /* ─── LINK LIJST ─── */
+  .link-lijst { display: flex; flex-direction: column; gap: 8px; }
+  .link-rij {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--bg); border-radius: 12px; padding: 12px 14px;
+    text-decoration: none; border-left: 4px solid var(--pink);
+    transition: background .15s;
+  }
+  .link-rij:hover { background: #fff0f5; }
+  .link-icon { font-size: 1.4rem; }
+  .link-titel { font-weight: 800; font-size: 0.88rem; color: var(--text); }
+  .link-sub   { font-size: 0.75rem; color: var(--muted); }
+  .link-arrow { margin-left: auto; font-weight: 900; color: var(--muted); font-size: 1rem; }
+
+  /* ─── HOME HERO WIDGETS ─── */
+  .hero-widgets {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-top: 16px;
+  }
+  .hero-widget {
+    background: rgba(255,255,255,0.15);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border-radius: 16px; padding: 14px;
+    border: 1px solid rgba(255,255,255,0.25);
+  }
+  .hw-label {
+    font-size: 0.72rem; font-weight: 800;
+    color: rgba(255,255,255,0.75);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .hw-stemmingen {
+    display: flex; gap: 6px; flex-wrap: wrap;
+  }
+  .hw-btn {
+    background: rgba(255,255,255,0.2); border: none;
+    border-radius: 50%; width: 36px; height: 36px;
+    font-size: 1.2rem; cursor: pointer;
+    transition: transform .15s, background .15s;
+  }
+  .hw-btn:hover { transform: scale(1.2); background: rgba(255,255,255,0.35); }
+  .hw-btn.gekozen { background: rgba(255,255,255,0.5); transform: scale(1.15); }
+
+  /* ─── DONKERE MODUS ─── */
+  body.donker {
+    --bg:    #1a1a2e;
+    --card:  #16213e;
+    --text:  #e8e0f0;
+    --muted: #8a8aaa;
+    --pink2: #3a2040;
+  }
+  body.donker nav {
+    background: rgba(26,26,46,0.95);
+    border-bottom-color: #3a2040;
+  }
+  body.donker .home-hero {
+    background: linear-gradient(135deg,#2d1b4e,#1a1a3e,#0d2137);
+  }
+
+  /* ─── STICKER BUTTONS ─── */
+  .sticker-btn {
+    background: none; border: 2px solid var(--pink2);
+    border-radius: 10px; font-size: 1.3rem; cursor: pointer;
+    padding: 4px 8px; transition: transform .15s;
+  }
+  .sticker-btn:hover { transform: scale(1.2); }
+
+  /* ─── QUIZ ─── */
+  .quiz-antwoord-btn {
+    width: 100%; background: var(--bg); border: 2px solid var(--lavender);
+    border-radius: 14px; padding: 13px 16px; text-align: left;
+    font-family: 'Nunito', sans-serif; font-size: 0.92rem; font-weight: 700;
+    cursor: pointer; color: var(--text); transition: all .15s;
+  }
+  .quiz-antwoord-btn:hover { background: var(--pink2); border-color: var(--pink); }
+  .quiz-antwoord-btn.goed  { background: #d1fae5; border-color: #10b981; color: #065f46; }
+  .quiz-antwoord-btn.fout  { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+
+  /* ─── DAGBOEK ─── */
+  .dagboek-entry {
+    background: var(--bg); border-radius: 14px; padding: 14px 16px;
+    border-left: 4px solid var(--lavender);
+  }
+  .dagboek-entry .de-datum { font-size: 0.75rem; color: var(--muted); font-weight: 700; margin-bottom: 4px; }
+  .dagboek-entry .de-tekst { font-size: 0.88rem; color: var(--text); line-height: 1.6; }
+
+  @media (max-width: 400px) {
+    .bp-members-big { grid-template-columns: 1fr 1fr; }
+    .yt-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">🌸 Milou</span>
+  <button class="active" onclick="toon('home', this)">🏠 Home</button>
+  <button onclick="toon('schema', this)">🗓️ Schema</button>
+  <button onclick="toon('recepten', this)">🍽️ Koken</button>
+  <button onclick="toon('blackpink', this)">🎵 BLACKPINK</button>
+  <button onclick="toon('creatief', this)">🎨 Creatief</button>
+  <button onclick="toon('rust', this)">💚 Rust</button>
+  <button onclick="toon('dagboek', this)">📓 Dagboek</button>
+  <button onclick="toon('quiz', this)">🎵 Quiz</button>
+  <button onclick="toon('ouder', this)" style="opacity:0.4;font-size:0.7rem">🔒 Ouder</button>
+  <button onclick="wisselDonker()" id="donker-btn" style="margin-left:auto;flex-shrink:0">🌙</button>
+</nav>
+
+<main>
+
+<!-- ══════════ HOME ══════════ -->
+<section class="section active" id="home">
+  <div class="home-hero">
+    <h1>Hoi Milou! 🌸</h1>
+    <p id="hero-dag-tekst">Welkom op jouw eigen plekje</p>
+    <div class="hero-widgets">
+      <!-- Dagelijkse stemming -->
+      <div class="hero-widget" id="stemming-widget">
+        <div class="hw-label">Hoe voel jij je vandaag?</div>
+        <div class="hw-stemmingen">
+          <button onclick="kiesStemming(event,'😊','Super!')" class="hw-btn">😊</button>
+          <button onclick="kiesStemming(event,'🥰','Liefdevol!')" class="hw-btn">🥰</button>
+          <button onclick="kiesStemming(event,'😐','Gewoon')" class="hw-btn">😐</button>
+          <button onclick="kiesStemming(event,'😴','Moe')" class="hw-btn">😴</button>
+          <button onclick="kiesStemming(event,'😢','Niet zo fijn')" class="hw-btn">😢</button>
+        </div>
+        <div id="stemming-reactie" style="min-height:20px;font-size:0.85rem;font-weight:700;color:rgba(255,255,255,0.9);margin-top:6px"></div>
+      </div>
+      <!-- Dagelijkse quote -->
+      <div class="hero-widget" id="quote-widget">
+        <div class="hw-label">✨ Quote van vandaag</div>
+        <div id="dagquote" style="font-size:0.88rem;font-weight:700;color:white;line-height:1.5;margin-top:4px"></div>
+      </div>
+    </div>
+  </div>
+  <div class="home-grid">
+    <button class="home-tile" onclick="toon('schema', navBtn('schema'))">
+      <div class="tile-emoji">🗓️</div>
+      <div class="tile-label">Mijn Schema</div>
+      <div class="tile-sub">Slaaptijden & juf</div>
+    </button>
+    <button class="home-tile" onclick="toon('recepten', navBtn('recepten'))">
+      <div class="tile-emoji">🍽️</div>
+      <div class="tile-label">Koken & Bakken</div>
+      <div class="tile-sub">Mijn favoriete gerechten</div>
+    </button>
+    <button class="home-tile" onclick="toon('blackpink', navBtn('blackpink'))">
+      <div class="tile-emoji">🎵</div>
+      <div class="tile-label">BLACKPINK</div>
+      <div class="tile-sub">Jisoo, Jennie, Rosé & Lisa</div>
+    </button>
+    <button class="home-tile" onclick="toon('creatief', navBtn('creatief'))">
+      <div class="tile-emoji">🎨</div>
+      <div class="tile-label">Creatief</div>
+      <div class="tile-sub">Tekenen & verven</div>
+    </button>
+    <button class="home-tile" onclick="toon('rust', navBtn('rust'))">
+      <div class="tile-emoji">💚</div>
+      <div class="tile-label">Even Uitblazen</div>
+      <div class="tile-sub">Rustmoment voor jou</div>
+    </button>
+    <button class="home-tile" onclick="toon('dagboek', navBtn('dagboek'))" style="position:relative">
+      <div class="tile-emoji">📓</div>
+      <div class="tile-label">Mijn Dagboek</div>
+      <div class="tile-sub">Privé voor jou alleen</div>
+      <span style="position:absolute;top:8px;right:8px;background:var(--pink);color:white;font-size:0.6rem;font-weight:900;padding:2px 6px;border-radius:10px">NIEUW</span>
+    </button>
+    <button class="home-tile" onclick="toon('quiz', navBtn('quiz'))" style="position:relative">
+      <div class="tile-emoji">🎵</div>
+      <div class="tile-label">BLACKPINK Quiz</div>
+      <div class="tile-sub">Test je kennis!</div>
+      <span style="position:absolute;top:8px;right:8px;background:var(--pink);color:white;font-size:0.6rem;font-weight:900;padding:2px 6px;border-radius:10px">NIEUW</span>
+    </button>
+    <a href="leren.html" class="home-tile" style="text-decoration:none;position:relative">
+      <div class="tile-emoji">📚</div>
+      <div class="tile-label">Leerboek</div>
+      <div class="tile-sub">Rekenen, klokkijken & meer</div>
+      <span style="position:absolute;top:8px;right:8px;background:linear-gradient(135deg,#ff6eb4,#ffb347);color:white;font-size:0.6rem;font-weight:900;padding:2px 6px;border-radius:10px">NIEUW</span>
+    </a>
+    <a href="kleurplaat.html" class="home-tile" style="text-decoration:none;position:relative">
+      <div class="tile-emoji">🖍️</div>
+      <div class="tile-label">Kleurplaten</div>
+      <div class="tile-sub">Tik en kleur in</div>
+      <span style="position:absolute;top:8px;right:8px;background:linear-gradient(135deg,#ff7bb5,#a77bff);color:white;font-size:0.6rem;font-weight:900;padding:2px 6px;border-radius:10px">NIEUW</span>
+    </a>
+    <div class="home-tile" id="weer-tile" style="cursor:default">
+      <div id="weer-emoji" style="font-size:2.4rem;margin-bottom:4px">🌤️</div>
+      <div class="tile-label" id="weer-temp">Beverwijk</div>
+      <div class="tile-sub" id="weer-omschrijving">weerbericht laden...</div>
+    </div>
+  </div>
+
+  <!-- Sterren beloningsbalk -->
+  <div class="card accent-yellow" style="margin-top:18px">
+    <h2>⭐ Jouw sterren deze week</h2>
+    <div id="sterren-balk" style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0"></div>
+    <p style="font-size:0.78rem;color:var(--muted)">Je verdient een ster voor elke dag dat je de app gebruikt en je stemming invult! 🌟</p>
+  </div>
+
+  <!-- Geheim berichtje van papa/mama -->
+  <div id="geheim-berichtje-card" style="display:none" class="card accent-pink">
+    <h2>💌 Verrassing voor jou!</h2>
+    <div id="geheim-tekst" style="font-size:1rem;font-weight:700;line-height:1.6;color:var(--text);margin-bottom:8px"></div>
+    <div id="geheim-van" style="font-size:0.8rem;color:var(--muted)"></div>
+    <button onclick="verwijderGeheimBerichtje()" style="margin-top:10px;background:var(--pink);border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:8px 20px;border-radius:50px;color:white;font-size:0.85rem">
+      💕 Gelezen!
+    </button>
+  </div>
+</section>
+
+<!-- ══════════ SCHEMA ══════════ -->
+<section class="section" id="schema">
+  <div class="page-header">
+    <div class="emoji">🗓️</div>
+    <h1>Mijn Schema</h1>
+    <p>Rust begint met weten wat er komt</p>
+  </div>
+
+  <!-- LIVE KLOK & DAG -->
+  <div class="klok-card" id="klokCard">
+    <div class="klok-tijd" id="klokTijd">--:--</div>
+    <div class="klok-datum" id="klokDatum">laden...</div>
+    <div class="klok-dag-badge" id="klokDagBadge"></div>
+  </div>
+
+  <!-- SLIMME MELDING — past zich aan op dag/tijd -->
+  <div class="slim-card" id="slimCard">
+    <div class="slim-emoji" id="slimEmoji">⏳</div>
+    <div>
+      <div class="slim-titel" id="slimTitel">Even laden...</div>
+      <div class="slim-sub" id="slimSub"></div>
+    </div>
+  </div>
+
+  <div class="card accent-pink">
+    <h2>😴 Slaaptijden</h2>
+
+    <p style="font-size:0.8rem;font-weight:800;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">📚 Schooldagen (ma t/m vr)</p>
+    <div class="time-card tc-sleep">
+      <span class="tc-emoji">🌙</span>
+      <div>
+        <div class="tc-label">Naar bed</div>
+        <div class="tc-value">19:30</div>
+      </div>
+    </div>
+    <div class="time-card tc-wake">
+      <span class="tc-emoji">☀️</span>
+      <div>
+        <div class="tc-label">Opstaan</div>
+        <div class="tc-value">07:00</div>
+      </div>
+    </div>
+
+    <p style="font-size:0.8rem;font-weight:800;color:var(--muted);margin:14px 0 8px;text-transform:uppercase;letter-spacing:1px">🌟 Zaterdag</p>
+    <div class="time-card" style="background:#f0f8ff">
+      <span class="tc-emoji">🌙</span>
+      <div>
+        <div class="tc-label">Naar bed</div>
+        <div class="tc-value">22:00</div>
+      </div>
+    </div>
+    <div class="time-card" style="background:#f0fff8">
+      <span class="tc-emoji">☀️</span>
+      <div>
+        <div class="tc-label">Opstaan</div>
+        <div class="tc-value" style="color:#5a9a7a">Lekker uitslapen! 😴</div>
+      </div>
+    </div>
+
+    <p style="font-size:0.8rem;font-weight:800;color:var(--muted);margin:14px 0 8px;text-transform:uppercase;letter-spacing:1px">🌿 Zondag</p>
+    <div class="time-card" style="background:#eee6ff">
+      <span class="tc-emoji">🌙</span>
+      <div>
+        <div class="tc-label">Naar bed</div>
+        <div class="tc-value">19:30</div>
+      </div>
+    </div>
+    <div class="time-card tc-wake">
+      <span class="tc-emoji">☀️</span>
+      <div>
+        <div class="tc-label">Opstaan</div>
+        <div class="tc-value">07:00</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card accent-mint">
+    <h2>📅 Weekschema</h2>
+    <div class="day-grid" id="dagGrid">
+      <!-- wordt gevuld via JS -->
+    </div>
+  </div>
+
+  <div class="card accent-lav">
+    <h2>💡 Handige herinneringen</h2>
+
+    <p style="font-size:0.8rem;font-weight:800;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">🎒 Tas klaarmaken de avond ervoor</p>
+    <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+      <li style="background:#f0fff8;border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px;font-size:0.88rem;font-weight:700">
+        <span style="font-size:1.3rem">🍎</span>
+        <div>
+          <div>Wat voor <strong>fruit</strong> wil je mee?</div>
+          <div style="font-size:0.75rem;color:var(--muted);margin-top:2px">Appel, banaan, mandarijn, druiven...</div>
+        </div>
+      </li>
+      <li style="background:#fff8e0;border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px;font-size:0.88rem;font-weight:700">
+        <span style="font-size:1.3rem">🥪</span>
+        <div>
+          <div>Wat wil je op je <strong>brood</strong>?</div>
+          <div style="font-size:0.75rem;color:var(--muted);margin-top:2px">Beleg alvast klaarzetten of vragen aan mama/papa</div>
+        </div>
+      </li>
+      <li style="background:#f0f8ff;border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px;font-size:0.88rem;font-weight:700">
+        <span style="font-size:1.3rem">🥤</span>
+        <div>
+          <div>Wat wil je <strong>drinken</strong> mee?</div>
+          <div style="font-size:0.75rem;color:var(--muted);margin-top:2px">Flesje water, pakje drinken, thermoskan...</div>
+        </div>
+      </li>
+      <li style="background:#fff0f5;border-radius:12px;padding:11px 14px;display:flex;align-items:center;gap:10px;font-size:0.88rem;font-weight:700">
+        <span style="font-size:1.3rem">🍪</span>
+        <div>
+          <div>Iets <strong>lekkers tussendoor</strong>?</div>
+          <div style="font-size:0.75rem;color:var(--muted);margin-top:2px">Een koekje, reepje, of iets anders kleins</div>
+        </div>
+      </li>
+    </ul>
+
+    <p style="font-size:0.8rem;font-weight:800;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px">✅ Nog meer checken</p>
+    <ul style="padding-left:18px;line-height:2.1;font-size:0.9rem;color:var(--muted)">
+      <li>Tas klaar zetten de avond van tevoren</li>
+      <li>Telefoon op stil voor het slapen</li>
+      <li>Gymkleren in de tas op <strong>maandag en dinsdag</strong> 🏃</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════ RECEPTEN ══════════ -->
+<section class="section" id="recepten">
+  <div class="page-header">
+    <div class="emoji">🍽️</div>
+    <h1>Koken & Bakken</h1>
+    <p>Milou's favoriete gerechten</p>
+  </div>
+
+  <div class="card accent-yellow">
+    <h2>🌟 Mijn favoriete gerechten</h2>
+    <div class="recipe-grid" id="receptGrid">
+      <!-- gevuld via JS -->
+    </div>
+  </div>
+
+  <div class="card accent-pink">
+    <h2>🍪 Koekjes bakken — Basisrecept</h2>
+    <p style="font-size:0.85rem; color:var(--muted); margin-bottom:12px">Knapperig van buiten, zacht van binnen</p>
+    <ul style="padding-left:18px; font-size:0.88rem; line-height:1.9; color:var(--text)">
+      <li>125g zachte boter</li>
+      <li>150g suiker</li>
+      <li>1 ei</li>
+      <li>1 tl vanille-extract</li>
+      <li>200g bloem</li>
+      <li>½ tl bakpoeder</li>
+      <li>Snufje zout</li>
+    </ul>
+    <div class="stappen" style="margin-top:14px; font-size:0.88rem; line-height:2; color:var(--text); border-top:1px solid #f0e0f0; padding-top:12px">
+      <strong>Zo maak je ze:</strong><br>
+      1️⃣ Verwarm de oven op 180°C<br>
+      2️⃣ Mix boter en suiker tot het luchtig is<br>
+      3️⃣ Voeg het ei en vanille toe<br>
+      4️⃣ Meng er de bloem, bakpoeder en zout door<br>
+      5️⃣ Vorm balletjes en leg op bakpapier<br>
+      6️⃣ Bak 10-12 minuten tot lichtgoud 🍪
+    </div>
+  </div>
+
+  <div class="card accent-mint">
+    <h2>🥒 Milou's Komkommersalade</h2>
+    <p style="font-size:0.85rem; color:var(--muted); margin-bottom:12px">Jouw eigen recept!</p>
+    <ul style="padding-left:18px; font-size:0.88rem; line-height:1.9;">
+      <li>1 komkommer</li>
+      <li>Scheut olijfolie</li>
+      <li>Beetje azijn of citroensap</li>
+      <li>Zout en peper</li>
+      <li>Optioneel: verse dille of munt</li>
+    </ul>
+    <p style="margin-top:10px; font-size:0.82rem; color:var(--muted)">✏️ <em>Pas dit recept aan naar jouw eigen smaak!</em></p>
+  </div>
+</section>
+
+<!-- ══════════ BLACKPINK ══════════ -->
+<section class="section" id="blackpink">
+  <div class="page-header">
+    <img src="blackpink-logo.svg.png" alt="BLACKPINK" style="height:48px;margin-bottom:8px;display:block;margin-left:auto;margin-right:auto">
+    <p>In your area! 🖤💗</p>
+  </div>
+
+  <!-- MEMBER CARDS met echte foto's -->
+  <div class="card accent-pink">
+    <h2><img src="blackpink-logo.svg.png" alt="BLACKPINK" style="height:32px;vertical-align:middle;margin-right:8px">De vier leden</h2>
+    <div class="bp-members-big">
+
+      <a href="https://www.youtube.com/results?search_query=Jisoo+BLACKPINK" target="_blank" class="bp-big-card bp-jisoo">
+        <img src="jisoo.jpg" alt="Jisoo"
+             style="width:100%;height:100%;object-fit:cover;object-position:top;display:block"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="bp-avatar" style="background:linear-gradient(160deg,#ffb6c1,#ff8fab,#c9184a);display:none">
+          <div class="bp-avatar-letter">JS</div>
+          <div class="bp-avatar-deco">🌸🌸🌸</div>
+        </div>
+        <div class="bp-big-overlay">
+          <div class="bp-big-name">🌸 Jisoo</div>
+          <div class="bp-big-role">Vocalist & Visual</div>
+          <div class="bp-big-info">30 jaar 🎂 3 jan · 🇰🇷</div>
+        </div>
+      </a>
+
+      <a href="https://www.youtube.com/results?search_query=Jennie+BLACKPINK" target="_blank" class="bp-big-card bp-jennie">
+        <img src="jennie.png" alt="Jennie"
+             style="width:100%;height:100%;object-fit:cover;object-position:top;display:block"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="bp-avatar" style="background:linear-gradient(160deg,#ffe066,#f4a261,#e76f51);display:none">
+          <div class="bp-avatar-letter">JN</div>
+          <div class="bp-avatar-deco">👑✨👑</div>
+        </div>
+        <div class="bp-big-overlay">
+          <div class="bp-big-name">👑 Jennie</div>
+          <div class="bp-big-role">Rapper & Vocalist</div>
+          <div class="bp-big-info">29 jaar 🎂 16 jan · 🇰🇷</div>
+        </div>
+      </a>
+
+      <a href="https://www.youtube.com/results?search_query=Rose+BLACKPINK" target="_blank" class="bp-big-card bp-rose">
+        <img src="rose.jpg" alt="Rosé"
+             style="width:100%;height:100%;object-fit:cover;object-position:top;display:block"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="bp-avatar" style="background:linear-gradient(160deg,#a8d8ea,#74c0fc,#4dabf7);display:none">
+          <div class="bp-avatar-letter">RO</div>
+          <div class="bp-avatar-deco">🌹🎵🌹</div>
+        </div>
+        <div class="bp-big-overlay">
+          <div class="bp-big-name">🌹 Rosé</div>
+          <div class="bp-big-role">Vocalist & Danser</div>
+          <div class="bp-big-info">28 jaar 🎂 11 feb · 🇳🇿</div>
+        </div>
+      </a>
+
+      <a href="https://www.youtube.com/results?search_query=Lisa+BLACKPINK" target="_blank" class="bp-big-card bp-lisa">
+        <img src="lisa.jpg" alt="Lisa"
+             style="width:100%;height:100%;object-fit:cover;object-position:top;display:block"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="bp-avatar" style="background:linear-gradient(160deg,#b7e4c7,#74c69d,#40916c);display:none">
+          <div class="bp-avatar-letter">LI</div>
+          <div class="bp-avatar-deco">⚡💚⚡</div>
+        </div>
+        <div class="bp-big-overlay">
+          <div class="bp-big-name">⚡ Lisa</div>
+          <div class="bp-big-role">Rapper & Hoofddanser</div>
+          <div class="bp-big-info">27 jaar 🎂 27 mrt · 🇹🇭</div>
+        </div>
+      </a>
+
+    </div>
+    <p style="font-size:0.72rem;color:var(--muted);text-align:center;margin-top:10px">
+      Foto's via Wikimedia Commons · CC BY 4.0 · Tik op een lid voor YouTube 🎵
+    </p>
+  </div>
+
+  <!-- VERJAARDAGEN TELLER -->
+  <div class="card accent-lav">
+    <h2>🎂 Volgende verjaardag</h2>
+    <div id="bdayCard" style="text-align:center;padding:10px 0"></div>
+  </div>
+
+  <!-- YOUTUBE VIDEO's -->
+  <div class="card accent-sky">
+    <h2>▶️ Bekijk & dans mee!</h2>
+    <p style="font-size:0.83rem;color:var(--muted);margin-bottom:14px">Tik op een video om hem op YouTube te openen 📱</p>
+    <div class="yt-grid">
+      <a href="https://www.youtube.com/watch?v=IHNzOHi8sJs" target="_blank" class="yt-card">
+        <img src="https://img.youtube.com/vi/IHNzOHi8sJs/mqdefault.jpg" alt="DDU-DU DDU-DU">
+        <div class="yt-play">▶</div>
+        <div class="yt-label">DDU-DU DDU-DU 🔥</div>
+      </a>
+      <a href="https://www.youtube.com/watch?v=ioNng23DkIM" target="_blank" class="yt-card">
+        <img src="https://img.youtube.com/vi/ioNng23DkIM/mqdefault.jpg" alt="How You Like That">
+        <div class="yt-play">▶</div>
+        <div class="yt-label">How You Like That 💕</div>
+      </a>
+      <a href="https://www.youtube.com/watch?v=e-ORhEE9VVg" target="_blank" class="yt-card">
+        <img src="https://img.youtube.com/vi/e-ORhEE9VVg/mqdefault.jpg" alt="Pink Venom">
+        <div class="yt-play">▶</div>
+        <div class="yt-label">Pink Venom 🖤</div>
+      </a>
+      <a href="https://www.youtube.com/watch?v=dyXnBRQCQEU" target="_blank" class="yt-card">
+        <img src="https://img.youtube.com/vi/dyXnBRQCQEU/mqdefault.jpg" alt="LOVESICK GIRLS">
+        <div class="yt-play">▶</div>
+        <div class="yt-label">LOVESICK GIRLS 🌹</div>
+      </a>
+      <a href="https://www.youtube.com/watch?v=rCkFCJiJBcA" target="_blank" class="yt-card">
+        <img src="https://img.youtube.com/vi/rCkFCJiJBcA/mqdefault.jpg" alt="Shut Down">
+        <div class="yt-play">▶</div>
+        <div class="yt-label">Shut Down ⚡</div>
+      </a>
+      <a href="https://www.youtube.com/watch?v=2VSSHBuJOZs" target="_blank" class="yt-card">
+        <img src="https://img.youtube.com/vi/2VSSHBuJOZs/mqdefault.jpg" alt="SOLO Jennie">
+        <div class="yt-play">▶</div>
+        <div class="yt-label">SOLO – Jennie 👑</div>
+      </a>
+      <a href="https://www.youtube.com/watch?v=wKysONrSmew" target="_blank" class="yt-card">
+        <img src="https://img.youtube.com/vi/wKysONrSmew/mqdefault.jpg" alt="On The Ground Rosé">
+        <div class="yt-play">▶</div>
+        <div class="yt-label">On The Ground – Rosé 🌹</div>
+      </a>
+      <a href="https://www.youtube.com/watch?v=NvBhqKGTwGI" target="_blank" class="yt-card">
+        <img src="https://img.youtube.com/vi/NvBhqKGTwGI/mqdefault.jpg" alt="MONEY Lisa">
+        <div class="yt-play">▶</div>
+        <div class="yt-label">MONEY – Lisa ⚡</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- DANSVIDEO's -->
+  <div class="card accent-pink" style="border-top-color:#c9b8f0">
+    <h2>💃 Leer de dans mee!</h2>
+    <p style="font-size:0.83rem;color:var(--muted);margin-bottom:14px">Dans-tutorial video's — tik om te openen in YouTube</p>
+    <div class="yt-grid">
+      <a href="https://www.youtube.com/results?search_query=DDU-DU+DDU-DU+dance+tutorial+easy" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner">
+          <div style="font-size:2rem">💃</div>
+          <div class="yt-label">DDU-DU tutorial</div>
+          <div class="yt-sub">Stap voor stap</div>
+        </div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=How+You+Like+That+dance+tutorial+easy" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner">
+          <div style="font-size:2rem">🕺</div>
+          <div class="yt-label">How You Like That</div>
+          <div class="yt-sub">Stap voor stap</div>
+        </div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=Pink+Venom+dance+tutorial" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner">
+          <div style="font-size:2rem">🖤</div>
+          <div class="yt-label">Pink Venom tutorial</div>
+          <div class="yt-sub">Stap voor stap</div>
+        </div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=BLACKPINK+dance+tutorial+beginners" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner">
+          <div style="font-size:2rem">🌟</div>
+          <div class="yt-label">Meer tutorials</div>
+          <div class="yt-sub">Voor beginners</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- WEETJES -->
+  <div class="card accent-lav">
+    <h2>✨ Leuke weetjes</h2>
+    <div class="bp-funfacts">
+      <div class="bp-fact">🎶 BLACKPINK debuteerde op <strong>8 augustus 2016</strong> bij YG Entertainment — ze bestaan nu al bijna 9 jaar!</div>
+      <div class="bp-fact">🌍 Hun YouTube-kanaal heeft meer dan <strong>90 miljoen abonnees</strong> — een van de grootste ter wereld.</div>
+      <div class="bp-fact">💪 Lisa werd gekozen uit meer dan <strong>4.000 auditiedeelnemers</strong> toen ze slechts 14 jaar oud was.</div>
+      <div class="bp-fact">🐶 Jisoo heeft twee schattige hondjes: <strong>Dalgom</strong> (een witte Maltees) en <strong>Snowball</strong>.</div>
+      <div class="bp-fact">🎸 Rosé speelt gitaar én piano — ze laat dat regelmatig zien op haar Instagram.</div>
+      <div class="bp-fact">🏆 Jennie was de <strong>eerste soliste</strong> van de groep en haar hit "SOLO" heeft miljarden streams.</div>
+      <div class="bp-fact">🎤 Jisoo bracht in 2023 haar solosingle <strong>"FLOWER"</strong> uit — bekijk de prachtige MV op YouTube!</div>
+      <div class="bp-fact">🌸 BLACKPINK is de <strong>eerste K-pop groep</strong> die headlinde op het Coachella festival in Amerika.</div>
+    </div>
+  </div>
+
+  <!-- SOCIALS LINKS -->
+  <div class="card accent-yellow">
+    <h2>📱 Volg BLACKPINK</h2>
+    <div class="social-links">
+      <a href="https://www.youtube.com/@BLACKPINK" target="_blank" class="social-btn" style="background:#ff0000">
+        <span>▶</span> YouTube
+      </a>
+      <a href="https://www.instagram.com/blackpinkofficial/" target="_blank" class="social-btn" style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)">
+        <span>📸</span> Instagram
+      </a>
+      <a href="https://www.youtube.com/results?search_query=BLACKPINK+2025" target="_blank" class="social-btn" style="background:#1a1a2e">
+        <span>🔍</span> Nieuws 2025
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ CREATIEF ══════════ -->
+<section class="section" id="creatief">
+  <div class="page-header">
+    <div class="emoji">🎨</div>
+    <h1>Creatieve Hoek</h1>
+    <p>Tekenen, verven en meer inspiratie!</p>
+  </div>
+
+  <!-- TEKENEN MET YOUTUBE LINKS -->
+  <div class="card accent-yellow">
+    <h2>✏️ Leer tekenen via YouTube</h2>
+    <p style="font-size:0.83rem;color:var(--muted);margin-bottom:14px">Tik op een tutorial om hem te openen 📱</p>
+    <div class="yt-grid">
+      <a href="https://www.youtube.com/results?search_query=how+to+draw+cute+anime+girl+easy+step+by+step" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner" style="background:linear-gradient(135deg,#fff8e0,#ffe49a)">
+          <div style="font-size:2rem">🌸</div>
+          <div class="yt-label">Schattig anime meisje</div>
+          <div class="yt-sub">Stap voor stap</div>
+        </div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=how+to+draw+BLACKPINK+chibi+easy" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner" style="background:linear-gradient(135deg,#fff0f5,#f9c9d8)">
+          <div style="font-size:2rem">🎤</div>
+          <div class="yt-label">BLACKPINK tekenen</div>
+          <div class="yt-sub">Chibi stijl</div>
+        </div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=easy+drawing+tutorials+for+kids+flowers" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner" style="background:linear-gradient(135deg,#f0fff8,#a8e6cf)">
+          <div style="font-size:2rem">🌺</div>
+          <div class="yt-label">Bloemen tekenen</div>
+          <div class="yt-sub">Makkelijk & mooi</div>
+        </div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=draw+so+cute+easy" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner" style="background:linear-gradient(135deg,#f0ecff,#c9b8f0)">
+          <div style="font-size:2rem">🦄</div>
+          <div class="yt-label">Draw So Cute</div>
+          <div class="yt-sub">Schattige stijl</div>
+        </div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=how+to+draw+eyes+anime+easy" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner" style="background:linear-gradient(135deg,#e8f8f0,#a8d8f0)">
+          <div style="font-size:2rem">👁️</div>
+          <div class="yt-label">Ogen tekenen</div>
+          <div class="yt-sub">Anime stijl</div>
+        </div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=easy+mandala+drawing+for+beginners" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner" style="background:linear-gradient(135deg,#fff8e0,#ffd580)">
+          <div style="font-size:2rem">🌀</div>
+          <div class="yt-label">Mandala tekenen</div>
+          <div class="yt-sub">Rustgevend & mooi</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- INSPIRATIE APPS -->
+  <div class="card accent-pink">
+    <h2>📱 Handige apps & websites</h2>
+    <div class="link-lijst">
+      <a href="https://www.pinterest.com/search/pins/?q=cute+drawing+ideas+for+girls" target="_blank" class="link-rij" style="border-left-color:#e60023">
+        <div class="link-icon">📌</div>
+        <div>
+          <div class="link-titel">Pinterest — Teken-ideeën</div>
+          <div class="link-sub">Eindeloos veel inspiratie voor meisjes</div>
+        </div>
+        <div class="link-arrow">→</div>
+      </a>
+      <a href="https://www.youtube.com/@DrawSoCute" target="_blank" class="link-rij" style="border-left-color:#ff0000">
+        <div class="link-icon">▶️</div>
+        <div>
+          <div class="link-titel">Draw So Cute — YouTube</div>
+          <div class="link-sub">Schattige teken-tutorials</div>
+        </div>
+        <div class="link-arrow">→</div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=art+for+kids+hub+easy" target="_blank" class="link-rij" style="border-left-color:#ff6b35">
+        <div class="link-icon">🎨</div>
+        <div>
+          <div class="link-titel">Art for Kids Hub</div>
+          <div class="link-sub">Stap-voor-stap tekenlessen</div>
+        </div>
+        <div class="link-arrow">→</div>
+      </a>
+      <a href="https://sketchpad.app" target="_blank" class="link-rij" style="border-left-color:#a8e6cf">
+        <div class="link-icon">✏️</div>
+        <div>
+          <div class="link-titel">Sketchpad.app</div>
+          <div class="link-sub">Digitaal tekenen in Safari</div>
+        </div>
+        <div class="link-arrow">→</div>
+      </a>
+      <a href="https://www.coloringpages101.com/pages/anime/" target="_blank" class="link-rij" style="border-left-color:#c9b8f0">
+        <div class="link-icon">🖍️</div>
+        <div>
+          <div class="link-titel">Anime kleurplaten</div>
+          <div class="link-sub">Gratis afdrukken & inkleuren</div>
+        </div>
+        <div class="link-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- KLEUREN -->
+  <div class="card accent-mint">
+    <h2>🎨 Kleurencombinaties</h2>
+    <p style="font-size:0.83rem;color:var(--muted);margin-bottom:14px">Tik op een kleur om de code te kopiëren</p>
+    <p style="font-size:0.82rem;font-weight:700;margin-bottom:8px">🌸 Pastel droomwereld</p>
+    <div class="kleur-grid">
+      <div class="kleur-dot" style="background:#f7a8c4" onclick="kopieer('#f7a8c4')"></div>
+      <div class="kleur-dot" style="background:#c9b8f0" onclick="kopieer('#c9b8f0')"></div>
+      <div class="kleur-dot" style="background:#a8e6cf" onclick="kopieer('#a8e6cf')"></div>
+      <div class="kleur-dot" style="background:#ffe49a" onclick="kopieer('#ffe49a')"></div>
+      <div class="kleur-dot" style="background:#a8d8f0" onclick="kopieer('#a8d8f0')"></div>
+    </div>
+    <p style="font-size:0.82rem;font-weight:700;margin:14px 0 8px">🖤💗 BLACKPINK stijl</p>
+    <div class="kleur-grid">
+      <div class="kleur-dot" style="background:#1a1a1a" onclick="kopieer('#1a1a1a')"></div>
+      <div class="kleur-dot" style="background:#ff69b4" onclick="kopieer('#ff69b4')"></div>
+      <div class="kleur-dot" style="background:#fff;border:1px solid #eee" onclick="kopieer('#ffffff')"></div>
+      <div class="kleur-dot" style="background:#c0392b" onclick="kopieer('#c0392b')"></div>
+      <div class="kleur-dot" style="background:#ffd700" onclick="kopieer('#ffd700')"></div>
+    </div>
+    <a href="https://coolors.co/generate" target="_blank" style="display:inline-block;margin-top:14px;font-size:0.83rem;font-weight:700;color:#5a9a7a;text-decoration:none">
+      🌈 Zelf kleuren genereren op Coolors →
+    </a>
+    <p id="kopie-feedback" style="font-size:0.8rem;color:var(--mint);margin-top:8px;min-height:20px;font-weight:700"></p>
+  </div>
+
+  <!-- VERF TUTORIALS -->
+  <div class="card accent-lav">
+    <h2>🖌️ Verven — tutorials & tips</h2>
+    <div class="yt-grid" style="margin-bottom:14px">
+      <a href="https://www.youtube.com/results?search_query=easy+watercolor+painting+for+beginners+flowers" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner" style="background:linear-gradient(135deg,#e8f0ff,#a8d8f0)">
+          <div style="font-size:2rem">💧</div>
+          <div class="yt-label">Waterverf bloemen</div>
+          <div class="yt-sub">Makkelijk voor beginners</div>
+        </div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=acrylic+pour+painting+easy+rainbow" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner" style="background:linear-gradient(135deg,#fff0f5,#ffe49a)">
+          <div style="font-size:2rem">🌈</div>
+          <div class="yt-label">Giet-schilderen</div>
+          <div class="yt-sub">Supercool resultaat!</div>
+        </div>
+      </a>
+    </div>
+    <ul class="creative-list">
+      <li><span class="ci-emoji">💧</span><div><strong>Waterverf:</strong> werk van licht naar donker. Nat papier = zachtere randen.</div></li>
+      <li><span class="ci-emoji">🖌️</span><div><strong>Acrylverf:</strong> droogt snel! Poets kwast direct schoon met water.</div></li>
+      <li><span class="ci-emoji">🌈</span><div><strong>Mengen:</strong> blauw + geel = groen, rood + blauw = paars, rood + geel = oranje.</div></li>
+      <li><span class="ci-emoji">⬜</span><div><strong>Wit toevoegen</strong> maakt elke kleur lekker pastelvrolijk.</div></li>
+    </ul>
+  </div>
+
+  <!-- BAKKEN CREATIEF -->
+  <div class="card accent-sky">
+    <h2>🍪 Creatief bakken — video-ideeën</h2>
+    <div class="yt-grid">
+      <a href="https://www.youtube.com/results?search_query=schattige+koekjes+versieren+kinderen" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner" style="background:linear-gradient(135deg,#fff8e0,#ffe4a0)">
+          <div style="font-size:2rem">🍪</div>
+          <div class="yt-label">Koekjes versieren</div>
+          <div class="yt-sub">Schattige vormpjes</div>
+        </div>
+      </a>
+      <a href="https://www.youtube.com/results?search_query=pancake+art+easy+for+kids" target="_blank" class="yt-card yt-tutorial">
+        <div class="yt-tutorial-inner" style="background:linear-gradient(135deg,#f0fff8,#c8f0e0)">
+          <div style="font-size:2rem">🥞</div>
+          <div class="yt-label">Pancake art</div>
+          <div class="yt-sub">Figuurpannenkoeken</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ RUST ══════════ -->
+<section class="section" id="rust">
+  <div class="page-header">
+    <div class="emoji">💚</div>
+    <h1>Even Uitblazen</h1>
+    <p>Een rustig plekje speciaal voor jou</p>
+  </div>
+
+  <!-- DAGELIJKS BERICHTJE — AI powered -->
+  <div class="card accent-lav">
+    <h2>💌 Berichtje voor jou</h2>
+    <div class="positief-kaart">
+      <div class="pk-tekst" id="pk-bericht">🌸</div>
+      <div class="pk-sub" id="pk-sub"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button id="nieuw-bericht-btn" onclick="nieuwBericht()" style="flex:1">🌸 Ander berichtje</button>
+      <button onclick="genereerNieuweBerichtjes()" id="ai-bericht-btn"
+        style="flex:1;background:linear-gradient(135deg,#c9b8f0,#a89de0);border:none;cursor:pointer;
+        font-family:'Nunito',sans-serif;font-weight:800;padding:12px;border-radius:14px;
+        font-size:0.88rem;color:white;transition:opacity .2s"
+        title="Genereer nieuwe berichtjes met AI">
+        ✨ Nieuwe berichtjes
+      </button>
+    </div>
+    <p id="ai-bericht-status" style="font-size:0.75rem;color:var(--muted);text-align:center;margin-top:6px;min-height:16px"></p>
+  </div>
+
+  <!-- ADEMHALING -->
+  <div class="card accent-mint">
+    <h2>🫁 Adem mee — kalmer worden</h2>
+    <div class="adem-box">
+      <div class="adem-circle" id="ademCircle">🌿</div>
+      <div id="adem-tekst">Druk op start om te beginnen</div>
+      <button id="adem-btn" onclick="startAdem()">Start ▶</button>
+    </div>
+    <p style="font-size:0.82rem;color:var(--muted);text-align:center">
+      Diep ademhalen helpt als je je onrustig voelt. Doe dit 3 keer achter elkaar.
+    </p>
+  </div>
+
+  <!-- RUST THEMA'S -->
+  <div class="card accent-sky">
+    <h2>😌 Wat helpt als je je gespannen voelt?</h2>
+    <p style="font-size:0.83rem;color:var(--muted);margin-bottom:14px">Kies iets wat bij jou past op dat moment:</p>
+    <div class="rust-grid">
+
+      <div class="rust-tile" style="background:linear-gradient(135deg,#fff0f5,#ffd6e7)">
+        <div class="rt-emoji">🎵</div>
+        <div class="rt-titel">Muziek & zingen</div>
+        <div class="rt-tekst">Zet je favoriete BLACKPINK nummer op en zing of dans mee. Muziek helpt echt!</div>
+      </div>
+
+      <div class="rust-tile" style="background:linear-gradient(135deg,#f0fff8,#c8f0e0)">
+        <div class="rt-emoji">🌿</div>
+        <div class="rt-titel">Frisse lucht</div>
+        <div class="rt-tekst">Ga even naar buiten of open een raam. Frisse lucht kalmeert je hoofd.</div>
+      </div>
+
+      <div class="rust-tile" style="background:linear-gradient(135deg,#fff8e0,#ffe4a0)">
+        <div class="rt-emoji">🎨</div>
+        <div class="rt-titel">Tekenen of kleuren</div>
+        <div class="rt-tekst">Je hand beweegt, je hoofd rust. Teken iets kleins — een bloem, een ster, wat dan ook.</div>
+      </div>
+
+      <div class="rust-tile" style="background:linear-gradient(135deg,#f0ecff,#d4c5f9)">
+        <div class="rt-emoji">🚿</div>
+        <div class="rt-titel">Warme douche</div>
+        <div class="rt-tekst">Een warme douche kalmeert je lichaam en hoofd. Bij opa en oma kun je ook lekker in bad! 🛁</div>
+      </div>
+
+      <div class="rust-tile" style="background:linear-gradient(135deg,#e8f8f0,#b2e8d0)">
+        <div class="rt-emoji">💬</div>
+        <div class="rt-titel">Praten helpt</div>
+        <div class="rt-tekst">Vertel mama of papa hoe je je voelt. Je hoeft het niet alleen te dragen.</div>
+      </div>
+
+      <div class="rust-tile" style="background:linear-gradient(135deg,#fff0f8,#f9c9e0)">
+        <div class="rt-emoji">🧸</div>
+        <div class="rt-titel">Knuffelen</div>
+        <div class="rt-tekst">Een knuffel van iemand die van je houdt — of gewoon je lievelingsknuffel vasthouden.</div>
+      </div>
+
+      <div class="rust-tile" style="background:linear-gradient(135deg,#f0f8ff,#c0d8f0)">
+        <div class="rt-emoji">📺</div>
+        <div class="rt-titel">Iets leuks kijken</div>
+        <div class="rt-tekst">Zet iets fijns op — een serie, BLACKPINK video's, of iets grappigs. Afleiding helpt ook.</div>
+      </div>
+
+      <div class="rust-tile" style="background:linear-gradient(135deg,#fffbe0,#ffeea0)">
+        <div class="rt-emoji">🍪</div>
+        <div class="rt-titel">Iets lekkers maken</div>
+        <div class="rt-tekst">Bak koekjes of maak een drankje. Bezig zijn in de keuken geeft je hoofd rust.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- OVER SHEIN -->
+  <div class="card accent-yellow">
+    <h2>🛡️ Over SHEIN — wat je moet weten</h2>
+    <div class="geruststelling">
+      <strong>Het is begrijpelijk dat je je zorgen maakt.</strong> Je hebt nieuws gehoord over SHEIN-spullen, en het is slim dat je goed op jezelf let.
+    </div>
+    <div class="geruststelling">
+      🔬 <strong>Wat wetenschappers zeggen:</strong> Bij kleding gaat het om stoffen die in sommige producten meer aanwezig waren dan de regels toestaan. Dat klinkt eng, maar even dragen of bij je hebben betekent <em>niet</em> dat je ziek wordt.
+    </div>
+    <div class="geruststelling">
+      💪 <strong>Wat helpt:</strong> Als je je ergens zorgen over maakt, mag je dat altijd zeggen. Je hoeft het niet alleen te dragen. Praat erover met mama of papa.
+    </div>
+    <div class="geruststelling">
+      🌱 <strong>Jij bent sterk.</strong> Zorgen hebben is normaal. Maar jij bent gezond, geliefd en er zijn mensen om je heen die voor je zorgen.
+    </div>
+  </div>
+
+</section>
+
+<!-- ══════════ DAGBOEK ══════════ -->
+<section class="section" id="dagboek">
+  <div class="page-header">
+    <div class="emoji">📓</div>
+    <h1>Mijn Dagboek</h1>
+    <p>Privé — alleen voor jou 🔒</p>
+  </div>
+  <div class="card accent-lav">
+    <h2>✍️ Schrijf vandaag</h2>
+    <div style="font-size:0.82rem;color:var(--muted);margin-bottom:10px" id="dagboek-datum"></div>
+    <textarea id="dagboek-input" placeholder="Hoe was jouw dag? Wat vond je leuk, wat was moeilijk, waar ben je trots op?..."
+      style="width:100%;min-height:160px;border:2px solid var(--lavender);border-radius:14px;
+      padding:14px;font-family:'Nunito',sans-serif;font-size:0.92rem;resize:vertical;
+      background:var(--bg);color:var(--text);outline:none;line-height:1.6"></textarea>
+    <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+      <div style="display:flex;gap:6px" id="dagboek-stickers">
+        <button onclick="voegStickerToe('🌸')" class="sticker-btn">🌸</button>
+        <button onclick="voegStickerToe('⭐')" class="sticker-btn">⭐</button>
+        <button onclick="voegStickerToe('💕')" class="sticker-btn">💕</button>
+        <button onclick="voegStickerToe('😊')" class="sticker-btn">😊</button>
+        <button onclick="voegStickerToe('🎵')" class="sticker-btn">🎵</button>
+        <button onclick="voegStickerToe('🎮')" class="sticker-btn">🎮</button>
+      </div>
+      <button onclick="slaanDagboekOp()" style="margin-left:auto;background:var(--lavender);border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:10px 20px;border-radius:50px;color:#5a4a9a;font-size:0.88rem">
+        💾 Opslaan
+      </button>
+    </div>
+    <div id="dagboek-feedback" style="font-size:0.8rem;color:var(--mint);margin-top:6px;min-height:18px;font-weight:700"></div>
+  </div>
+  <div class="card accent-mint" id="dagboek-entries-card">
+    <h2>📖 Eerdere dagboekpagina's</h2>
+    <div id="dagboek-entries" style="display:flex;flex-direction:column;gap:10px;margin-top:6px"></div>
+  </div>
+</section>
+
+<!-- ══════════ BLACKPINK QUIZ ══════════ -->
+<section class="section" id="quiz">
+  <div class="page-header">
+    <div class="emoji">🎵</div>
+    <h1>BLACKPINK Quiz</h1>
+    <p>Test je kennis! 🖤💗</p>
+  </div>
+  <div class="card accent-pink">
+    <div id="quiz-score-balk" style="display:flex;justify-content:space-between;margin-bottom:16px">
+      <span style="font-weight:800;font-size:0.9rem">❓ Vraag <span id="quiz-nr">1</span> van 10</span>
+      <span style="font-weight:800;font-size:0.9rem">⭐ Score: <span id="quiz-score">0</span></span>
+    </div>
+    <div id="quiz-vraag" style="font-size:1.05rem;font-weight:800;line-height:1.5;margin-bottom:18px;color:var(--text)"></div>
+    <div id="quiz-antwoorden" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div id="quiz-feedback" style="margin-top:14px;font-size:0.9rem;font-weight:700;min-height:24px"></div>
+    <button id="quiz-volgende-btn" onclick="volgendeQuizVraag()" style="display:none;margin-top:12px;background:var(--pink);border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:11px 28px;border-radius:50px;color:white;font-size:0.9rem">
+      Volgende vraag →
+    </button>
+  </div>
+  <div id="quiz-einde" style="display:none" class="card accent-lav">
+    <div style="text-align:center;padding:10px 0">
+      <div style="font-size:3rem">🎉</div>
+      <h2 style="margin:10px 0">Quiz afgerond!</h2>
+      <div id="quiz-einde-score" style="font-family:'Pacifico',cursive;font-size:2rem;color:var(--pink);margin:8px 0"></div>
+      <div id="quiz-einde-tekst" style="font-size:0.9rem;color:var(--muted);margin-bottom:16px"></div>
+      <button onclick="herStartQuiz()" style="background:var(--pink);border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:12px 28px;border-radius:50px;color:white;font-size:0.9rem">
+        🔄 Opnieuw spelen
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ OUDER DASHBOARD ══════════ -->
+<section class="section" id="ouder">
+  <div id="ouder-login" class="card accent-lav" style="text-align:center;padding:32px 20px">
+    <div style="font-size:3rem;margin-bottom:12px">🔒</div>
+    <h2 style="margin-bottom:8px">Ouder pagina</h2>
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:18px">Deze pagina is alleen voor papa en mama</p>
+    <input type="password" id="ouder-pin" placeholder="Pincode" maxlength="4"
+      style="width:120px;text-align:center;font-size:1.5rem;font-weight:900;letter-spacing:8px;
+      padding:10px;border:2px solid var(--lavender);border-radius:14px;font-family:'Nunito',sans-serif;
+      background:var(--bg);color:var(--text)">
+    <br><br>
+    <button onclick="checkOuderPin()" style="background:var(--lavender);border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:11px 28px;border-radius:50px;color:#5a4a9a;font-size:0.9rem">
+      🔓 Inloggen
+    </button>
+    <div id="pin-fout" style="color:#e63946;font-size:0.82rem;margin-top:8px;min-height:18px;font-weight:700"></div>
+  </div>
+
+  <div id="ouder-dashboard" style="display:none">
+    <div class="page-header">
+      <div class="emoji">📊</div>
+      <h1>Ouder Dashboard</h1>
+      <p>Overzicht van Milou's week</p>
+    </div>
+
+    <!-- Stemming grafiek -->
+    <div class="card accent-lav">
+      <h2>📈 Stemmingen deze week</h2>
+      <canvas id="stemmingGrafiek" height="200" style="width:100%;margin-top:8px"></canvas>
+      <div id="stemming-samenvatting" style="margin-top:12px;font-size:0.85rem;color:var(--muted);line-height:1.8"></div>
+    </div>
+
+    <!-- Geheim berichtje sturen -->
+    <div class="card accent-pink">
+      <h2>💌 Stuur een geheim berichtje naar Milou</h2>
+      <p style="font-size:0.83rem;color:var(--muted);margin-bottom:12px">Milou ziet dit de volgende keer dat ze de app opent op de homepagina!</p>
+      <textarea id="geheim-input" placeholder="Schrijf hier je verrassing voor Milou..."
+        style="width:100%;min-height:100px;border:2px solid var(--pink2);border-radius:14px;
+        padding:12px;font-family:'Nunito',sans-serif;font-size:0.9rem;resize:vertical;
+        background:var(--bg);color:var(--text);outline:none"></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <input type="text" id="geheim-van" placeholder="Van: (bijv. Mama 💕)" value="Mama & Papa 💕"
+          style="flex:1;border:2px solid var(--pink2);border-radius:50px;padding:8px 14px;
+          font-family:'Nunito',sans-serif;font-size:0.85rem;background:var(--bg);color:var(--text)">
+        <button onclick="verstuurGeheimBerichtje()" style="background:var(--pink);border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:10px 20px;border-radius:50px;color:white;font-size:0.85rem">
+          💌 Sturen!
+        </button>
+      </div>
+      <div id="geheim-bevestiging" style="font-size:0.8rem;color:var(--mint);margin-top:8px;min-height:18px;font-weight:700"></div>
+    </div>
+
+    <!-- Dagboek inzien (optioneel) -->
+    <div class="card accent-mint">
+      <h2>📓 Dagboek statistieken</h2>
+      <div id="dagboek-stats" style="font-size:0.88rem;color:var(--muted);line-height:2"></div>
+    </div>
+
+    <button onclick="uitloggenOuder()" style="width:100%;background:#fee2e2;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:12px;border-radius:14px;color:#e63946;font-size:0.88rem;margin-top:8px">
+      🔒 Uitloggen
+    </button>
+  </div>
+</section>
+
+</main>
+
+<script>
+// ── HOME HERO ──
+const DAGQUOTES = [
+  "Jij bent een ster — zelfs als je dat zelf niet voelt. 🌟",
+  "Vandaag is een nieuwe dag vol mogelijkheden! 🌸",
+  "Je mag zijn wie je bent. Dat is meer dan genoeg. 💕",
+  "Kleine stappen tellen ook. Trots op jou! 🌱",
+  "Jouw lach maakt de wereld mooier. 😊",
+  "Doe vandaag iets wat je blij maakt. 🎨",
+  "Fouten zijn bewijs dat je het hebt geprobeerd. 💪",
+  "Jij bent sterker dan je denkt. Echt! 🦋",
+  "BLACKPINK in your area en jij ook! 🖤💗",
+  "Elke dag is een kans om iets leuks te ontdekken. ✨",
+  "Rustig ademen. Jij redt het. 💚",
+  "Vandaag ga jij er helemaal voor! 🎵",
+];
+const DAGGROETEN = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'];
+const dagNu = DAGGROETEN[new Date().getDay()];
+const uurNu = new Date().getHours();
+const groet = uurNu < 12 ? 'Goedemorgen' : uurNu < 18 ? 'Goedemiddag' : 'Goedenavond';
+const dagTekstEl = document.getElementById('hero-dag-tekst');
+if (dagTekstEl) dagTekstEl.textContent = `${groet}, het is ${dagNu} 🌸`;
+// dagquote wordt geladen vanuit data.js
+
+// ════════════════════════════════════════════════════════
+//  📊 STEMMING TRACKING & WEKELIJKSE EMAIL
+// ════════════════════════════════════════════════════════
+
+// ── Stemming opslaan in localStorage ──
+function slaStemmingOp(emoji, label) {
+  const nu      = new Date();
+  const datumKey = `${nu.getFullYear()}-${String(nu.getMonth()+1).padStart(2,'0')}-${String(nu.getDate()).padStart(2,'0')}`;
+  const dagNaamNu = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'][nu.getDay()];
+  const tijdStr  = `${String(nu.getHours()).padStart(2,'0')}:${String(nu.getMinutes()).padStart(2,'0')}`;
+
+  // Lees bestaande week-data
+  let weekData = {};
+  try { weekData = JSON.parse(localStorage.getItem('milou_stemmingen') || '{}'); } catch(e) {}
+
+  // Voeg toe (meerdere stemmingen op één dag zijn OK)
+  if (!weekData[datumKey]) weekData[datumKey] = [];
+  weekData[datumKey].push({ emoji, label, dag: dagNaamNu, tijd: tijdStr, timestamp: nu.toISOString() });
+
+  localStorage.setItem('milou_stemmingen', JSON.stringify(weekData));
+  return weekData;
+}
+
+// ── Bouw het email-overzicht op ──
+function bouwWeekOverzicht(weekData) {
+  const dagNamenNL = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'];
+  const nu = new Date();
+
+  // Laatste 7 dagen
+  let overzicht = '';
+  let totaalStemmingen = 0;
+  let stemmingTelling = { '😊':0, '🥰':0, '😐':0, '😴':0, '😢':0 };
+
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(nu);
+    d.setDate(d.getDate() - i);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const dagNaam = dagNamenNL[d.getDay()];
+    const datumStr = `${d.getDate()} ${['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'][d.getMonth()]}`;
+
+    if (weekData[key] && weekData[key].length > 0) {
+      const items = weekData[key];
+      totaalStemmingen += items.length;
+      items.forEach(s => { if (stemmingTelling[s.emoji] !== undefined) stemmingTelling[s.emoji]++; });
+      const stemmingRegel = items.map(s => `${s.emoji} ${s.label} (${s.tijd})`).join(', ');
+      overzicht += `${dagNaam} ${datumStr}: ${stemmingRegel}\n`;
+    } else {
+      overzicht += `${dagNaam} ${datumStr}: geen stemming ingevuld\n`;
+    }
+  }
+
+  // Samenvatting
+  const vaakst = Object.entries(stemmingTelling).sort((a,b) => b[1]-a[1])[0];
+  const samenvatting = totaalStemmingen === 0
+    ? 'Milou heeft deze week geen stemmingen ingevuld.'
+    : `Milou vulde ${totaalStemmingen}x een stemming in. Meest voorkomend: ${vaakst[0]} (${vaakst[1]}x).`;
+
+  return { overzicht, samenvatting, stemmingTelling, totaalStemmingen };
+}
+
+// ── Verstuur weekmail via EmailJS ──
+function verstuurWeekmail(weekData) {
+  const { overzicht, samenvatting, stemmingTelling, totaalStemmingen } = bouwWeekOverzicht(weekData);
+  const nu = new Date();
+  const weekStr = `week van ${nu.getDate()-6} t/m ${nu.getDate()} ${['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'][nu.getMonth()]} ${nu.getFullYear()}`;
+
+  const templateParams = {
+    to_email_1:   'frankburrei@gmail.com',
+    to_email_2:   'marleenhomminga@gmail.com',
+    week_periode: weekStr,
+    samenvatting: samenvatting,
+    overzicht:    overzicht,
+    blij:         stemmingTelling['😊'] + stemmingTelling['🥰'],
+    gewoon:       stemmingTelling['😐'],
+    moe_verdrietig: stemmingTelling['😴'] + stemmingTelling['😢'],
+    totaal:       totaalStemmingen,
+  };
+
+  // Stuur naar beide adressen — alleen als EmailJS geladen is
+  if (typeof emailjs === 'undefined') {
+    console.log('EmailJS nog niet geladen, mail wordt niet verstuurd.');
+    return;
+  }
+  emailjs.send(
+    'service_po4zbha',
+    'template_bilthjo',
+    templateParams
+  ).then(() => {
+    console.log('✅ Weekoverzicht verstuurd naar frank & marleen');
+    localStorage.setItem('milou_laatste_mail', new Date().toISOString());
+  }).catch(err => {
+    console.error('❌ EmailJS fout:', err);
+  });
+}
+
+// ── Controleer elke zondag of de mail al verstuurd is ──
+function checkZondagMail() {
+  const nu = new Date();
+  const isZondag = nu.getDay() === 0;
+  const isAvond  = nu.getHours() >= 19; // na 19:00
+
+  if (!isZondag || !isAvond) return;
+
+  // Voorkom dubbele verzending
+  const laatsteMail = localStorage.getItem('milou_laatste_mail');
+  if (laatsteMail) {
+    const laats = new Date(laatsteMail);
+    const vandaagDate = `${nu.getFullYear()}-${nu.getMonth()}-${nu.getDate()}`;
+    const laaatsteDate = `${laats.getFullYear()}-${laats.getMonth()}-${laats.getDate()}`;
+    if (vandaagDate === laaatsteDate) return; // al verstuurd vandaag
+  }
+
+  let weekData = {};
+  try { weekData = JSON.parse(localStorage.getItem('milou_stemmingen') || '{}'); } catch(e) {}
+  verstuurWeekmail(weekData);
+}
+
+// Controleer bij opstarten en daarna elk uur
+checkZondagMail();
+setInterval(checkZondagMail, 60 * 60 * 1000);
+
+// ── kiesStemming: opslaan + tonen ──
+const STEMMING_REACTIES = {
+  '😊': ['Wat fijn! Geniet ervan! 🌟', 'Super! Jij straalt vandaag! ✨'],
+  '🥰': ['Aah wat lief! Geniet van dat fijne gevoel 💕', 'Zo mooi! Je bent geliefd! 🌸'],
+  '😐': ['Dat is ook goed. Niet elke dag hoeft bijzonder te zijn 🌿', 'Gewoon is prima! Rust maar even 💚'],
+  '😴': ['Doe het rustig aan vandaag. Jij mag ook uitrusten 😴', 'Moe zijn mag. Zorg goed voor jezelf 🌙'],
+  '😢': ['Dat is oké. Slechte dagen horen erbij. Je bent niet alleen 💕', 'Ik hoor je. Misschien helpt een knuffel of muziek? 🎵'],
+};
+
+function kiesStemming(e, emoji, label) {
+  document.querySelectorAll('.hw-btn').forEach(b => b.classList.remove('gekozen'));
+  if (e && e.currentTarget) e.currentTarget.classList.add('gekozen');
+
+  // Sla op
+  slaStemmingOp(emoji, label);
+
+  // Toon reactie
+  const reacties = STEMMING_REACTIES[emoji] || ['Bedankt dat je het deelt 💚'];
+  const r = reacties[Math.floor(Math.random() * reacties.length)];
+  const el = document.getElementById('stemming-reactie');
+  if (el) el.textContent = r;
+}
+
+// ── NAVIGATIE ──
+function toon(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // Initialiseer secties bij eerste bezoek
+  if (id==='dagboek') laadDagboekEntries();
+  if (id==='quiz')    initQuiz();
+  if (id==='ouder')   laadOuderDashboard();
+  if (id==='home')  { updateSterren(); checkGeheimBerichtje(); }
+}
+function navBtn(id) {
+  return [...document.querySelectorAll('nav button')]
+    .find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${id}'`));
+}
+
+// ── SCHEMA: DAG GRID ──
+// ✏️ PAS HIER DE NAMEN VAN DE JUFFEN AAN
+// Groep 8 — schooljaar 2026-2027
+const SCHEMA = [
+  { dag: 'Maandag',   juf: 'Juf Eva',             gym: true  },
+  { dag: 'Dinsdag',   juf: 'Juf Eva & Stephanie', gym: true  },
+  { dag: 'Woensdag',  juf: 'Juf Stephanie',       gym: false },
+  { dag: 'Donderdag', juf: 'Juf Stephanie',       gym: false },
+  { dag: 'Vrijdag',   juf: 'Juf Stephanie',       gym: false },
+];
+
+const dagNamen = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'];
+const vandaag = dagNamen[new Date().getDay()];
+
+const grid = document.getElementById('dagGrid');
+SCHEMA.forEach(item => {
+  const isVandaag = item.dag === vandaag;
+  const div = document.createElement('div');
+  div.className = 'day-row' + (isVandaag ? ' today' : '');
+  div.innerHTML = `
+    <span class="dr-day">${item.dag}${isVandaag ? '<span class="vandaag-badge">vandaag</span>' : ''}</span>
+    <span class="dr-juf">${item.juf}</span>
+    ${item.gym ? '<span class="dr-badge">🏃 Gym</span>' : ''}
+  `;
+  grid.appendChild(div);
+});
+
+// ── LIVE KLOK & SLIMME MELDING ──
+const MAANDEN   = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+const WEEKDAGEN = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'];
+
+function updateKlok() {
+  const nu    = new Date();
+  const uur   = nu.getHours();
+  const min   = String(nu.getMinutes()).padStart(2,'0');
+  const sec   = String(nu.getSeconds()).padStart(2,'0');
+  const dag   = nu.getDay();        // 0=zo, 1=ma ... 6=za
+  const datum = nu.getDate();
+  const maand = MAANDEN[nu.getMonth()];
+  const jaar  = nu.getFullYear();
+  const dagNaam = WEEKDAGEN[dag];
+
+  // Klok
+  const tijdEl = document.getElementById('klokTijd');
+  const datumEl = document.getElementById('klokDatum');
+  const badgeEl = document.getElementById('klokDagBadge');
+  if (tijdEl)  tijdEl.textContent  = `${String(uur).padStart(2,'0')}:${min}:${sec}`;
+  if (datumEl) datumEl.textContent = `${dagNaam} ${datum} ${maand} ${jaar}`;
+
+  // Badge kleur per dag
+  const isWeekend  = dag === 0 || dag === 6;
+  const isVrijdag  = dag === 5;
+  const isZaterdag = dag === 6;
+  let badgeTekst = dagNaam;
+  if (isZaterdag)    badgeTekst = '🌟 Zaterdag!';
+  else if (dag === 0)     badgeTekst = '😴 Zondag';
+  else if (isVrijdag)     badgeTekst = '🎒 Vrijdag — bijna weekend!';
+  if (badgeEl) badgeEl.textContent = badgeTekst;
+
+  // ── Slimme melding — per dag én tijdstip ──
+  const slimCard  = document.getElementById('slimCard');
+  const slimEmoji = document.getElementById('slimEmoji');
+  const slimTitel = document.getElementById('slimTitel');
+  const slimSub   = document.getElementById('slimSub');
+  if (!slimCard) return;
+
+  let emoji = '🌸', titel = '', sub = '', kleur = '#fff8fb';
+
+  // Slaaptijd logica
+  const bedtijdWerkdag = 19 * 60 + 30;  // 19:30
+  const bedtijdWeekend = 22 * 60;        // 22:00
+  const opstaaanTijd   = 7 * 60;         // 07:00
+  const nuMinuten = uur * 60 + nu.getMinutes();
+
+  const isSchooldag = dag >= 1 && dag <= 5;  // ma t/m vr
+
+  if (isSchooldag) {
+    if (nuMinuten < opstaaanTijd) {
+      emoji = '😴'; titel = 'Nog even slapen!';
+      sub = 'Je wekker gaat om 07:00 uur.'; kleur = '#eee6ff';
+    } else if (uur < 8) {
+      emoji = '🎒'; titel = 'Goedemorgen! Tijd om op te staan.';
+      sub = 'Vergeet je tas niet. Fijne schooldag!'; kleur = '#fff8e0';
+    } else if (uur < 12) {
+      emoji = '✏️'; titel = 'Nu op school!';
+      const vandaagItem = SCHEMA.find(s=>s.dag===dagNaam);
+      sub = `Vandaag: ${vandaagItem?.juf || 'juf op school'}${vandaagItem?.gym ? ' · 🏃 Gym!' : ''}`; kleur = '#fff0f5';
+    } else if (uur < 14) {
+      emoji = '🥪'; titel = 'Lunchtijd!';
+      sub = 'Even uitrusten en eten.'; kleur = '#f0fff8';
+    } else if (uur < 16) {
+      emoji = '📚'; titel = 'Middag op school';
+      sub = 'Bijna klaar voor vandaag!'; kleur = '#fff0f5';
+    } else if (uur < 18) {
+      emoji = isVrijdag ? '🎉' : '🏠';
+      titel  = isVrijdag ? 'School is klaar! Fijn weekend! 🎉' : 'Thuis! Lekker uitrusten.';
+      sub    = isVrijdag ? 'Morgen mag je lekker uitslapen!' : 'Huiswerk eerst, dan lekker spelen!';
+      kleur  = isVrijdag ? '#fff8e0' : '#f0fff8';
+    } else if (nuMinuten < bedtijdWerkdag) {
+      const over = bedtijdWerkdag - nuMinuten;
+      emoji = '🌙'; titel = `Nog ${over} minuten tot bedtijd (19:30).`;
+      sub = isVrijdag ? 'Morgen mag je uitslapen! Slaap lekker 🌸' : 'Leg je spullen al klaar voor morgen!'; kleur = '#eee6ff';
+    } else {
+      emoji = '🌙'; titel = 'Het is bedtijd! 😴';
+      sub = isVrijdag ? 'Slaap lekker. Morgen mag je uitslapen! 🌸' : 'Telefoon uit, lekker slapen. Morgen is een nieuwe dag 🌸'; kleur = '#e8e0ff';
+    }
+  } else if (isZaterdag) {
+    if (nuMinuten < bedtijdWeekend) {
+      emoji = '🎮'; titel = 'Zaterdag! Lekker vrij 🌈';
+      sub = 'Spelen, tekenen, BLACKPINK — doe wat je leuk vindt!'; kleur = '#f0f8ff';
+    } else {
+      emoji = '🌙'; titel = 'Bedtijd! (22:00) 😴';
+      sub = 'Morgen opstaan om 07:00. Slaap lekker!'; kleur = '#e8e0ff';
+    }
+  } else {
+    // Zondag
+    if (nuMinuten < opstaaanTijd) {
+      emoji = '😴'; titel = 'Nog even slapen!'; sub = 'Wekker om 07:00.'; kleur = '#eee6ff';
+    } else if (uur < 18) {
+      emoji = '☀️'; titel = 'Zondag!';
+      sub = 'Geniet van de dag. Vanavond vroeg naar bed — morgen is het maandag!'; kleur = '#fff8e0';
+    } else if (nuMinuten < bedtijdWerkdag) {
+      const over = bedtijdWerkdag - nuMinuten;
+      emoji = '🌙'; titel = `Bijna bedtijd! Nog ${over} minuten.`;
+      sub = 'Leg je tas alvast klaar voor morgen.'; kleur = '#eee6ff';
+    } else {
+      emoji = '🌙'; titel = 'Bedtijd! (19:30) 😴';
+      sub = 'Morgen begint de week weer. Slaap lekker 🌸'; kleur = '#e8e0ff';
+    }
+  }
+
+  // Gym-herinnering: avond voor een gymdag
+  const morgenItem = SCHEMA.find(s => s.dag === WEEKDAGEN[(dag + 1) % 7]);
+  if (morgenItem?.gym && uur >= 17) {
+    sub += ' 🏃 Morgen gym — gymkleren in je tas!';
+  }
+
+  slimCard.style.background = kleur;
+  slimEmoji.textContent = emoji;
+  slimTitel.textContent  = titel;
+  slimSub.textContent    = sub;
+}
+
+updateKlok();
+setInterval(updateKlok, 1000); // update elke seconde
+
+// ── RECEPTEN ──
+const RECEPTEN = [
+  { emoji:'🍛', naam:'Kip tandoori' },
+  { emoji:'🥡', naam:'Beef Shanghai' },
+  { emoji:'🍝', naam:'Spaghetti' },
+  { emoji:'🌯', naam:'Kipwraps' },
+  { emoji:'🍚', naam:'Oosterse kip met rijst' },
+  { emoji:'🥙', naam:'Köfte' },
+  { emoji:'🍗', naam:'Kip in braadzak' },
+  { emoji:'🥘', naam:'Bloemkoolschotel' },
+  { emoji:'🥒', naam:'Komkommersalade' },
+  { emoji:'🥩', naam:'Vlees & gebakken aardappels' },
+  { emoji:'🥔', naam:'Gepofte aardappel' },
+  { emoji:'🌽', naam:'Maïskolf' },
+  { emoji:'🍕', naam:'Pizza' },
+  { emoji:'🍔', naam:'Broodje hamburger' },
+  { emoji:'🌮', naam:'Taco' },
+  { emoji:'🥔', naam:'Aardappel met jus' },
+  { emoji:'🥞', naam:'Pannenkoeken' },
+  { emoji:'🍣', naam:'Komkommer sushi' },
+  { emoji:'🧅', naam:'Uiensoep' },
+  { emoji:'🍲', naam:'Lasagne' },
+];
+// Normaliseer namen voor opzoeken in RECEPTEN_DATA
+function zoekRecept(naam) {
+  if (RECEPTEN_DATA[naam]) return RECEPTEN_DATA[naam];
+  const key = Object.keys(RECEPTEN_DATA).find(k => naam.toLowerCase().includes(k.toLowerCase().split(' ')[0]));
+  return key ? RECEPTEN_DATA[key] : null;
+}
+
+const RECEPTEN_DATA = {
+  'Kip tandoori': {
+    emoji: '🍛', tijd: '30 min', land: '🇮🇳 India',
+    badge: 'Knorr Wereldgerecht',
+    intro: 'Kruidige kip in romige tomatensaus met rijst en frisse raita. Gebruik het Knorr pakket of maak het zelf!',
+    ingredienten: [
+      '225 g kipfilet, in blokjes',
+      '1 ui, grof gesnipperd',
+      '1 komkommer',
+      '150 g peen julienne',
+      '150 ml magere yoghurt',
+      '100 g crème fraîche light',
+      'Knorr Kip Tandoori pakket (rijstmix, sausmix, specerijenmix, raita sausmix)',
+      '2 el + 1 el olie',
+    ],
+    stappen: [
+      'Meng de specerijenmix met 2 el olie. Marineer de kipblokjes hierin ca. 10 minuten.',
+      'Kook de rijstmix in ruim kokend water in ca. 14 min. gaar en giet af.',
+      'Rasp de komkommer grof. Meng de yoghurt met de raita sausmix en schep de peen julienne en komkommer erdoor. Dit is de raita.',
+      'Verhit 1 el olie in een koekenpan. Bak de kipblokjes goudbruin en gaar. Voeg de ui toe en bak ca. 2 min. mee.',
+      'Voeg 300 ml water en de sausmix toe. Roer goed door, breng aan de kook en laat ca. 1 min. zachtjes koken.',
+      'Voeg de crème fraîche toe en verwarm nog ca. 1 min. mee.',
+      'Serveer de kip, de raita en de rijst apart van elkaar. Lekker met naanbrood erbij! 🫓',
+    ]
+  },
+  'Beef Shanghai': {
+    emoji: '🥡', tijd: '40 min', land: '🇨🇳 China',
+    badge: 'Knorr Wereldgerecht',
+    intro: 'Chinese gehaktballetjes met mie, champignons, prei en taugé in een kruidige saus.',
+    ingredienten: [
+      '225 g mager rundergehakt',
+      '250 g champignons, in vieren',
+      '1 ui, fijn gesnipperd',
+      '125 g taugé',
+      '3 bosuien, in smalle ringen',
+      '1 prei, in halve ringen',
+      'Knorr Beef Shanghai pakket (mie, sausmix, kruidenmix, kruidige olie)',
+      'Olie om in te bakken',
+    ],
+    stappen: [
+      'Meng de kruidenmix met het gehakt. Draai er ca. 15 kleine gehaktballetjes van.',
+      'Snipper de ui fijn. Snij de champignons in vieren. Snij de prei in halve ringen en bosui in smalle ringen.',
+      'Kook de mie volgens de aanwijzingen op het pak en houd warm.',
+      'Verhit olie in een wok of koekenpan. Bak de gehaktballetjes goudbruin en gaar. Haal ze uit de pan.',
+      'Bak in dezelfde pan de ui en champignons ca. 3 min. Voeg de prei toe en bak nog 2 min. mee.',
+      'Voeg 350 ml water en de sausmix toe. Roer goed door en breng aan de kook. Voeg de gehaktballetjes terug en laat ca. 3 min. zachtjes doorkoken.',
+      'Voeg de taugé en bosui toe en warm nog 1 min. mee. Besprenkel met de kruidige olie.',
+      'Serveer de balletjes met saus over de mie. Lekker met sesamzaadjes erover! 🌿',
+    ]
+  },
+  'Köfte': {
+    emoji: '🥙', tijd: '35 min', land: '🇬🇷 Griekenland',
+    badge: 'Knorr Wereldgerecht',
+    intro: 'Griekse gehaktrolletjes in pittige tomatensaus met rijst, courgette en tomaten.',
+    ingredienten: [
+      '225 g mager rundergehakt',
+      '5 tomaten, in blokjes',
+      '1 courgette, in halve plakken',
+      'Knorr Griekse Kofta pakket (rijstmix, sausmix, kruidenmix)',
+      'Olie om in te bakken',
+    ],
+    stappen: [
+      'Meng het gehakt met de kruidenmix. Draai hier 6 rolletjes van.',
+      'Snij de courgette in halve plakken en de tomaten in blokjes.',
+      'Kook de rijstmix in ruim kokend water in ca. 14 min. gaar en giet af.',
+      'Verhit 1 el olie in een koekenpan. Bak de gehaktrolletjes rondom bruin en gaar.',
+      'Voeg de courgette toe en bak ca. 3 min. mee. Voeg daarna de tomaten toe en bak nog ca. 1 min. mee.',
+      'Voeg de sausmix en 200 ml water toe. Breng al roerend aan de kook en laat ca. 3 min. zachtjes doorkoken.',
+      'Serveer de kofta met de saus en de rijst apart. Lekker met tzatziki erbij! 🫙',
+    ]
+  },
+  'Spaghetti': {
+    emoji: '🍝', tijd: '25 min', land: '🇮🇹 Italië',
+    intro: 'Klassieke spaghetti bolognese — een familiefavoriet!',
+    ingredienten: [
+      '250 g spaghetti',
+      '300 g rundergehakt',
+      '1 ui, gesnipperd',
+      '2 teentjes knoflook',
+      '1 blik gepelde tomaten (400g)',
+      '2 el tomatenpuree',
+      'Snufje oregano en basilicum',
+      'Zout, peper, olie',
+      'Geraspte kaas (optioneel)',
+    ],
+    stappen: [
+      'Verhit olie in een pan en bak de ui ca. 3 min. glazig. Voeg de knoflook toe en bak 1 min. mee.',
+      'Voeg het gehakt toe en bak rul en bruin.',
+      'Roer de tomatenpuree erdoor. Voeg de gepelde tomaten toe en prak ze grof.',
+      'Breng op smaak met oregano, basilicum, zout en peper. Laat ca. 15 min. zachtjes pruttelen.',
+      'Kook ondertussen de spaghetti gaar volgens de verpakking. Giet af.',
+      'Serveer de saus over de spaghetti. Doe er geraspte kaas over als je wilt! 🧀',
+    ]
+  },
+  'Kipwraps': {
+    emoji: '🌯', tijd: '20 min', land: '🌍 Wereld',
+    intro: 'Snel en lekker — kip in een wrap met frisse groenten.',
+    ingredienten: [
+      '2 kipfilets',
+      '4 wraps',
+      'Sla, komkommer, tomaat',
+      '4 el crème fraîche of mayonaise',
+      'Paprikapoeder, zout, peper',
+      'Beetje olie',
+    ],
+    stappen: [
+      'Snij de kipfilet in reepjes. Bestrooi met paprikapoeder, zout en peper.',
+      'Bak de kip in een koekenpan met wat olie ca. 8 min. gaar. Laat even afkoelen.',
+      'Beleg elke wrap met een lepel crème fraîche of mayo.',
+      'Leg sla, komkommer en tomaat op de wrap.',
+      'Verdeel de kipreepjes over de wraps en rol ze strak op.',
+      'Snij ze eventueel doormidden. Eet smakelijk! 🥗',
+    ]
+  },
+  'Oosterse kip met rijst': {
+    emoji: '🍚', tijd: '30 min', land: '🌏 Azië',
+    intro: 'Kruidige kip met rijst en zoet-pittige saus — heerlijk voor doordeweeks!',
+    ingredienten: [
+      '300 g kipfilet, in reepjes',
+      '200 g rijst',
+      '1 ui, gesnipperd',
+      '2 el sojasaus',
+      '1 el honing',
+      '1 teentje knoflook',
+      'Beetje gember (poeder of vers)',
+      'Olie',
+    ],
+    stappen: [
+      'Kook de rijst gaar volgens de verpakking.',
+      'Meng de sojasaus, honing, knoflook en gember in een kommetje voor de saus.',
+      'Verhit olie in een wok of koekenpan. Bak de ui ca. 2 min.',
+      'Voeg de kipfiletreepjes toe en bak ca. 6 min. gaar.',
+      'Schenk de saus erbij en roer goed door. Laat ca. 2 min. meekoken tot de saus iets dikker is.',
+      'Serveer over de rijst. Lekker met een groene salade erbij! 🥬',
+    ]
+  },
+  'Kip in braadzak': {
+    emoji: '🍗', tijd: '60 min', land: '🏠 Huisgemaakt',
+    intro: 'Sappige kip met groenten uit de oven — de braadzak houdt alles lekker vochtig.',
+    ingredienten: [
+      '1 heel kip of kipstukken',
+      '3 aardappelen, in blokjes',
+      '2 wortelen, in plakjes',
+      '1 ui, in partjes',
+      'Zout, peper, paprikapoeder',
+      'Tijm of rozemarijn',
+      '1 braadzak (uit de supermarkt)',
+    ],
+    stappen: [
+      'Verwarm de oven op 180°C.',
+      'Wrijf de kip in met zout, peper en paprikapoeder.',
+      'Doe de kip samen met de aardappelen, wortelen, ui en kruiden in de braadzak.',
+      'Sluit de braadzak goed af en leg in een ovenschaal.',
+      'Prik een paar kleine gaatjes in de bovenkant van de zak.',
+      'Bak ca. 50-60 minuten in de oven tot de kip gaar is.',
+      'Open de zak voorzichtig (stoom!). Serveer direct. 🌿',
+    ]
+  },
+  'Bloemkoolschotel': {
+    emoji: '🥘', tijd: '35 min', land: '🏠 Huisgemaakt',
+    intro: 'Romige ovenschotel met bloemkool, gehakt en kaassaus.',
+    ingredienten: [
+      '1 bloemkool, in roosjes',
+      '300 g rundergehakt',
+      '1 ui, gesnipperd',
+      '200 ml kookroom',
+      '100 g geraspte kaas',
+      'Zout, peper, nootmuskaat',
+      'Olie',
+    ],
+    stappen: [
+      'Verwarm de oven op 200°C.',
+      'Kook de bloemkoolroosjes ca. 8 min. in gezouten water. Giet af.',
+      'Bak het gehakt met de ui in olie rul en gaar. Breng op smaak.',
+      'Doe de bloemkool en het gehakt in een ovenschaal.',
+      'Schenk de kookroom erover en strooi de kaas over de bovenkant.',
+      'Bak ca. 20 min. in de oven tot de kaas goudbruin is. Lekker! 🧀',
+    ]
+  },
+  'Komkommersalade': {
+    emoji: '🥒', tijd: '10 min', land: '🏠 Milou\'s recept',
+    intro: 'Milou\'s eigen komkommersalade! Fris, simpel en lekker.',
+    ingredienten: [
+      '1 komkommer',
+      'Scheut olijfolie',
+      'Beetje witte azijn of citroensap',
+      'Zout en peper naar smaak',
+      'Optioneel: verse dille, munt of bieslook',
+    ],
+    stappen: [
+      'Was de komkommer en snij hem in dunne plakjes of blokjes.',
+      'Doe de komkommer in een schaal.',
+      'Besprenkel met een scheut olijfolie en een beetje azijn of citroensap.',
+      'Breng op smaak met zout en peper.',
+      'Voeg vers kruid toe als je wilt. Meng alles goed en serveer direct. 🌿',
+    ]
+  },
+  'Vlees & gebakken aardappels': {
+    emoji: '🥩', tijd: '35 min', land: '🏠 Huisgemaakt',
+    intro: 'Krokante gebakken aardappels met een lekker stukje vlees.',
+    ingredienten: [
+      '4 aardappelen, in blokjes',
+      '2 biefstukjes of varkenskoteletten',
+      '1 ui, in ringen',
+      'Zout, peper, paprikapoeder',
+      'Olie of boter',
+    ],
+    stappen: [
+      'Kook de aardappelblokjes ca. 8 min. voor in gezouten water. Giet af en laat even stomen.',
+      'Verhit olie in een koekenpan op hoog vuur. Bak de aardappels krokant goudbruin. Breng op smaak.',
+      'Bak in een andere pan het vlees op hoog vuur ca. 3 min. per kant (afhankelijk van dikte).',
+      'Bak de uiringen mee tot ze glazig zijn.',
+      'Laat het vlees even rusten onder aluminiumfolie voor je het aansnijdt.',
+      'Serveer het vlees met de gebakken aardappels en ui. 🧅',
+    ]
+  },
+  'Gepofte aardappel': {
+    emoji: '🥔', tijd: '60 min', land: '🏠 Huisgemaakt',
+    intro: 'Lekker simpel — een aardappel uit de oven met een romige vulling.',
+    ingredienten: [
+      '2 grote aardappelen',
+      '100 g crème fraîche of zure room',
+      'Bieslook, fijngesneden',
+      'Zout en peper',
+      'Optioneel: geraspte kaas of spekjes',
+    ],
+    stappen: [
+      'Verwarm de oven op 200°C.',
+      'Was de aardappelen goed. Prik er een paar keer in met een vork.',
+      'Leg op de ovenrooster en bak ca. 50-60 minuten tot ze zacht zijn (prik er met een mes in om te controleren).',
+      'Snij de aardappelen open en maak ze los met een vork.',
+      'Klop de crème fraîche op en voeg bieslook, zout en peper toe.',
+      'Lepel de vulling in de aardappel. Doe er geraspte kaas over als je wilt! 🧀',
+    ]
+  },
+  'Maïskolf': {
+    emoji: '🌽', tijd: '15 min', land: '🌍 Wereld',
+    intro: 'Simpel, zomers en heerlijk — maïskolf uit de pan of van de barbecue.',
+    ingredienten: [
+      '2 maïskolven (vers of diepvries)',
+      'Boter',
+      'Zout',
+      'Optioneel: beetje paprikapoeder of limoen',
+    ],
+    stappen: [
+      'Kook de maïskolven in een grote pan water ca. 10 min. gaar.',
+      'Giet af en dep droog.',
+      'Besmeer met een klontje boter en bestrooi met zout.',
+      'Optioneel: doe er een beetje paprikapoeder over of een schijfje limoen erbij.',
+      'Eet ze meteen warm! 🌽',
+    ]
+  },
+  'Pizza': {
+    emoji: '🍕', tijd: '30 min', land: '🇮🇹 Italië',
+    intro: 'Zelf pizza maken is superleuk! Kies je eigen beleg.',
+    ingredienten: [
+      '1 kant-en-klaar pizzabodem (of zelf maken)',
+      '3 el tomatensaus of ketchup',
+      '100 g geraspte mozzarella',
+      'Beleg naar keuze: ham, paprika, champignons, olijven',
+      'Oregano',
+    ],
+    stappen: [
+      'Verwarm de oven op 220°C.',
+      'Leg de pizzabodem op bakpapier op een bakplaat.',
+      'Smeer de tomatensaus gelijkmatig uit over de bodem.',
+      'Verdeel de kaas en het beleg erover.',
+      'Bestrooi met oregano.',
+      'Bak ca. 10-12 min. tot de kaas bubbelt en goudbruin is. Smakelijk! 🍕',
+    ]
+  },
+  'Broodje hamburger': {
+    emoji: '🍔', tijd: '20 min', land: '🇺🇸 Amerika',
+    intro: 'Zelf hamburgers bakken is veel lekkerder dan uit een fastfoodketen!',
+    ingredienten: [
+      '250 g rundergehakt',
+      '2 hamburgerbroodjes',
+      'Sla, tomaat, augurk, ui',
+      'Ketchup en/of mayonaise',
+      'Zout en peper',
+    ],
+    stappen: [
+      'Meng het gehakt met zout en peper. Verdeel in 2 gelijke ballen en druk plat.',
+      'Verhit een koekenpan op hoog vuur. Bak de burgers ca. 3-4 min. per kant.',
+      'Toast de broodjes kort in de pan of broodrooster.',
+      'Beleg de onderste helft met sla en tomaat.',
+      'Leg de burger erop. Voeg augurk en ui toe.',
+      'Besprenkel met ketchup en/of mayo. Leg de bovenkant erop. 🍔',
+    ]
+  },
+  'Taco': {
+    emoji: '🌮', tijd: '25 min', land: '🇲🇽 Mexico',
+    intro: 'Gezellige tacos — iedereen bouwt zijn eigen!',
+    ingredienten: [
+      '250 g rundergehakt of kipgehakt',
+      '4-6 taco-schelpen (uit de supermarkt)',
+      'Sla, tomaat, geraspte kaas',
+      '1 tl komijn en paprikapoeder',
+      'Zout, peper',
+      'Crème fraîche of guacamole',
+    ],
+    stappen: [
+      'Bak het gehakt in een pan rul en gaar. Voeg komijn, paprikapoeder, zout en peper toe.',
+      'Verwarm de taco-schelpen even in de oven (ca. 5 min. op 180°C).',
+      'Zet alle vullingen op tafel zodat iedereen zijn eigen taco kan bouwen!',
+      'Vul de schelpen met gehakt, sla, tomaat en kaas.',
+      'Doe er een lepel crème fraîche bovenop. 🌮',
+    ]
+  },
+  'Aardappel met jus': {
+    emoji: '🥔', tijd: '40 min', land: '🇳🇱 Nederland',
+    intro: 'Een echte Nederlandse klassieker — aardappelen met jus.',
+    ingredienten: [
+      '4 grote aardappelen, geschild en in stukken',
+      '1 pakje juspoeder (of zelfgemaakte jus)',
+      'Boter',
+      'Zout',
+    ],
+    stappen: [
+      'Kook de aardappelen in gezouten water ca. 20 min. gaar.',
+      'Maak ondertussen de jus: volg de aanwijzingen op het pakje juspoeder.',
+      'Giet de aardappelen af en stamp ze kort aan (of serveer ze heel).',
+      'Doe er een klontje boter over.',
+      'Schenk de jus erover. Lekker met een groentje erbij! 🥕',
+    ]
+  },
+  'Pannenkoeken': {
+    emoji: '🥞', tijd: '30 min', land: '🇳🇱 Nederland',
+    intro: 'Dikke, zachte pannenkoeken — voor bij het avondeten of als traktatie!',
+    ingredienten: [
+      '200 g bloem',
+      '2 eieren',
+      '400 ml melk',
+      'Snufje zout',
+      'Boter om in te bakken',
+      'Stroop, suiker of hartig beleg naar keuze',
+    ],
+    stappen: [
+      'Meng de bloem, eieren, melk en zout tot een glad beslag. Klop goed door.',
+      'Laat het beslag ca. 10 min. rusten.',
+      'Smelt een klein klontje boter in een koekenpan op middelhoog vuur.',
+      'Schep een soeplepel beslag in de pan en spreid het uit.',
+      'Bak ca. 2 min. tot de bovenkant droog ziet. Draai om en bak nog 1 min.',
+      'Herhaal tot al het beslag op is. Serveer met stroop, poedersuiker of hartig beleg! 🍯',
+    ]
+  },
+  'Komkommer sushi': {
+    emoji: '🍣', tijd: '30 min', land: '🇯🇵 Japan',
+    intro: 'Zelf sushi rollen met komkommer is makkelijker dan je denkt!',
+    ingredienten: [
+      '150 g sushirijst',
+      '2 el rijstazijn',
+      '1 tl suiker, snufje zout',
+      '½ komkommer, in lange dunne reepjes',
+      '2 noribladen (zeewier)',
+      'Sojasaus om in te dippen',
+      'Bamboematje (of plastic folie)',
+    ],
+    stappen: [
+      'Kook de sushirijst gaar. Meng warm met rijstazijn, suiker en zout. Laat afkoelen.',
+      'Leg een noriblad op het bamboematje of een stuk plastic folie.',
+      'Verdeel de rijst in een gelijkmatige laag over het noriblad — laat 1 cm vrij aan de bovenkant.',
+      'Leg de komkommerreepjes op de rijst.',
+      'Rol de sushi strak op met behulp van het matje.',
+      'Snij in plakjes met een scherp nat mes. Dip in sojasaus! 🎋',
+    ]
+  },
+  'Uiensoep': {
+    emoji: '🧅', tijd: '45 min', land: '🇫🇷 Frankrijk',
+    intro: 'Warme, zoete Franse uiensoep — perfect voor een koude avond.',
+    ingredienten: [
+      '4 grote uien, in halve ringen',
+      '1 l runderbouillon',
+      '2 el boter',
+      '1 tl suiker',
+      'Snufje tijm',
+      'Zout en peper',
+      'Optioneel: stokbrood met kaas erop',
+    ],
+    stappen: [
+      'Smelt de boter in een grote pan. Voeg de uiringen toe.',
+      'Bak de uien op laag vuur ca. 25-30 min. langzaam gaar en lichtbruin — roer af en toe.',
+      'Voeg de suiker en tijm toe. Bak nog 5 min. mee.',
+      'Voeg de bouillon toe. Breng aan de kook en laat ca. 10 min. pruttelen.',
+      'Breng op smaak met zout en peper.',
+      'Optioneel: leg een schijf stokbrood met geraspte kaas in de soep en gratineer kort onder de grill. 🥖',
+    ]
+  },
+  'Lasagne': {
+    emoji: '🍲', tijd: '60 min', land: '🇮🇹 Italië',
+    intro: 'Laagje voor laagje — zelfgemaakte lasagne is geweldig!',
+    ingredienten: [
+      '8-10 lasagnebladen',
+      '300 g rundergehakt',
+      '1 ui, 2 teentjes knoflook',
+      '1 blik gepelde tomaten + 2 el tomatenpuree',
+      '500 ml béchamelsaus (pak of zelf: boter, bloem, melk)',
+      '100 g geraspte mozzarella of kaas',
+      'Zout, peper, oregano',
+    ],
+    stappen: [
+      'Verwarm de oven op 190°C.',
+      'Bak de ui en knoflook glazig. Voeg het gehakt toe en bak rul.',
+      'Voeg tomatenpuree en gepelde tomaten toe. Breng op smaak met oregano, zout en peper. Laat 10 min. pruttelen.',
+      'Maak de béchamelsaus (of verwarm de kant-en-klare saus).',
+      'Vet een ovenschaal in. Begin met een laagje vleessaus, dan lasagnebladen, dan béchamel. Herhaal.',
+      'Eindig met béchamelsaus. Strooi de kaas erover.',
+      'Bak ca. 35-40 min. in de oven tot goudbruin en bubbelig. Laat 5 min. rusten voor je snijdt! 🧀',
+    ]
+  },
+};
+
+const receptGrid = document.getElementById('receptGrid');
+
+RECEPTEN.forEach((r) => {
+  const btn = document.createElement('button');
+  btn.className = 'recipe-pill';
+  btn.innerHTML = `<span class="rp-emoji">${r.emoji}</span><span class="rp-naam">${r.naam}</span><span class="rp-pijl">›</span>`;
+
+  const detail = document.createElement('div');
+  detail.className = 'recipe-detail';
+
+  btn.onclick = () => {
+    const isOpen = detail.classList.contains('open');
+    document.querySelectorAll('.recipe-pill').forEach(b => b.classList.remove('actief'));
+    document.querySelectorAll('.recipe-detail').forEach(d => d.classList.remove('open'));
+    if (!isOpen) {
+      btn.classList.add('actief');
+      detail.classList.add('open');
+      const d = zoekRecept(r.naam);
+      if (!d) {
+        detail.innerHTML = `<p style="color:var(--muted);font-size:0.85rem">Recept volgt nog!</p>`;
+      } else {
+        const badge = d.badge ? `<span style="background:var(--pink2);color:#9a4060;font-size:0.72rem;font-weight:800;padding:2px 10px;border-radius:20px;margin-left:6px">${d.badge}</span>` : '';
+        detail.innerHTML = `
+          <h3>${d.emoji} ${r.naam} ${badge}</h3>
+          <div style="display:flex;gap:10px;margin:6px 0 10px;flex-wrap:wrap">
+            <span style="font-size:0.8rem;color:var(--muted)">⏱️ ${d.tijd}</span>
+            <span style="font-size:0.8rem;color:var(--muted)">${d.land}</span>
+          </div>
+          <p style="font-size:0.87rem;color:var(--text);margin-bottom:12px;font-style:italic">${d.intro}</p>
+          <strong style="font-size:0.85rem">🛒 Nodig:</strong>
+          <ul style="padding-left:18px;font-size:0.85rem;line-height:1.9;color:var(--text);margin:6px 0 14px">
+            ${d.ingredienten.map(ig => `<li>${ig}</li>`).join('')}
+          </ul>
+          <strong style="font-size:0.85rem">👩‍🍳 Zo maak je het:</strong>
+          <ol style="padding-left:18px;font-size:0.85rem;line-height:2;color:var(--text);margin-top:6px">
+            ${d.stappen.map(s => `<li>${s}</li>`).join('')}
+          </ol>
+        `;
+      }
+      setTimeout(() => btn.scrollIntoView({ behavior:'smooth', block:'nearest' }), 100);
+    }
+  };
+  receptGrid.appendChild(btn);
+  receptGrid.appendChild(detail);
+});
+
+// ── ADEMHALING ──
+let ademBezig = false, ademTimer = null;
+function startAdem() {
+  if (ademBezig) {
+    clearTimeout(ademTimer);
+    ademBezig = false;
+    document.getElementById('adem-btn').textContent = 'Start ▶';
+    document.getElementById('adem-tekst').textContent = 'Druk op start om te beginnen';
+    document.getElementById('ademCircle').className = 'adem-circle';
+    return;
+  }
+  ademBezig = true;
+  document.getElementById('adem-btn').textContent = 'Stop ■';
+  function cyclus() {
+    if (!ademBezig) return;
+    document.getElementById('adem-tekst').textContent = 'Adem in... 🌬️';
+    document.getElementById('ademCircle').classList.add('grow');
+    document.getElementById('ademCircle').classList.remove('shrink');
+    ademTimer = setTimeout(() => {
+      if (!ademBezig) return;
+      document.getElementById('adem-tekst').textContent = 'Vasthouden... 🌿';
+      ademTimer = setTimeout(() => {
+        if (!ademBezig) return;
+        document.getElementById('adem-tekst').textContent = 'Adem uit... 😮‍💨';
+        document.getElementById('ademCircle').classList.remove('grow');
+        document.getElementById('ademCircle').classList.add('shrink');
+        ademTimer = setTimeout(cyclus, 4000);
+      }, 2000);
+    }, 4000);
+  }
+  cyclus();
+}
+
+// ── VERJAARDAG TELLER ──
+const LEDEN = [
+  { naam: 'Jisoo 🌸',  dag: 3,  maand: 1  },
+  { naam: 'Jennie 👑', dag: 16, maand: 1  },
+  { naam: 'Rosé 🌹',   dag: 11, maand: 2  },
+  { naam: 'Lisa ⚡',   dag: 27, maand: 3  },
+];
+function volgendeVerjaardag() {
+  const nu = new Date();
+  let min = null, minDagen = 999;
+  LEDEN.forEach(l => {
+    let d = new Date(nu.getFullYear(), l.maand - 1, l.dag);
+    if (d < nu) d = new Date(nu.getFullYear() + 1, l.maand - 1, l.dag);
+    const diff = Math.ceil((d - nu) / 86400000);
+    if (diff < minDagen) { minDagen = diff; min = { ...l, dagen: diff, datum: d }; }
+  });
+  const el = document.getElementById('bdayCard');
+  if (!el) return;
+  const maanden = ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+  el.innerHTML = `
+    <div style="font-size:2.5rem;margin-bottom:6px">🎂</div>
+    <div style="font-weight:900;font-size:1.2rem;color:var(--text)">${min.naam}</div>
+    <div style="color:var(--muted);font-size:0.85rem;margin:4px 0">${min.dag} ${maanden[min.maand-1]}</div>
+    <div style="font-family:'Pacifico',cursive;font-size:1.6rem;color:var(--pink);margin-top:8px">
+      ${min.dagen === 0 ? '🎉 Vandaag!' : `nog ${min.dagen} dagen`}
+    </div>
+    <div style="margin-top:12px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap">
+      ${LEDEN.map(l => {
+        let d = new Date(nu.getFullYear(), l.maand-1, l.dag);
+        if (d < nu) d = new Date(nu.getFullYear()+1, l.maand-1, l.dag);
+        const dg = Math.ceil((d-nu)/86400000);
+        return `<span style="background:var(--bg);border-radius:10px;padding:6px 10px;font-size:0.75rem;font-weight:700">
+          ${l.naam.split(' ')[1]} ${dg===0?'🎉 Vandaag':dg+'d'}
+        </span>`;
+      }).join('')}
+    </div>
+  `;
+}
+volgendeVerjaardag();
+
+// ════════════════════════════════════════════════════
+//  🌙 DONKERE MODUS
+// ════════════════════════════════════════════════════
+function wisselDonker() {
+  document.body.classList.toggle('donker');
+  const isDonker = document.body.classList.contains('donker');
+  document.getElementById('donker-btn').textContent = isDonker ? '☀️' : '🌙';
+  localStorage.setItem('milou_donker', isDonker ? '1' : '0');
+}
+if (localStorage.getItem('milou_donker') === '1') {
+  document.body.classList.add('donker');
+  const db = document.getElementById('donker-btn');
+  if (db) db.textContent = '☀️';
+}
+
+// ════════════════════════════════════════════════════
+//  ⭐ BELONINGSSYSTEEM
+// ════════════════════════════════════════════════════
+function updateSterren() {
+  const el = document.getElementById('sterren-balk');
+  if (!el) return;
+  let data = {};
+  try { data = JSON.parse(localStorage.getItem('milou_stemmingen') || '{}'); } catch(e) {}
+  const nu = new Date();
+  let sterren = 0;
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(nu); d.setDate(d.getDate() - i);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if (data[key] && data[key].length > 0) sterren++;
+  }
+  el.innerHTML = '';
+  for (let i = 0; i < 7; i++) {
+    const s = document.createElement('span');
+    s.style.cssText = `font-size:1.6rem;filter:${i < sterren ? 'none' : 'grayscale(1) opacity(0.3)'}`;
+    s.textContent = i < sterren ? '⭐' : '☆';
+    el.appendChild(s);
+  }
+}
+updateSterren();
+
+// ════════════════════════════════════════════════════
+//  🌤️ WEERBERICHT LEIDEN
+// ════════════════════════════════════════════════════
+async function laadWeer() {
+  try {
+    const url = 'https://api.open-meteo.com/v1/forecast?latitude=52.49&longitude=4.66&current=temperature_2m,weather_code&timezone=Europe/Amsterdam';
+    const r = await fetch(url);
+    const d = await r.json();
+    const temp = Math.round(d.current.temperature_2m);
+    const code = d.current.weather_code;
+    const WEER = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',95:'⛈️'};
+    const OMSCH = {0:'Zonnig',1:'Licht bewolkt',2:'Bewolkt',3:'Zwaar bewolkt',45:'Mist',51:'Motregen',61:'Lichte regen',63:'Regen',80:'Buien',95:'Onweer',71:'Sneeuw'};
+    const el1 = document.getElementById('weer-emoji');
+    const el2 = document.getElementById('weer-temp');
+    const el3 = document.getElementById('weer-omschrijving');
+    if (el1) el1.textContent = WEER[code] || '🌤️';
+    if (el2) el2.textContent = `${temp}°C`;
+    if (el3) el3.textContent = `Beverwijk • ${OMSCH[code] || 'Wisselend'}`;
+  } catch(e) {}
+}
+laadWeer();
+
+// ════════════════════════════════════════════════════
+//  📓 DAGBOEK
+// ════════════════════════════════════════════════════
+(function() {
+  const el = document.getElementById('dagboek-datum');
+  if (el) el.textContent = new Date().toLocaleDateString('nl-NL', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+})();
+
+function voegStickerToe(sticker) {
+  const ta = document.getElementById('dagboek-input');
+  if (ta) ta.value += sticker;
+}
+function slaanDagboekOp() {
+  const tekst = document.getElementById('dagboek-input')?.value?.trim();
+  if (!tekst) return;
+  const nu = new Date();
+  const key = nu.toLocaleDateString('nl-NL', { weekday:'long', day:'numeric', month:'long' });
+  let e = []; try { e = JSON.parse(localStorage.getItem('milou_dagboek') || '[]'); } catch(ex) {}
+  e.unshift({ datum: key, tekst, timestamp: nu.toISOString() });
+  if (e.length > 50) e = e.slice(0, 50);
+  localStorage.setItem('milou_dagboek', JSON.stringify(e));
+  document.getElementById('dagboek-input').value = '';
+  const fb = document.getElementById('dagboek-feedback');
+  if (fb) { fb.textContent = '✅ Opgeslagen! 💕'; setTimeout(() => fb.textContent = '', 2500); }
+  laadDagboekEntries();
+}
+function laadDagboekEntries() {
+  const c = document.getElementById('dagboek-entries');
+  if (!c) return;
+  let e = []; try { e = JSON.parse(localStorage.getItem('milou_dagboek') || '[]'); } catch(ex) {}
+  if (!e.length) { c.innerHTML = '<p style="font-size:0.85rem;color:var(--muted)">Nog niets geschreven. Begin vandaag! ✍️</p>'; return; }
+  c.innerHTML = e.slice(0,10).map(i => `<div class="dagboek-entry"><div class="de-datum">📅 ${i.datum}</div><div class="de-tekst">${i.tekst.replace(/</g,'&lt;')}</div></div>`).join('');
+}
+
+// ════════════════════════════════════════════════════
+//  🎵 BLACKPINK QUIZ
+// ════════════════════════════════════════════════════
+const QUIZ_VRAGEN = [
+  { vraag:'Welk BLACKPINK-lid komt uit Thailand?', antwoorden:['Jisoo','Jennie','Rosé','Lisa'], goed:3 },
+  { vraag:'Wanneer debuteerde BLACKPINK?', antwoorden:['2014','2016','2018','2015'], goed:1 },
+  { vraag:'Wat is de echte naam van Rosé?', antwoorden:['Park Sooyoung','Kim Jisoo','Roseanne Park','Lalisa Manoban'], goed:2 },
+  { vraag:'Welk nummer heeft "DDU-DU" in de titel?', antwoorden:['Pink Venom','How You Like That','DDU-DU DDU-DU','Shut Down'], goed:2 },
+  { vraag:'Bij welk label is BLACKPINK?', antwoorden:['SM Entertainment','HYBE','JYP','YG Entertainment'], goed:3 },
+  { vraag:'Welk lid was de EERSTE soliste?', antwoorden:['Lisa','Jisoo','Jennie','Rosé'], goed:2 },
+  { vraag:'Hoe heet Jisoo haar hondje?', antwoorden:['Kuma','Dalgom','Bori','Tobi'], goed:1 },
+  { vraag:'Op welk festival headlinede BLACKPINK als eerste K-pop groep?', antwoorden:['Glastonbury','Lollapalooza','Coachella','Tomorrowland'], goed:2 },
+  { vraag:'Wat speelt Rosé naast zingen?', antwoorden:['Drums','Viool','Piano & Gitaar','Fluit'], goed:2 },
+  { vraag:'Hoe oud was Lisa bij haar auditie bij YG?', antwoorden:['12','14','16','18'], goed:1 },
+];
+let quizIndex = 0, quizScore = 0, quizAntwoordGegeven = false;
+
+function initQuiz() {
+  quizIndex = 0; quizScore = 0;
+  const e = document.getElementById('quiz-einde');
+  const s = document.getElementById('quiz-score-balk');
+  if (e) e.style.display = 'none';
+  if (s) s.style.display = 'flex';
+  toonQuizVraag();
+}
+function toonQuizVraag() {
+  if (quizIndex >= QUIZ_VRAGEN.length) { eindQuiz(); return; }
+  const v = QUIZ_VRAGEN[quizIndex];
+  quizAntwoordGegeven = false;
+  document.getElementById('quiz-nr').textContent = quizIndex + 1;
+  document.getElementById('quiz-score').textContent = quizScore;
+  document.getElementById('quiz-vraag').textContent = v.vraag;
+  document.getElementById('quiz-feedback').textContent = '';
+  document.getElementById('quiz-volgende-btn').style.display = 'none';
+  document.getElementById('quiz-antwoorden').innerHTML = v.antwoorden.map((a,i) =>
+    `<button class="quiz-antwoord-btn" onclick="checkQuizAntwoord(${i})">${a}</button>`).join('');
+}
+function checkQuizAntwoord(index) {
+  if (quizAntwoordGegeven) return;
+  quizAntwoordGegeven = true;
+  const v = QUIZ_VRAGEN[quizIndex];
+  const btns = document.querySelectorAll('.quiz-antwoord-btn');
+  btns[v.goed].classList.add('goed');
+  const fb = document.getElementById('quiz-feedback');
+  if (index === v.goed) { quizScore++; btns[index].classList.add('goed'); fb.textContent = '✅ Goed! Super! 🌟'; fb.style.color = '#10b981'; }
+  else { btns[index].classList.add('fout'); fb.textContent = `❌ Het goede antwoord was: ${v.antwoorden[v.goed]}`; fb.style.color = '#ef4444'; }
+  document.getElementById('quiz-volgende-btn').style.display = 'block';
+  document.getElementById('quiz-score').textContent = quizScore;
+}
+function volgendeQuizVraag() { quizIndex++; toonQuizVraag(); }
+function eindQuiz() {
+  document.getElementById('quiz-score-balk').style.display = 'none';
+  document.getElementById('quiz-vraag').textContent = '';
+  document.getElementById('quiz-antwoorden').innerHTML = '';
+  document.getElementById('quiz-feedback').textContent = '';
+  document.getElementById('quiz-volgende-btn').style.display = 'none';
+  document.getElementById('quiz-einde').style.display = 'block';
+  document.getElementById('quiz-einde-score').textContent = `${quizScore} / ${QUIZ_VRAGEN.length}`;
+  const pct = quizScore / QUIZ_VRAGEN.length;
+  document.getElementById('quiz-einde-tekst').textContent =
+    pct === 1 ? '🏆 PERFECTE score! Jij bent een echte BLACKPINK expert!' :
+    pct >= 0.7 ? '🎉 Heel goed! Jij weet veel over BLACKPINK!' :
+    pct >= 0.5 ? '👍 Niet slecht! Nog een keer proberen?' : '🌸 Oefening baart kunst! Probeer het nog een keer!';
+}
+function herStartQuiz() {
+  QUIZ_VRAGEN.sort(() => Math.random() - 0.5);
+  document.getElementById('quiz-einde').style.display = 'none';
+  document.getElementById('quiz-score-balk').style.display = 'flex';
+  initQuiz();
+}
+
+// ════════════════════════════════════════════════════
+//  🔒 OUDER DASHBOARD
+// ════════════════════════════════════════════════════
+const OUDER_PIN = '1987'; // ✏️ Verander naar jouw eigen pincode!
+
+function checkOuderPin() {
+  const pin = document.getElementById('ouder-pin')?.value;
+  if (pin === OUDER_PIN) {
+    document.getElementById('ouder-login').style.display = 'none';
+    document.getElementById('ouder-dashboard').style.display = 'block';
+    laadOuderDashboard();
+  } else {
+    const fb = document.getElementById('pin-fout');
+    if (fb) { fb.textContent = '❌ Verkeerde pincode'; setTimeout(() => fb.textContent = '', 2000); }
+  }
+}
+function uitloggenOuder() {
+  document.getElementById('ouder-login').style.display = 'block';
+  document.getElementById('ouder-dashboard').style.display = 'none';
+  if (document.getElementById('ouder-pin')) document.getElementById('ouder-pin').value = '';
+}
+function laadOuderDashboard() {
+  tekenStemmingGrafiek();
+  laadDagboekStats();
+}
+function tekenStemmingGrafiek() {
+  const canvas = document.getElementById('stemmingGrafiek');
+  if (!canvas) return;
+  canvas.width = canvas.offsetWidth;
+  const ctx = canvas.getContext('2d');
+  let weekData = {}; try { weekData = JSON.parse(localStorage.getItem('milou_stemmingen') || '{}'); } catch(e) {}
+  const nu = new Date();
+  const SCORE = { '😊':5,'🥰':5,'😐':3,'😴':2,'😢':1 };
+  const DN = ['Zo','Ma','Di','Wo','Do','Vr','Za'];
+  const labels=[], scores=[], kleuren=[];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(nu); d.setDate(d.getDate()-i);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    labels.push(DN[d.getDay()]);
+    if (weekData[key]?.length > 0) {
+      const gem = weekData[key].reduce((s,e) => s+(SCORE[e.emoji]||3), 0) / weekData[key].length;
+      scores.push(gem); kleuren.push(gem>=4?'#a8e6cf':gem>=3?'#ffe49a':'#f9c9d8');
+    } else { scores.push(0); kleuren.push('#e0e0e0'); }
+  }
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const bW = (canvas.width-40)/7-8, mH = canvas.height-40;
+  scores.forEach((s,i) => {
+    const x = 20 + i*((canvas.width-40)/7);
+    const h = s > 0 ? (s/5)*mH : 4;
+    ctx.fillStyle = kleuren[i];
+    ctx.beginPath();
+    // iOS-compatible afgeronde rechthoek (roundRect werkt niet op oudere Safari)
+    const rx = 6, bx = x, by = canvas.height-30-h, bh = h;
+    ctx.moveTo(bx+rx, by); ctx.lineTo(bx+bW-rx, by);
+    ctx.arcTo(bx+bW, by, bx+bW, by+rx, rx);
+    ctx.lineTo(bx+bW, by+bh-rx);
+    ctx.arcTo(bx+bW, by+bh, bx+bW-rx, by+bh, rx);
+    ctx.lineTo(bx+rx, by+bh);
+    ctx.arcTo(bx, by+bh, bx, by+bh-rx, rx);
+    ctx.lineTo(bx, by+rx);
+    ctx.arcTo(bx, by, bx+rx, by, rx);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle='#3a2a3a'; ctx.font='bold 11px Nunito,sans-serif'; ctx.textAlign='center';
+    ctx.fillText(labels[i], x+bW/2, canvas.height-10);
+    if (s>0) { ctx.font='14px serif'; ctx.fillText(s>=4.5?'🥰':s>=3.5?'😊':s>=2.5?'😐':s>=1.5?'😴':'😢', x+bW/2, canvas.height-35-h); }
+  });
+  const sv = document.getElementById('stemming-samenvatting');
+  if (sv) {
+    const t = scores.filter(s=>s>0).length;
+    const g = t>0 ? scores.reduce((a,b)=>a+b,0)/t : 0;
+    sv.innerHTML = `📅 <strong>${t} van 7 dagen</strong> ingevuld<br>😊 Gemiddeld: <strong>${g.toFixed(1)}/5</strong><br>${g>=4?'💚 Milou heeft een goede week!':g>=3?'🌿 Gemiddelde week':'💛 Milou heeft wat extra aandacht nodig'}`;
+  }
+}
+function laadDagboekStats() {
+  const el = document.getElementById('dagboek-stats');
+  if (!el) return;
+  let e=[]; try{e=JSON.parse(localStorage.getItem('milou_dagboek')||'[]');}catch(ex){}
+  el.innerHTML = !e.length ? 'Milou heeft nog niets in haar dagboek geschreven.' :
+    `📝 <strong>${e.length}</strong> pagina's geschreven<br>📅 Laatste: <strong>${e[0]?.datum}</strong><br>✍️ Gem. lengte: <strong>${Math.round(e.reduce((s,i)=>s+i.tekst.length,0)/e.length)} tekens</strong>`;
+}
+
+// ════════════════════════════════════════════════════
+//  💌 GEHEIM BERICHTJE
+// ════════════════════════════════════════════════════
+function verstuurGeheimBerichtje() {
+  const tekst = document.getElementById('geheim-input')?.value?.trim();
+  const van   = document.getElementById('geheim-van')?.value?.trim() || 'Mama & Papa';
+  if (!tekst) return;
+  localStorage.setItem('milou_geheim', JSON.stringify({ tekst, van }));
+  const fb = document.getElementById('geheim-bevestiging');
+  if (fb) { fb.textContent = '✅ Klaar! Milou ziet het de volgende keer 💕'; setTimeout(() => fb.textContent='', 3000); }
+  document.getElementById('geheim-input').value = '';
+}
+function checkGeheimBerichtje() {
+  try {
+    const raw = localStorage.getItem('milou_geheim');
+    if (!raw) return;
+    const b = JSON.parse(raw);
+    const card = document.getElementById('geheim-berichtje-card');
+    if (card) { card.style.display='block'; }
+    const t = document.getElementById('geheim-tekst');
+    if (t) t.textContent = b.tekst;
+    const v = card?.querySelector('.geheim-van-tekst');
+    if (v) v.textContent = `💕 Van: ${b.van}`;
+  } catch(e) {}
+}
+function verwijderGeheimBerichtje() {
+  localStorage.removeItem('milou_geheim');
+  const c = document.getElementById('geheim-berichtje-card');
+  if (c) c.style.display='none';
+}
+checkGeheimBerichtje();
+
+// ════════════════════════════════════════════════════
+//  🔔 BEDTIJD HERINNERING
+// ════════════════════════════════════════════════════
+function checkBedtijdHerinnering() {
+  const nu = new Date();
+  const dag = nu.getDay(), uur = nu.getHours(), min = nu.getMinutes();
+  const bt = dag===6 ? {h:22,m:0} : {h:19,m:30};
+  const minNu = uur*60+min, minBt = bt.h*60+bt.m, diff = minBt-minNu;
+  if (diff===15 || diff===5) {
+    const el = document.createElement('div');
+    el.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#2d1b4e;color:white;padding:14px 24px;border-radius:20px;font-family:Nunito,sans-serif;font-weight:800;font-size:0.92rem;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.3);text-align:center;max-width:300px';
+    el.innerHTML=`🌙 Nog ${diff} minuten tot bedtijd (${bt.h}:${String(bt.m).padStart(2,'0')})<br><span style="font-size:0.78rem;opacity:0.8">Maak je klaar om lekker te slapen 😴</span>`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 8000);
+  }
+}
+setInterval(checkBedtijdHerinnering, 60000);
+checkBedtijdHerinnering();
+
+// ════════════════════════════════════════════════════
+//  🤖 AI — AUTOMATISCHE BERICHTJES & QUOTES VIA CLAUDE
+
+async function genereerNieuweBerichtjes() {
+  const btn = document.getElementById('ai-bericht-btn');
+  const status = document.getElementById('ai-bericht-status');
+  if (btn) { btn.textContent = '⏳ Bezig...'; btn.disabled = true; }
+  if (status) status.textContent = 'Nieuwe berichtjes worden gemaakt... even geduld 🌸';
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: `Genereer 8 unieke, warme en bemoedigende berichtjes in het Nederlands voor Milou, een meisje van 11 jaar.
+Ze houdt van BLACKPINK, Roblox, tekenen en koken. Ze gaat soms met spanning naar school en heeft soms zorgen.
+De berichtjes moeten haar opbeuren, geruststellen en een goed gevoel geven.
+Geef ook 7 inspirerende dagquotes voor haar.
+
+Antwoord ALLEEN in dit JSON formaat, geen uitleg erbuiten:
+{
+  "berichtjes": [
+    {"tekst": "berichtje hier", "sub": "korte ondertitel met emoji"},
+    ...
+  ],
+  "quotes": [
+    "quote 1 met emoji",
+    ...
+  ]
+}`
+        }]
+      })
+    });
+
+    const data = await response.json();
+    const tekst = data.content[0].text;
+    const clean = tekst.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    // Sla op in localStorage
+    if (parsed.berichtjes && parsed.berichtjes.length > 0) {
+      localStorage.setItem('milou_ai_berichtjes', JSON.stringify(parsed.berichtjes));
+      localStorage.setItem('milou_ai_quotes', JSON.stringify(parsed.quotes));
+      localStorage.setItem('milou_ai_datum', new Date().toISOString());
+
+      if (status) status.textContent = `✅ ${parsed.berichtjes.length} nieuwe berichtjes + ${parsed.quotes.length} quotes opgeslagen!`;
+
+      // Toon meteen een nieuw berichtje
+      nieuwBericht();
+
+      // Update ook de dagquote
+      const quoteEl = document.getElementById('dagquote');
+      if (quoteEl && parsed.quotes.length > 0) {
+        quoteEl.textContent = parsed.quotes[new Date().getDay() % parsed.quotes.length];
+      }
+    }
+  } catch(e) {
+    if (status) status.textContent = '❌ Niet gelukt. Probeer het later nog eens.';
+    console.error('AI fout:', e);
+  }
+
+  if (btn) { btn.textContent = '✨ Nieuwe berichtjes'; btn.disabled = false; }
+  setTimeout(() => { if (status) status.textContent = ''; }, 4000);
+}
+
+// Controleer wekelijks of er nieuwe AI berichtjes gegenereerd moeten worden
+function checkAIUpdate() {
+  const datum = localStorage.getItem('milou_ai_datum');
+  if (!datum) return; // Eerste keer handmatig via knop
+  const dagen = (new Date() - new Date(datum)) / (1000 * 60 * 60 * 24);
+  if (dagen >= 7) genereerNieuweBerichtjes(); // Automatisch na 7 dagen
+}
+checkAIUpdate();
+
+// ── KLEUR KOPIËREN ──
+function kopieer(kleur) {
+  navigator.clipboard.writeText(kleur).catch(() => {});
+  const el = document.getElementById('kopie-feedback');
+  if (el) { el.textContent = `Gekopieerd: ${kleur} ✓`; setTimeout(() => el.textContent = '', 2000); }
+}
+
+// ── POSITIEVE BERICHTEN ──
+// Gebruikt AI-berichtjes als die beschikbaar zijn, anders de fallback
+const BERICHTEN_FALLBACK = [
+  { tekst: "Jij bent moediger dan je denkt, sterker dan je voelt, en slimmer dan je gelooft.", sub: "En dat is echt zo 💚" },
+  { tekst: "Het is oké om soms niet lekker in je vel te zitten. Dat hoort bij het leven.", sub: "Je hoeft niet altijd sterk te zijn 🌸" },
+  { tekst: "Je mag fouten maken. Zo leer je. Fouten zijn geen mislukkingen.", sub: "Ze zijn gewoon stappen 🌱" },
+  { tekst: "Jouw creativiteit is een gave. Blijf tekenen, bakken en zingen!", sub: "De wereld heeft jou nodig 🎨" },
+  { tekst: "Zorgen voelen groot, maar ze gaan ook weer weg. Altijd.", sub: "En er zijn mensen die van je houden 💕" },
+  { tekst: "Jij doet het heel goed. Echt.", sub: "Vergeet dat niet 🌟" },
+  { tekst: "Elke dag naar school gaan is dapper. Zeker als het moeilijk voelt.", sub: "Trots op je 💪" },
+  { tekst: "Groep 8 — jouw laatste jaar op de basisschool. Geniet ervan!", sub: "Je kunt dit echt 🎓" },
+  { tekst: "Je bent lief, grappig en slim. Vergeet dat nooit.", sub: "Mama en papa zijn zo trots op je! 💕" },
+  { tekst: "Ademen helpt. Probeer het maar.", sub: "In... en uit... alles komt goed 🌬️" },
+];
+
+function nieuwBericht() {
+  // Probeer AI berichtjes eerst, dan data.js, dan fallback
+  let lijst = BERICHTEN_FALLBACK;
+  try {
+    const aiRaw = localStorage.getItem('milou_ai_berichtjes');
+    if (aiRaw) {
+      const aiLijst = JSON.parse(aiRaw);
+      if (aiLijst && aiLijst.length > 0) lijst = aiLijst;
+    } else if (typeof BERICHTEN !== 'undefined' && BERICHTEN.length) {
+      lijst = BERICHTEN;
+    }
+  } catch(e) {}
+
+  const r = lijst[Math.floor(Math.random() * lijst.length)];
+  const el1 = document.getElementById('pk-bericht');
+  const el2 = document.getElementById('pk-sub');
+  if (el1) el1.textContent = r.tekst;
+  if (el2) el2.textContent = r.sub || '';
+}
+
+// Laad meteen het eerste bericht
+nieuwBericht();
+</script>
+
+<!-- 📦 Data bestand — pas data.js aan voor updates, niet dit bestand! -->
+<script src="data.js"></script>
+<script>
+  // Dagquote — gebruikt AI quotes als beschikbaar, anders DAGQUOTES uit data.js
+  const quoteEl = document.getElementById('dagquote');
+  if (quoteEl) {
+    const dagNr = new Date().getDay();
+    try {
+      const aiQuotesRaw = localStorage.getItem('milou_ai_quotes');
+      if (aiQuotesRaw) {
+        const aiQuotes = JSON.parse(aiQuotesRaw);
+        if (aiQuotes && aiQuotes.length > 0) {
+          quoteEl.textContent = aiQuotes[dagNr % aiQuotes.length];
+        } else { throw new Error('leeg'); }
+      } else { throw new Error('geen ai quotes'); }
+    } catch(e) {
+      // Fallback naar data.js quotes
+      if (typeof DAGQUOTES !== 'undefined' && DAGQUOTES.length) {
+        quoteEl.textContent = DAGQUOTES[dagNr % DAGQUOTES.length];
+      }
+    }
+  }
+</script>
+</body>
+</html>
