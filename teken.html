@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tekenstudio">
+<meta name="theme-color" content="#2a1f33">
+<title>Tekenstudio</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pruim: #2a1f33;      /* werkruimte rond het doek */
+    --pruim-2: #3b2c48;    /* balken */
+    --pruim-3: #4d3b5d;    /* knoppen */
+    --lila: #e9dcf5;       /* tekst op donker */
+    --roze: #ff5fa2;       /* accent */
+    --munt: #7fe3c4;
+    --wit: #ffffff;
+    --tekst: #2b2233;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Nunito', system-ui, sans-serif; background: var(--pruim); color: var(--lila);
+    -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; overflow: hidden;
+  }
+  button { font-family: inherit; border: none; cursor: pointer; touch-action: manipulation; color: inherit; background: none; }
+  input[type=range] { accent-color: var(--roze); }
+
+  /* ══ STARTSCHERM ══ */
+  #start { position: fixed; inset: 0; overflow-y: auto; padding: calc(16px + env(safe-area-inset-top, 0px)) 18px calc(30px + env(safe-area-inset-bottom, 0px)); }
+  .start-top { display: flex; align-items: center; gap: 12px; max-width: 1100px; margin: 0 auto 6px; }
+  .rond {
+    width: 44px; height: 44px; border-radius: 50%; background: var(--pruim-3); display: inline-flex;
+    align-items: center; justify-content: center; font-size: 1.2rem; text-decoration: none; color: var(--lila); flex: none;
+  }
+  .start-top h1 { font-family: 'Pacifico', cursive; font-weight: 400; font-size: 2.1rem; color: var(--wit); }
+  .start-sub { max-width: 1100px; margin: 0 auto 20px; padding-left: 56px; color: #b9a8c9; font-weight: 700; }
+  .start-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 16px; }
+  .tk-kaart { position: relative; border-radius: 18px; overflow: hidden; background: var(--pruim-2); text-align: left; }
+  .tk-kaart img { width: 100%; aspect-ratio: 4 / 3; object-fit: contain; display: block; background: #fff; }
+  .tk-kaart .tk-info { padding: 8px 12px 10px; font-size: 0.8rem; font-weight: 700; color: #b9a8c9; }
+  .tk-weg { position: absolute; top: 6px; right: 6px; width: 32px; height: 32px; border-radius: 50%; background: rgba(42,31,51,0.8); color: #fff; font-size: 0.9rem; }
+  .tk-nieuw {
+    border-radius: 18px; border: 3px dashed #6b5680; min-height: 170px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 6px; font-weight: 900; font-size: 1rem; color: var(--wit);
+  }
+  .tk-nieuw span { font-size: 2.4rem; }
+
+  /* ══ STUDIO ══ */
+  #studio { position: fixed; inset: 0; display: none; flex-direction: column; }
+  #studio.open { display: flex; }
+  .st-top {
+    display: flex; align-items: center; gap: 8px; padding: calc(8px + env(safe-area-inset-top, 0px)) 10px 8px;
+    background: var(--pruim-2);
+  }
+  .st-top .titel { flex: 1; font-family: 'Pacifico', cursive; font-size: 1.2rem; color: var(--wit); white-space: nowrap; overflow: hidden; }
+  .tbk {
+    height: 42px; min-width: 42px; padding: 0 12px; border-radius: 12px; background: var(--pruim-3); font-weight: 800;
+    font-size: 0.85rem; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .tbk.roze { background: var(--roze); color: #fff; }
+  .tbk:disabled { opacity: 0.35; }
+  .st-main { flex: 1; min-height: 0; display: flex; position: relative; }
+
+  .tools {
+    width: 64px; flex: none; background: var(--pruim-2); padding: 8px 6px; overflow-y: auto; display: flex;
+    flex-direction: column; gap: 4px; align-items: center;
+  }
+  .tool {
+    width: 52px; height: 52px; border-radius: 14px; font-size: 1.45rem; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; line-height: 1; position: relative;
+  }
+  .tool small { font-size: 0.55rem; font-weight: 800; margin-top: 3px; color: #b9a8c9; }
+  .tool.actief { background: var(--roze); }
+  .tool.actief small { color: #fff; }
+  .tool-streep { width: 36px; height: 2px; background: var(--pruim-3); margin: 4px 0; flex: none; }
+
+  #werkvlak { flex: 1; position: relative; overflow: hidden; touch-action: none; background: var(--pruim); }
+  #doek { position: absolute; left: 0; top: 0; transform-origin: 0 0; box-shadow: 0 10px 40px rgba(0,0,0,0.45); }
+  #doek canvas { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+  #papier { position: absolute; inset: 0; }
+  .zoomknoppen { position: absolute; right: 12px; bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .zoomknoppen button, .zoom-label {
+    width: 44px; height: 44px; border-radius: 50%; background: var(--pruim-2); font-size: 1.2rem; font-weight: 900;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  }
+  .zoom-label { font-size: 0.7rem; display: flex; align-items: center; justify-content: center; }
+
+  .onderbalk {
+    display: flex; align-items: center; gap: 14px; padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+    background: var(--pruim-2); overflow-x: auto;
+  }
+  .kleurpuck {
+    width: 54px; height: 54px; border-radius: 50%; flex: none; border: 4px solid var(--wit);
+    box-shadow: 0 0 0 3px var(--roze), 0 4px 14px rgba(0,0,0,0.35);
+  }
+  .schuif { display: flex; flex-direction: column; gap: 2px; min-width: 130px; flex: 1; max-width: 240px; }
+  .schuif label { font-size: 0.72rem; font-weight: 800; color: #b9a8c9; display: flex; justify-content: space-between; }
+  .schuif input { width: 100%; height: 26px; }
+  .voorbeeld { width: 56px; height: 56px; flex: none; border-radius: 12px; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .voorbeeld span { display: block; border-radius: 50%; }
+  .recent { display: flex; gap: 6px; flex: none; }
+  .recent button { width: 30px; height: 30px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.25); }
+
+  /* Lagen */
+  #lagenPaneel {
+    position: absolute; right: 0; top: 0; bottom: 0; width: 250px; background: var(--pruim-2); padding: 12px;
+    transform: translateX(105%); transition: transform .2s; overflow-y: auto; z-index: 5; box-shadow: -6px 0 20px rgba(0,0,0,0.3);
+  }
+  #lagenPaneel.open { transform: none; }
+  .lp-kop { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 900; color: #fff; }
+  .laag-rij { display: flex; align-items: center; gap: 8px; padding: 6px; border-radius: 12px; margin-bottom: 6px; background: var(--pruim-3); }
+  .laag-rij.actief { box-shadow: 0 0 0 3px var(--roze); }
+  .laag-rij canvas { width: 56px; height: 42px; border-radius: 6px; background: #fff; flex: none; }
+  .laag-rij .ln { flex: 1; font-weight: 800; font-size: 0.85rem; }
+  .laag-rij button { width: 32px; height: 32px; border-radius: 8px; font-size: 1rem; }
+  .lp-knoppen { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 10px 0; }
+  .lp-knoppen button { height: 40px; border-radius: 10px; background: var(--pruim-3); font-size: 1.1rem; }
+  .lp-dekking label { font-size: 0.75rem; font-weight: 800; color: #b9a8c9; }
+  .lp-dekking input { width: 100%; }
+
+  /* Modals */
+  .modal { position: fixed; inset: 0; background: rgba(20,12,28,0.6); display: none; align-items: center; justify-content: center; z-index: 20; padding: 16px; }
+  .modal.open { display: flex; }
+  .venster {
+    background: #fff; color: var(--tekst); border-radius: 26px; width: 100%; max-width: 440px; max-height: 92vh; overflow-y: auto;
+    padding: 18px; box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+  .venster h2 { font-family: 'Pacifico', cursive; font-weight: 400; font-size: 1.5rem; color: var(--roze); margin-bottom: 12px; }
+  .v-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+  .v-tab { flex: 1; height: 40px; border-radius: 12px; background: #f3ecf8; font-weight: 900; font-size: 0.85rem; color: var(--tekst); }
+  .v-tab.actief { background: var(--roze); color: #fff; }
+  .v-deel { display: none; }
+  .v-deel.actief { display: block; }
+  #svVlak { width: 100%; aspect-ratio: 1; border-radius: 14px; touch-action: none; display: block; }
+  #hueBalk { width: 100%; height: 32px; border-radius: 16px; margin-top: 12px; touch-action: none; display: block; }
+  .kleur-rij { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+  .kleur-rij .groot { width: 52px; height: 52px; border-radius: 50%; border: 3px solid #eee; flex: none; }
+  .kleur-rij input[type=text] { flex: 1; height: 44px; border-radius: 12px; border: 2px solid #eee; padding: 0 12px; font: 800 1rem Nunito, sans-serif; }
+  .palet { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; }
+  .palet button { aspect-ratio: 1; border-radius: 50%; border: 2px solid rgba(0,0,0,0.08); }
+  .mix-rij { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .mix-rij .chip { width: 48px; height: 48px; border-radius: 50%; border: 3px solid #eee; flex: none; position: relative; }
+  .mix-rij .chip small { position: absolute; bottom: -18px; left: 0; right: 0; text-align: center; font-size: 0.65rem; font-weight: 800; color: #8a7a8a; }
+  .mix-rij input { flex: 1; }
+  .verfpalet-wrap { position: relative; margin-top: 22px; }
+  #mengpalet {
+    width: 100%; aspect-ratio: 16 / 10; display: block; touch-action: none; background: #fbf6ee;
+    border-radius: 60% 40% 45% 55% / 55% 55% 45% 45%; box-shadow: inset 0 0 0 3px #e5d8c4;
+  }
+  .duimgat { position: absolute; left: 12%; bottom: 16%; width: 11%; aspect-ratio: 1; border-radius: 50%; background: #fff; box-shadow: inset 0 0 0 3px #e5d8c4; pointer-events: none; }
+  .mp-knoppen { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+  .mp-knoppen button { height: 42px; border-radius: 12px; background: #f3ecf8; font-weight: 900; font-size: 0.82rem; color: var(--tekst); }
+  .mp-knoppen button.actief { background: var(--munt); }
+  .uitleg { font-size: 0.8rem; color: #8a7a8a; font-weight: 700; margin-top: 8px; line-height: 1.4; }
+  .v-onder { display: flex; gap: 8px; margin-top: 16px; }
+  .v-onder button { flex: 1; height: 48px; border-radius: 14px; background: #f3ecf8; font-weight: 900; color: var(--tekst); }
+  .v-onder button.roze { background: var(--roze); color: #fff; }
+  .formaten, .papieren { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+  .formaat { height: 90px; border-radius: 14px; background: #f3ecf8; font-weight: 900; font-size: 0.85rem; color: var(--tekst); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+  .formaat i { display: block; background: #fff; border: 2px solid #c9b8e0; border-radius: 3px; }
+  .formaat.actief, .papier.actief { box-shadow: 0 0 0 3px var(--roze); }
+  .papier { height: 48px; border-radius: 12px; border: 2px solid #eee; font-weight: 800; font-size: 0.75rem; }
+
+  .melding {
+    position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%) translateY(16px);
+    background: #fff; color: var(--tekst); padding: 10px 18px; border-radius: 999px; font-weight: 800; opacity: 0;
+    transition: all .25s; pointer-events: none; z-index: 30; box-shadow: 0 6px 24px rgba(0,0,0,0.3); white-space: nowrap;
+  }
+  .melding.toon { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 600px) {
+    .tools { width: 56px; } .tool { width: 46px; height: 46px; font-size: 1.25rem; }
+    .st-top .titel { display: none; } .tbk .tekst { display: none; }
+    .schuif { min-width: 110px; }
+  }
+  @media (prefers-reduced-motion: reduce) { #lagenPaneel, .melding { transition: none; } }
+</style>
+</head>
+<body>
+
+<!-- ══════════ STARTSCHERM ══════════ -->
+<div id="start">
+  <div class="start-top">
+    <a href="index.html" class="rond" aria-label="Terug naar Milou's Wereld">←</a>
+    <h1>Tekenstudio</h1>
+  </div>
+  <p class="start-sub">Verf, meng en teken wat je maar wilt 🎨</p>
+  <div class="start-grid" id="startGrid"></div>
+</div>
+
+<!-- ══════════ STUDIO ══════════ -->
+<div id="studio">
+  <div class="st-top">
+    <button class="rond" onclick="naarStart()" aria-label="Terug naar mijn tekeningen">←</button>
+    <div class="titel">Tekenstudio</div>
+    <button class="tbk" id="knopTerug" onclick="ongedaan()" aria-label="Ongedaan maken">↩️</button>
+    <button class="tbk" id="knopVooruit" onclick="opnieuw()" aria-label="Opnieuw doen">↪️</button>
+    <button class="tbk" onclick="document.getElementById('fotoInput').click()" aria-label="Foto toevoegen">📷<span class="tekst">Foto</span></button>
+    <button class="tbk" onclick="wisselLagen()" aria-label="Lagen">🗂️<span class="tekst">Lagen</span></button>
+    <button class="tbk roze" onclick="exporteer()" aria-label="Opslaan in foto's">💾<span class="tekst">Opslaan</span></button>
+  </div>
+  <div class="st-main">
+    <div class="tools" id="tools"></div>
+    <div id="werkvlak">
+      <div id="doek"><div id="papier"></div></div>
+      <div class="zoomknoppen">
+        <button onclick="zoomKnop(1.3)" aria-label="Inzoomen">＋</button>
+        <button onclick="zoomKnop(0.77)" aria-label="Uitzoomen">－</button>
+        <button onclick="passend()" aria-label="Hele tekening zien">⤢</button>
+      </div>
+    </div>
+    <div id="lagenPaneel">
+      <div class="lp-kop"><span>🗂️ Lagen</span><button class="rond" style="width:34px;height:34px" onclick="wisselLagen()" aria-label="Sluiten">✕</button></div>
+      <div id="lagenLijst"></div>
+      <div class="lp-knoppen">
+        <button onclick="nieuweLaag()" aria-label="Nieuwe laag">＋</button>
+        <button onclick="laagOmhoog()" aria-label="Laag omhoog">⬆️</button>
+        <button onclick="laagOmlaag()" aria-label="Laag omlaag">⬇️</button>
+        <button onclick="laagWeg()" aria-label="Laag weggooien">🗑️</button>
+      </div>
+      <div class="lp-dekking"><label for="laagDekking">Doorzichtigheid van deze laag</label><input type="range" id="laagDekking" min="0" max="100" oninput="zetLaagDekking(this.value)"></div>
+    </div>
+  </div>
+  <div class="onderbalk">
+    <button class="kleurpuck" id="kleurPuck" onclick="openKleur()" aria-label="Kleur kiezen"></button>
+    <div class="recent" id="recent"></div>
+    <div class="voorbeeld" id="voorbeeld"><span id="vbStip"></span></div>
+    <div class="schuif"><label for="grootte"><span>Grootte</span><span id="grootteW"></span></label><input type="range" id="grootte" min="1" max="150" oninput="zetInstelling('grootte', +this.value)"></div>
+    <div class="schuif"><label for="dekking"><span>Dekking</span><span id="dekkingW"></span></label><input type="range" id="dekking" min="5" max="100" oninput="zetInstelling('dekking', this.value / 100)"></div>
+    <div class="schuif"><label for="extra"><span id="extraNaam">Glad</span><span id="extraW"></span></label><input type="range" id="extra" min="0" max="90" oninput="zetInstelling('extra', this.value / 100)"></div>
+  </div>
+</div>
+
+<!-- ══════════ KLEUR KIEZEN & MENGEN ══════════ -->
+<div class="modal" id="kleurModal" onclick="if (event.target === this) sluitKleur()">
+  <div class="venster">
+    <h2>Kleuren</h2>
+    <div class="v-tabs">
+      <button class="v-tab actief" data-deel="kiezen" onclick="kleurTab('kiezen')">🎯 Kiezen</button>
+      <button class="v-tab" data-deel="palet" onclick="kleurTab('palet')">🎨 Palet</button>
+      <button class="v-tab" data-deel="mengen" onclick="kleurTab('mengen')">🫧 Mengen</button>
+    </div>
+    <div class="v-deel actief" id="deel-kiezen">
+      <canvas id="svVlak" width="300" height="300"></canvas>
+      <canvas id="hueBalk" width="300" height="32"></canvas>
+      <div class="kleur-rij"><div class="groot" id="kiesVoorbeeld"></div><input type="text" id="hexVeld" maxlength="7" oninput="hexIngetypt(this.value)" aria-label="Kleurcode"></div>
+    </div>
+    <div class="v-deel" id="deel-palet"><div class="palet" id="paletGrid"></div></div>
+    <div class="v-deel" id="deel-mengen">
+      <div class="mix-rij">
+        <button class="chip" id="mixA" onclick="zetMix('a')"><small>Kleur 1</small></button>
+        <input type="range" id="mixT" min="0" max="100" value="50" oninput="updateMix()" aria-label="Verhouding">
+        <button class="chip" id="mixB" onclick="zetMix('b')"><small>Kleur 2</small></button>
+        <button class="chip" id="mixUit" onclick="gebruikMix()" style="border-color:var(--roze)"><small>Gebruik</small></button>
+      </div>
+      <p class="uitleg">Tik op Kleur 1 of 2 om je huidige kleur erin te zetten. Schuif om te mengen, net als echte verf: blauw + geel wordt groen.</p>
+      <div class="verfpalet-wrap"><canvas id="mengpalet" width="480" height="300"></canvas><div class="duimgat"></div></div>
+      <div class="mp-knoppen">
+        <button id="mpVerf" class="actief" onclick="mengModus('verf')">🖌️ Verven</button>
+        <button id="mpPak" onclick="mengModus('pak')">💧 Pak kleur</button>
+        <button onclick="leegMengpalet()">🧽 Schoon</button>
+      </div>
+      <p class="uitleg">Verf met verschillende kleuren over elkaar op je palet. Kies dan Pak kleur en tik op de kleur die je wilt.</p>
+    </div>
+    <div class="v-onder"><button class="roze" onclick="sluitKleur()">Klaar</button></div>
+  </div>
+</div>
+
+<!-- ══════════ NIEUWE TEKENING ══════════ -->
+<div class="modal" id="nieuwModal" onclick="if (event.target === this) this.classList.remove('open')">
+  <div class="venster">
+    <h2>Nieuwe tekening</h2>
+    <div class="formaten" id="formaten"></div>
+    <div class="papieren" id="papieren"></div>
+    <div class="v-onder">
+      <button onclick="document.getElementById('nieuwModal').classList.remove('open')">Annuleren</button>
+      <button class="roze" onclick="maakNieuw()">Beginnen</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="fotoInput" accept="image/*" hidden onchange="fotoGekozen(this)">
+<div class="melding" id="melding"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  KLEURHULP: RGB, HSV en mengen zoals echte verf
+// ═══════════════════════════════════════════════
+const hex2rgb = h => { h = h.replace('#', ''); if (h.length === 3) h = h.split('').map(c => c + c).join(''); const n = parseInt(h, 16); return { r: n >> 16 & 255, g: n >> 8 & 255, b: n & 255 }; };
+const rgb2hex = c => '#' + [c.r, c.g, c.b].map(v => Math.round(Math.max(0, Math.min(255, v))).toString(16).padStart(2, '0')).join('');
+const rgbCss = (c, a) => `rgba(${Math.round(c.r)},${Math.round(c.g)},${Math.round(c.b)},${a === undefined ? 1 : a})`;
+function hsv2rgb(h, s, v) {
+  const f = n => { const k = (n + h / 60) % 6; return v - v * s * Math.max(0, Math.min(k, 4 - k, 1)); };
+  return { r: f(5) * 255, g: f(3) * 255, b: f(1) * 255 };
+}
+function rgb2hsv(c) {
+  const r = c.r / 255, g = c.g / 255, b = c.b / 255, mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
+  let h = 0;
+  if (d) { if (mx === r) h = ((g - b) / d) % 6; else if (mx === g) h = (b - r) / d + 2; else h = (r - g) / d + 4; h *= 60; if (h < 0) h += 360; }
+  return { h: h, s: mx ? d / mx : 0, v: mx };
+}
+// Rood-geel-blauw mengen, zodat blauw + geel groen wordt (zoals verf)
+function rgb2ryb(c) {
+  let r = c.r, g = c.g, b = c.b;
+  const w = Math.min(r, g, b); r -= w; g -= w; b -= w;
+  const mg = Math.max(r, g, b);
+  let y = Math.min(r, g); r -= y; g -= y;
+  if (b && g) { b /= 2; g /= 2; }
+  y += g; b += g;
+  const my = Math.max(r, y, b);
+  if (my) { const n = mg / my; r *= n; y *= n; b *= n; }
+  return { r: r + w, y: y + w, b: b + w };
+}
+function ryb2rgb(c) {
+  let r = c.r, y = c.y, b = c.b;
+  const w = Math.min(r, y, b); r -= w; y -= w; b -= w;
+  const my = Math.max(r, y, b);
+  let g = Math.min(y, b); y -= g; b -= g;
+  if (b && g) { b *= 2; g *= 2; }
+  r += y; g += y;
+  const mg = Math.max(r, g, b);
+  if (mg) { const n = my / mg; r *= n; g *= n; b *= n; }
+  return { r: r + w, g: g + w, b: b + w };
+}
+function meng(a, b, t) {
+  const A = rgb2ryb(a), B = rgb2ryb(b);
+  const c = ryb2rgb({ r: A.r + (B.r - A.r) * t, y: A.y + (B.y - A.y) * t, b: A.b + (B.b - A.b) * t });
+  // Helderheid behouden (verf wordt bij mengen maar een klein beetje donkerder)
+  const verschil = (Math.abs(A.r - B.r) + Math.abs(A.y - B.y) + Math.abs(A.b - B.b)) / 765;
+  const doel = (Math.max(a.r, a.g, a.b) * (1 - t) + Math.max(b.r, b.g, b.b) * t) * (1 - 0.12 * verschil * 4 * t * (1 - t)), mx = Math.max(c.r, c.g, c.b);
+  if (mx > 0) { const k = Math.min(3, doel / mx); c.r = Math.min(255, c.r * k); c.g = Math.min(255, c.g * k); c.b = Math.min(255, c.b * k); }
+  return c;
+}
+
+// ═══════════════════════════════════════════════
+//  GELUIDJES (zacht)
+// ═══════════════════════════════════════════════
+let actx = null;
+function audio() { if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } } if (actx.state === 'suspended') actx.resume(); return actx; }
+function piep(freq, duur, vol, naar) {
+  const a = audio(); if (!a) return;
+  const t = a.currentTime, o = a.createOscillator(), g = a.createGain();
+  o.type = 'sine'; o.frequency.setValueAtTime(freq, t); if (naar) o.frequency.exponentialRampToValueAtTime(naar, t + duur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + duur);
+  o.connect(g); g.connect(a.destination); o.start(t); o.stop(t + duur + 0.02);
+}
+
+// ═══════════════════════════════════════════════
+//  GEREEDSCHAP
+// ═══════════════════════════════════════════════
+const TOOLS = [
+  { id: 'pen',      emoji: '✒️', naam: 'Pen',      soort: 'buffer', grootte: 8,  dekking: 1,    extra: 0.3, extraNaam: 'Glad' },
+  { id: 'potlood',  emoji: '✏️', naam: 'Potlood',  soort: 'buffer', grootte: 6,  dekking: 0.85, extra: 0.2, extraNaam: 'Glad' },
+  { id: 'stift',    emoji: '🖍️', naam: 'Stift',    soort: 'buffer', grootte: 24, dekking: 0.6,  extra: 0.2, extraNaam: 'Glad' },
+  { id: 'kwast',    emoji: '🖌️', naam: 'Kwast',    soort: 'buffer', grootte: 40, dekking: 0.8,  extra: 0.2, extraNaam: 'Glad' },
+  { id: 'spray',    emoji: '💨', naam: 'Spray',    soort: 'buffer', grootte: 60, dekking: 0.7,  extra: 0.5, extraNaam: 'Dichtheid' },
+  { id: 'aquarel',  emoji: '💧', naam: 'Aquarel',  soort: 'direct', grootte: 50, dekking: 0.5,  extra: 0.5, extraNaam: 'Mengen' },
+  { id: 'glitter',  emoji: '✨', naam: 'Glitter',  soort: 'buffer', grootte: 40, dekking: 1,    extra: 0.5, extraNaam: 'Dichtheid' },
+  'streep',
+  { id: 'vegen',    emoji: '👆', naam: 'Vegen',    soort: 'direct', grootte: 40, dekking: 1,    extra: 0.6, extraNaam: 'Sterkte' },
+  { id: 'vervagen', emoji: '🌫️', naam: 'Blenden',  soort: 'direct', grootte: 50, dekking: 1,    extra: 0.5, extraNaam: 'Sterkte' },
+  { id: 'gum',      emoji: '🧽', naam: 'Gum',      soort: 'direct', grootte: 30, dekking: 1,    extra: 0.5, extraNaam: 'Zachtheid' },
+  'streep',
+  { id: 'emmer',    emoji: '🪣', naam: 'Emmer',    soort: 'klik',   grootte: 0,  dekking: 1,    extra: 0.3, extraNaam: 'Bereik' },
+  { id: 'pipet',    emoji: '🧪', naam: 'Pipet',    soort: 'klik',   grootte: 0,  dekking: 1,    extra: 0,   extraNaam: '' },
+  { id: 'hand',     emoji: '✋', naam: 'Schuif',   soort: 'hand',   grootte: 0,  dekking: 1,    extra: 0,   extraNaam: '' },
+];
+const TOOL = {}; TOOLS.forEach(t => { if (t.id) TOOL[t.id] = t; });
+let tool = 'pen', vorigeTool = 'pen', kleur = hex2rgb('#ff5fa2');
+let recent = ['#ff5fa2', '#7c3aed', '#1f7ae0', '#2ea44f', '#ffd21f', '#1e1a22'];
+try { const inst = JSON.parse(localStorage.getItem('tekenstudio-inst') || 'null'); if (inst) inst.forEach(i => { if (TOOL[i.id]) Object.assign(TOOL[i.id], i); }); } catch (e) {}
+function bewaarInstellingen() {
+  try { localStorage.setItem('tekenstudio-inst', JSON.stringify(TOOLS.filter(t => t.id).map(t => ({ id: t.id, grootte: t.grootte, dekking: t.dekking, extra: t.extra })))); } catch (e) {}
+}
+
+(function bouwTools() {
+  const box = document.getElementById('tools');
+  TOOLS.forEach(t => {
+    if (t === 'streep') { const d = document.createElement('div'); d.className = 'tool-streep'; box.appendChild(d); return; }
+    const b = document.createElement('button');
+    b.className = 'tool'; b.dataset.tool = t.id; b.setAttribute('aria-label', t.naam);
+    b.innerHTML = `${t.emoji}<small>${t.naam}</small>`;
+    b.addEventListener('click', function () { kiesTool(t.id); });
+    box.appendChild(b);
+  });
+})();
+function kiesTool(id) {
+  if (id !== 'pipet') vorigeTool = id;
+  tool = id;
+  document.querySelectorAll('.tool').forEach(b => b.classList.toggle('actief', b.dataset.tool === id));
+  const t = TOOL[id], heeft = t.soort !== 'klik' && t.soort !== 'hand';
+  document.getElementById('grootte').parentNode.style.display = heeft ? '' : 'none';
+  document.getElementById('dekking').parentNode.style.display = id === 'pipet' || id === 'hand' ? 'none' : '';
+  document.getElementById('extra').parentNode.style.display = t.extraNaam ? '' : 'none';
+  document.getElementById('voorbeeld').style.display = heeft ? '' : 'none';
+  document.getElementById('extraNaam').textContent = t.extraNaam;
+  document.getElementById('grootte').value = t.grootte;
+  document.getElementById('dekking').value = Math.round(t.dekking * 100);
+  document.getElementById('extra').value = Math.round(t.extra * 100);
+  updateBalk();
+  piep(1300, 0.04, 0.05);
+}
+function zetInstelling(sleutel, w) { TOOL[tool][sleutel] = w; updateBalk(); bewaarInstellingen(); }
+function updateBalk() {
+  const t = TOOL[tool];
+  document.getElementById('grootteW').textContent = t.grootte;
+  document.getElementById('dekkingW').textContent = Math.round(t.dekking * 100) + '%';
+  document.getElementById('extraW').textContent = Math.round(t.extra * 100) + '%';
+  document.getElementById('kleurPuck').style.background = rgb2hex(kleur);
+  const stip = document.getElementById('vbStip'), px = Math.max(3, Math.min(52, t.grootte * 0.5));
+  stip.style.width = stip.style.height = px + 'px';
+  stip.style.background = tool === 'gum' ? 'repeating-conic-gradient(#ddd 0 25%, #fff 0 50%) 50% / 8px 8px' : rgbCss(kleur, t.dekking);
+  stip.style.boxShadow = tool === 'gum' ? 'inset 0 0 0 2px #999' : 'none';
+  stip.style.filter = (tool === 'kwast' || tool === 'spray' || tool === 'aquarel') ? 'blur(2px)' : 'none';
+}
+function zetKleur(c, nietRecent) {
+  kleur = c;
+  if (!nietRecent) {
+    const h = rgb2hex(c);
+    recent = [h].concat(recent.filter(x => x !== h)).slice(0, 6);
+    bouwRecent();
+  }
+  updateBalk();
+}
+function bouwRecent() {
+  const r = document.getElementById('recent'); r.innerHTML = '';
+  recent.forEach(h => {
+    const b = document.createElement('button'); b.style.background = h; b.setAttribute('aria-label', h);
+    b.addEventListener('click', function () { zetKleur(hex2rgb(h)); if (tool === 'gum' || TOOL[tool].soort === 'klik' || tool === 'hand') kiesTool('pen'); });
+    r.appendChild(b);
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  DOEK EN LAGEN
+// ═══════════════════════════════════════════════
+const FORMATEN = [
+  { id: 'liggend', naam: 'Liggend', w: 1600, h: 1200 },
+  { id: 'staand', naam: 'Staand', w: 1200, h: 1600 },
+  { id: 'vierkant', naam: 'Vierkant', w: 1400, h: 1400 },
+];
+const PAPIEREN = [['#ffffff', 'Wit'], ['#fdf3e1', 'Crème'], ['#ffe0ee', 'Roze'], ['#e3f1ff', 'Lichtblauw'], ['#2b2233', 'Donker'], ['#1c1a4a', 'Nacht']];
+let DOC = { w: 1600, h: 1200 }, papier = '#ffffff', lagen = [], actief = 0, huidigId = null;
+let buffer, bctx, snap, sctx, tmp, tctx, patch, pctx;
+const doek = document.getElementById('doek'), werkvlak = document.getElementById('werkvlak');
+
+function maakCanvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+function maakLaag(naam) {
+  const c = maakCanvas(DOC.w, DOC.h);
+  return { c: c, ctx: c.getContext('2d'), naam: naam, zichtbaar: true, dekking: 1, id: Math.random().toString(36).slice(2) };
+}
+function initDoek(w, h, kleurPapier) {
+  DOC = { w: w, h: h }; papier = kleurPapier;
+  buffer = maakCanvas(w, h); bctx = buffer.getContext('2d');
+  snap = maakCanvas(w, h); sctx = snap.getContext('2d');
+  tmp = maakCanvas(256, 256); tctx = tmp.getContext('2d');
+  patch = maakCanvas(256, 256); pctx = patch.getContext('2d');
+  doek.style.width = w + 'px'; doek.style.height = h + 'px';
+  document.getElementById('papier').style.background = papier;
+  lagen = []; actief = 0; geschiedenis = []; vooruit = [];
+}
+function toonLagen() {
+  Array.from(doek.querySelectorAll('canvas')).forEach(c => c.remove());
+  lagen.forEach((l, i) => {
+    l.c.style.opacity = l.dekking; l.c.style.visibility = l.zichtbaar ? 'visible' : 'hidden';
+    doek.appendChild(l.c);
+    if (i === actief) { buffer.style.opacity = TOOL[tool] ? TOOL[tool].dekking * l.dekking : 1; doek.appendChild(buffer); }
+  });
+  bouwLagenLijst();
+}
+function bouwLagenLijst() {
+  const lijst = document.getElementById('lagenLijst'); lijst.innerHTML = '';
+  for (let i = lagen.length - 1; i >= 0; i--) {
+    const l = lagen[i], rij = document.createElement('div');
+    rij.className = 'laag-rij' + (i === actief ? ' actief' : '');
+    const mini = maakCanvas(112, 84); mini.getContext('2d').drawImage(l.c, 0, 0, 112, 84);
+    rij.appendChild(mini);
+    const n = document.createElement('div'); n.className = 'ln'; n.textContent = l.naam; rij.appendChild(n);
+    const oog = document.createElement('button'); oog.textContent = l.zichtbaar ? '👁️' : '🚫'; oog.setAttribute('aria-label', 'Laag tonen of verbergen');
+    oog.addEventListener('click', function (e) { e.stopPropagation(); l.zichtbaar = !l.zichtbaar; toonLagen(); planOpslaan(); });
+    rij.appendChild(oog);
+    rij.addEventListener('click', function () { actief = i; toonLagen(); });
+    lijst.appendChild(rij);
+  }
+  document.getElementById('laagDekking').value = Math.round((lagen[actief] ? lagen[actief].dekking : 1) * 100);
+}
+function wisselLagen() { document.getElementById('lagenPaneel').classList.toggle('open'); bouwLagenLijst(); }
+function nieuweLaag() {
+  if (lagen.length >= 8) { melding('Maximaal 8 lagen'); return; }
+  lagen.splice(actief + 1, 0, maakLaag('Laag ' + (lagen.length + 1)));
+  actief++; toonLagen(); planOpslaan();
+}
+function laagOmhoog() { if (actief >= lagen.length - 1) return; const l = lagen.splice(actief, 1)[0]; lagen.splice(actief + 1, 0, l); actief++; toonLagen(); planOpslaan(); }
+function laagOmlaag() { if (actief <= 0) return; const l = lagen.splice(actief, 1)[0]; lagen.splice(actief - 1, 0, l); actief--; toonLagen(); planOpslaan(); }
+function laagWeg() {
+  if (lagen.length <= 1) { melding('Je hebt minstens één laag nodig'); return; }
+  if (!confirm('Deze laag weggooien?')) return;
+  const weg = lagen.splice(actief, 1)[0];
+  geschiedenis = geschiedenis.filter(s => s.laag !== weg); vooruit = vooruit.filter(s => s.laag !== weg);
+  actief = Math.max(0, actief - 1); toonLagen(); updateKnoppen(); planOpslaan();
+}
+function zetLaagDekking(w) { if (!lagen[actief]) return; lagen[actief].dekking = w / 100; toonLagen(); planOpslaan(); }
+
+// ═══════════════════════════════════════════════
+//  ZOOMEN EN SCHUIVEN
+// ═══════════════════════════════════════════════
+let sc = 1, tx = 0, ty = 0;
+function pasToe() { doek.style.transform = `translate(${tx}px, ${ty}px) scale(${sc})`; }
+function passend() {
+  const r = werkvlak.getBoundingClientRect();
+  sc = Math.min(r.width / DOC.w, r.height / DOC.h) * 0.92;
+  tx = (r.width - DOC.w * sc) / 2; ty = (r.height - DOC.h * sc) / 2; pasToe();
+}
+function zoomBij(cx, cy, factor) {
+  const r = werkvlak.getBoundingClientRect(), px = cx - r.left, py = cy - r.top;
+  const nieuw = Math.max(0.1, Math.min(12, sc * factor));
+  tx = px - (px - tx) * nieuw / sc; ty = py - (py - ty) * nieuw / sc; sc = nieuw; pasToe();
+}
+function zoomKnop(f) { const r = werkvlak.getBoundingClientRect(); zoomBij(r.left + r.width / 2, r.top + r.height / 2, f); }
+function docPunt(cx, cy) { const r = werkvlak.getBoundingClientRect(); return [(cx - r.left - tx) / sc, (cy - r.top - ty) / sc]; }
+werkvlak.addEventListener('wheel', function (e) { e.preventDefault(); zoomBij(e.clientX, e.clientY, Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0015))); }, { passive: false });
+window.addEventListener('resize', function () { if (document.getElementById('studio').classList.contains('open')) passend(); });
+
+// ═══════════════════════════════════════════════
+//  PENSELEN
+// ═══════════════════════════════════════════════
+const zachtCache = {};
+function zachteStempel(d, c, hard) {
+  d = Math.max(2, Math.round(d));
+  const sleutel = d + '|' + (c ? rgb2hex(c) : 'masker') + '|' + hard;
+  if (zachtCache[sleutel]) return zachtCache[sleutel];
+  const s = maakCanvas(d, d), x = s.getContext('2d'), g = x.createRadialGradient(d / 2, d / 2, 0, d / 2, d / 2, d / 2);
+  const kl = c || { r: 0, g: 0, b: 0 };
+  g.addColorStop(0, rgbCss(kl, 1)); g.addColorStop(Math.max(0, Math.min(0.95, hard)), rgbCss(kl, 1)); g.addColorStop(1, rgbCss(kl, 0));
+  x.fillStyle = g; x.fillRect(0, 0, d, d);
+  const sleutels = Object.keys(zachtCache); if (sleutels.length > 60) delete zachtCache[sleutels[0]];
+  zachtCache[sleutel] = s; return s;
+}
+function cirkel(ctx, x, y, r) { ctx.beginPath(); ctx.arc(x, y, Math.max(0.4, r), 0, Math.PI * 2); ctx.fill(); }
+function gauss() { return (Math.random() + Math.random() + Math.random() - 1.5) / 1.5; }
+function variant(c, v) { return { r: c.r + (255 - c.r) * Math.max(0, v) + c.r * Math.min(0, v), g: c.g + (255 - c.g) * Math.max(0, v) + c.g * Math.min(0, v), b: c.b + (255 - c.b) * Math.max(0, v) + c.b * Math.min(0, v) }; }
+
+let streek = null;
+function laag() { return lagen[actief]; }
+function groei(x, y, r) {
+  const b = streek.bbox;
+  b[0] = Math.min(b[0], x - r - 2); b[1] = Math.min(b[1], y - r - 2); b[2] = Math.max(b[2], x + r + 2); b[3] = Math.max(b[3], y + r + 2);
+}
+function stempel(x, y, p) {
+  const t = TOOL[tool], s = t.grootte, L = laag();
+  if (tool === 'pen') { const r = s * (0.3 + 0.7 * p) / 2; bctx.fillStyle = rgbCss(kleur); cirkel(bctx, x, y, r); groei(x, y, r); }
+  else if (tool === 'potlood') {
+    const r = Math.max(0.8, s * (0.35 + 0.65 * p) / 2), n = Math.max(3, Math.round(r * r * 1.2));
+    bctx.fillStyle = rgbCss(kleur, 0.55 + 0.45 * p);
+    for (let i = 0; i < n; i++) { const a = Math.random() * 6.283, q = Math.sqrt(Math.random()) * r; bctx.fillRect(x + Math.cos(a) * q, y + Math.sin(a) * q, 1.2, 1.2); }
+    groei(x, y, r);
+  }
+  else if (tool === 'stift') { const r = s / 2; bctx.fillStyle = rgbCss(kleur); cirkel(bctx, x, y, r); groei(x, y, r); }
+  else if (tool === 'kwast') {
+    const d = s * (0.5 + 0.5 * p); bctx.globalAlpha = 0.35 + 0.4 * p;
+    bctx.drawImage(zachteStempel(d, kleur, 0.35), x - d / 2, y - d / 2); bctx.globalAlpha = 1; groei(x, y, d / 2);
+  }
+  else if (tool === 'spray') {
+    const r = s / 2, n = Math.round(6 + s * 0.5 * (0.3 + t.extra));
+    bctx.fillStyle = rgbCss(kleur, 0.35);
+    for (let i = 0; i < n; i++) { const a = Math.random() * 6.283, q = Math.abs(gauss()) * r; bctx.fillRect(x + Math.cos(a) * q, y + Math.sin(a) * q, 1.6, 1.6); }
+    groei(x, y, r * 1.2);
+  }
+  else if (tool === 'glitter') {
+    const r = s / 2, n = Math.max(1, Math.round(1 + t.extra * 4));
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * 6.283, q = Math.sqrt(Math.random()) * r, gx = x + Math.cos(a) * q, gy = y + Math.sin(a) * q;
+      const k = Math.random(), gr = 1 + Math.random() * Math.max(1.5, s / 12);
+      bctx.fillStyle = k < 0.18 ? '#ffffff' : rgbCss(variant(kleur, (Math.random() - 0.5) * 0.9));
+      if (k < 0.3) { // sterretje
+        bctx.beginPath();
+        for (let j = 0; j < 8; j++) { const aa = j * Math.PI / 4, rr = j % 2 ? gr * 0.35 : gr * 1.8; bctx.lineTo(gx + Math.cos(aa) * rr, gy + Math.sin(aa) * rr); }
+        bctx.closePath(); bctx.fill();
+      } else cirkel(bctx, gx, gy, gr);
+    }
+    groei(x, y, r + s / 6);
+  }
+  else if (tool === 'aquarel') {
+    // Oppakken van de verf die er al ligt, en die mengen met de kwast
+    const px = L.ctx.getImageData(Math.max(0, Math.min(DOC.w - 1, x | 0)), Math.max(0, Math.min(DOC.h - 1, y | 0)), 1, 1).data;
+    if (px[3] > 40) streek.lading = meng(streek.lading, { r: px[0], g: px[1], b: px[2] }, 0.18 * t.extra * (px[3] / 255));
+    const d = s * (0.6 + 0.4 * p);
+    L.ctx.globalAlpha = t.dekking * 0.16 * (0.5 + 0.5 * p);
+    L.ctx.drawImage(zachteStempel(d, streek.lading, 0.55), x - d / 2, y - d / 2);
+    L.ctx.globalAlpha = 1; groei(x, y, d / 2);
+  }
+  else if (tool === 'vegen' || tool === 'vervagen') {
+    const D = Math.max(4, Math.min(256, Math.round(s))), hx = x - D / 2, hy = y - D / 2;
+    tctx.clearRect(0, 0, D, D);
+    if (tool === 'vegen') tctx.drawImage(patch, 0, 0, D, D, 0, 0, D, D);
+    else {
+      // Vervagen: klein maken en weer groot = zachte overgang
+      const k = Math.max(2, Math.round(D / 6));
+      pctx.clearRect(0, 0, 256, 256); pctx.imageSmoothingEnabled = true;
+      pctx.drawImage(L.c, hx, hy, D, D, 0, 0, k, k);
+      tctx.imageSmoothingEnabled = true; tctx.drawImage(patch, 0, 0, k, k, 0, 0, D, D);
+    }
+    tctx.globalCompositeOperation = 'destination-in'; tctx.drawImage(zachteStempel(D, null, 0.2), 0, 0); tctx.globalCompositeOperation = 'source-over';
+    L.ctx.globalAlpha = tool === 'vegen' ? t.extra : t.extra * 0.6;
+    L.ctx.drawImage(tmp, 0, 0, D, D, hx, hy, D, D); L.ctx.globalAlpha = 1;
+    if (tool === 'vegen') { pctx.clearRect(0, 0, 256, 256); pctx.drawImage(L.c, hx, hy, D, D, 0, 0, D, D); }
+    groei(x, y, D / 2);
+  }
+  else if (tool === 'gum') {
+    const d = s * (0.5 + 0.5 * p);
+    L.ctx.globalCompositeOperation = 'destination-out'; L.ctx.globalAlpha = t.dekking;
+    L.ctx.drawImage(zachteStempel(d, null, 1 - t.extra * 0.9), x - d / 2, y - d / 2);
+    L.ctx.globalCompositeOperation = 'source-over'; L.ctx.globalAlpha = 1; groei(x, y, d / 2);
+  }
+}
+function tussenruimte() {
+  const s = TOOL[tool].grootte;
+  if (tool === 'pen' || tool === 'stift') return Math.max(0.6, s * 0.08);
+  if (tool === 'potlood') return Math.max(0.8, s * 0.25);
+  if (tool === 'spray' || tool === 'glitter') return Math.max(2, s * 0.18);
+  if (tool === 'vegen') return Math.max(1, s * 0.1);
+  return Math.max(1, s * 0.15);
+}
+function startStreek(x, y, p) {
+  const L = laag(); if (!L) return;
+  sctx.clearRect(0, 0, DOC.w, DOC.h); sctx.drawImage(L.c, 0, 0);
+  streek = { laag: L, x: x, y: y, sx: x, sy: y, rest: 0, bbox: [x, y, x, y], lading: { r: kleur.r, g: kleur.g, b: kleur.b }, p: p };
+  buffer.style.opacity = TOOL[tool].dekking * L.dekking;
+  if (tool === 'vegen') { const D = Math.max(4, Math.min(256, Math.round(TOOL.vegen.grootte))); pctx.clearRect(0, 0, 256, 256); pctx.drawImage(L.c, x - D / 2, y - D / 2, D, D, 0, 0, D, D); }
+  else stempel(x, y, p);
+  if (tool === 'spray') streek.timer = setInterval(function () { if (streek) stempel(streek.sx, streek.sy, streek.p); }, 40);
+  voegRecentToe();
+}
+function beweegStreek(x, y, p) {
+  if (!streek) return;
+  const glad = (tool === 'vegen' || tool === 'vervagen' || tool === 'gum' || tool === 'aquarel') ? 0.2 : TOOL[tool].extra;
+  const f = 1 - Math.min(0.9, tool === 'spray' || tool === 'glitter' ? 0 : glad);
+  const nx = streek.sx + (x - streek.sx) * f, ny = streek.sy + (y - streek.sy) * f;
+  const dx = nx - streek.sx, dy = ny - streek.sy, afst = Math.hypot(dx, dy), stap = tussenruimte();
+  let t = stap - streek.rest;
+  while (t <= afst) {
+    const q = t / afst, pp = streek.p + (p - streek.p) * q;
+    stempel(streek.sx + dx * q, streek.sy + dy * q, pp);
+    t += stap;
+  }
+  streek.rest = afst - (t - stap);
+  streek.sx = nx; streek.sy = ny; streek.p = p;
+}
+function eindStreek() {
+  if (!streek) return;
+  if (streek.timer) clearInterval(streek.timer);
+  const L = streek.laag, t = TOOL[tool];
+  if (t.soort === 'buffer') {
+    L.ctx.globalAlpha = t.dekking; L.ctx.drawImage(buffer, 0, 0); L.ctx.globalAlpha = 1;
+    bctx.clearRect(0, 0, DOC.w, DOC.h);
+  }
+  const b = streek.bbox.map(Math.round), x0 = Math.max(0, b[0]), y0 = Math.max(0, b[1]), x1 = Math.min(DOC.w, b[2]), y1 = Math.min(DOC.h, b[3]);
+  if (x1 > x0 && y1 > y0) {
+    bewaarStap(L, x0, y0, x1 - x0, y1 - y0, sctx.getImageData(x0, y0, x1 - x0, y1 - y0));
+  }
+  streek = null; planOpslaan();
+}
+function annuleerStreek() {
+  if (!streek) return;
+  if (streek.timer) clearInterval(streek.timer);
+  bctx.clearRect(0, 0, DOC.w, DOC.h);
+  streek.laag.ctx.clearRect(0, 0, DOC.w, DOC.h); streek.laag.ctx.drawImage(snap, 0, 0);
+  streek = null;
+}
+function voegRecentToe() {
+  if (tool === 'gum' || tool === 'vegen' || tool === 'vervagen') return;
+  const h = rgb2hex(kleur);
+  if (recent[0] !== h) { recent = [h].concat(recent.filter(x => x !== h)).slice(0, 6); bouwRecent(); }
+}
+
+// ═══════════════════════════════════════════════
+//  ONGEDAAN MAKEN / OPNIEUW
+// ═══════════════════════════════════════════════
+let geschiedenis = [], vooruit = [];
+function bewaarStap(L, x, y, w, h, voor) {
+  geschiedenis.push({ laag: L, x: x, y: y, voor: voor, na: L.ctx.getImageData(x, y, w, h) });
+  let totaal = 0;
+  for (let i = geschiedenis.length - 1; i >= 0; i--) { totaal += geschiedenis[i].voor.data.length * 2; if (totaal > 180e6 || geschiedenis.length - i > 40) { geschiedenis.splice(0, i); break; } }
+  vooruit = []; updateKnoppen();
+}
+function ongedaan() {
+  const s = geschiedenis.pop(); if (!s) return;
+  s.laag.ctx.putImageData(s.voor, s.x, s.y); vooruit.push(s); updateKnoppen(); planOpslaan(); piep(700, 0.15, 0.08, 350);
+}
+function opnieuw() {
+  const s = vooruit.pop(); if (!s) return;
+  s.laag.ctx.putImageData(s.na, s.x, s.y); geschiedenis.push(s); updateKnoppen(); planOpslaan(); piep(400, 0.15, 0.08, 800);
+}
+function updateKnoppen() {
+  document.getElementById('knopTerug').disabled = !geschiedenis.length;
+  document.getElementById('knopVooruit').disabled = !vooruit.length;
+}
+
+// ═══════════════════════════════════════════════
+//  EMMER EN PIPET
+// ═══════════════════════════════════════════════
+function emmer(x, y) {
+  const L = laag(); x = Math.floor(x); y = Math.floor(y);
+  if (x < 0 || y < 0 || x >= DOC.w || y >= DOC.h) return;
+  const W = DOC.w, H = DOC.h, beeld = L.ctx.getImageData(0, 0, W, H), d = beeld.data, voor = L.ctx.getImageData(0, 0, W, H);
+  const i0 = (y * W + x) * 4, doel = [d[i0], d[i0 + 1], d[i0 + 2], d[i0 + 3]], tol = 20 + TOOL.emmer.extra * 180;
+  const lijkt = i => Math.abs(d[i] - doel[0]) + Math.abs(d[i + 1] - doel[1]) + Math.abs(d[i + 2] - doel[2]) + Math.abs(d[i + 3] - doel[3]) * 1.5 <= tol;
+  const masker = new Uint8Array(W * H), stapel = [x, y];
+  let minx = x, maxx = x, miny = y, maxy = y;
+  while (stapel.length) {
+    const sy = stapel.pop(), sx = stapel.pop();
+    let lx = sx; while (lx >= 0 && !masker[sy * W + lx] && lijkt((sy * W + lx) * 4)) lx--;
+    lx++;
+    let boven = false, onder = false;
+    for (let xx = lx; xx < W && !masker[sy * W + xx] && lijkt((sy * W + xx) * 4); xx++) {
+      masker[sy * W + xx] = 1;
+      if (xx < minx) minx = xx; if (xx > maxx) maxx = xx; if (sy < miny) miny = sy; if (sy > maxy) maxy = sy;
+      if (sy > 0) { const ok = !masker[(sy - 1) * W + xx] && lijkt(((sy - 1) * W + xx) * 4); if (ok && !boven) { stapel.push(xx, sy - 1); boven = true; } else if (!ok) boven = false; }
+      if (sy < H - 1) { const ok = !masker[(sy + 1) * W + xx] && lijkt(((sy + 1) * W + xx) * 4); if (ok && !onder) { stapel.push(xx, sy + 1); onder = true; } else if (!ok) onder = false; }
+    }
+  }
+  // Eén pixel uitbreiden zodat er geen wit randje langs de lijnen blijft
+  const a = Math.round(TOOL.emmer.dekking * 255);
+  const vul = i => {
+    const al = a / 255, oa = d[i + 3] / 255, na = al + oa * (1 - al);
+    d[i] = (kleur.r * al + d[i] * oa * (1 - al)) / (na || 1); d[i + 1] = (kleur.g * al + d[i + 1] * oa * (1 - al)) / (na || 1);
+    d[i + 2] = (kleur.b * al + d[i + 2] * oa * (1 - al)) / (na || 1); d[i + 3] = na * 255;
+  };
+  for (let yy = Math.max(0, miny - 1); yy <= Math.min(H - 1, maxy + 1); yy++) for (let xx = Math.max(0, minx - 1); xx <= Math.min(W - 1, maxx + 1); xx++) {
+    const k = yy * W + xx;
+    if (masker[k] || (xx > 0 && masker[k - 1]) || (xx < W - 1 && masker[k + 1]) || (yy > 0 && masker[k - W]) || (yy < H - 1 && masker[k + W])) vul(k * 4);
+  }
+  L.ctx.putImageData(beeld, 0, 0);
+  const bx = Math.max(0, minx - 1), by = Math.max(0, miny - 1), bw = Math.min(W, maxx + 2) - bx, bh = Math.min(H, maxy + 2) - by;
+  const deel = maakCanvas(1, 1).getContext('2d').createImageData(bw, bh);
+  for (let yy = 0; yy < bh; yy++) deel.data.set(voor.data.subarray(((by + yy) * W + bx) * 4, ((by + yy) * W + bx + bw) * 4), yy * bw * 4);
+  bewaarStap(L, bx, by, bw, bh, deel);
+  voegRecentToe(); planOpslaan(); piep(660, 0.14, 0.12, 990);
+}
+function pipet(x, y) {
+  x = Math.floor(x); y = Math.floor(y);
+  if (x < 0 || y < 0 || x >= DOC.w || y >= DOC.h) return;
+  let c = hex2rgb(papier);
+  lagen.forEach(l => {
+    if (!l.zichtbaar) return;
+    const px = l.ctx.getImageData(x, y, 1, 1).data, a = px[3] / 255 * l.dekking;
+    c = { r: c.r * (1 - a) + px[0] * a, g: c.g * (1 - a) + px[1] * a, b: c.b * (1 - a) + px[2] * a };
+  });
+  zetKleur(c); kiesTool(vorigeTool === 'pipet' ? 'pen' : vorigeTool);
+  melding('Kleur gepakt 🧪'); piep(1200, 0.08, 0.08);
+}
+
+// ═══════════════════════════════════════════════
+//  AANRAKEN: tekenen, knijpen, twee vingers = terug
+// ═══════════════════════════════════════════════
+const vingers = new Map();
+let penGezien = false, actievePointer = null, knijp = null, schuif = null, tweeTik = null;
+function druk(e) { return (e.pointerType === 'mouse' || !e.pressure) ? 0.8 : e.pressure; }
+function afst(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
+
+werkvlak.addEventListener('pointerdown', function (e) {
+  if (e.target.closest('.zoomknoppen')) return;
+  audio();
+  if (e.pointerType === 'pen') penGezien = true;
+  if (e.pointerType === 'touch') {
+    vingers.set(e.pointerId, { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY });
+    if (vingers.size === 2) {
+      if (streek && actievePointer !== null && vingers.has(actievePointer)) annuleerStreek();
+      actievePointer = null;
+      const p = Array.from(vingers.values());
+      knijp = { d0: afst(p[0], p[1]), sc0: sc, tx0: tx, ty0: ty, mx: (p[0].x + p[1].x) / 2, my: (p[0].y + p[1].y) / 2 };
+      tweeTik = { tijd: Date.now(), bewogen: false };
+      return;
+    }
+    if (vingers.size > 2 || penGezien) return;
+  }
+  if (knijp || actievePointer !== null) return;
+  e.preventDefault();
+  const t = TOOL[tool], p = docPunt(e.clientX, e.clientY);
+  if (t.soort === 'hand') { actievePointer = e.pointerId; schuif = { x: e.clientX, y: e.clientY, tx: tx, ty: ty }; return; }
+  if (tool === 'emmer') { emmer(p[0], p[1]); return; }
+  if (tool === 'pipet') { pipet(p[0], p[1]); return; }
+  actievePointer = e.pointerId;
+  try { werkvlak.setPointerCapture(e.pointerId); } catch (err) {}
+  startStreek(p[0], p[1], druk(e));
+});
+werkvlak.addEventListener('pointermove', function (e) {
+  if (vingers.has(e.pointerId)) {
+    const v = vingers.get(e.pointerId); v.x = e.clientX; v.y = e.clientY;
+    if (knijp && vingers.size >= 2) {
+      e.preventDefault();
+      const p = Array.from(vingers.values()), mx = (p[0].x + p[1].x) / 2, my = (p[0].y + p[1].y) / 2;
+      if (Math.abs(mx - knijp.mx) + Math.abs(my - knijp.my) > 10 || Math.abs(afst(p[0], p[1]) - knijp.d0) > 12) tweeTik.bewogen = true;
+      const r = werkvlak.getBoundingClientRect(), nieuw = Math.max(0.1, Math.min(12, knijp.sc0 * afst(p[0], p[1]) / Math.max(10, knijp.d0)));
+      const ax = knijp.mx - r.left, ay = knijp.my - r.top;
+      tx = mx - r.left - (ax - knijp.tx0) * nieuw / knijp.sc0; ty = my - r.top - (ay - knijp.ty0) * nieuw / knijp.sc0; sc = nieuw; pasToe();
+      return;
+    }
+  }
+  if (e.pointerId !== actievePointer) return;
+  e.preventDefault();
+  if (schuif) { tx = schuif.tx + e.clientX - schuif.x; ty = schuif.ty + e.clientY - schuif.y; pasToe(); return; }
+  const lijst = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+  (lijst.length ? lijst : [e]).forEach(ev => { const p = docPunt(ev.clientX, ev.clientY); beweegStreek(p[0], p[1], druk(ev)); });
+});
+function loslaten(e) {
+  if (vingers.has(e.pointerId)) {
+    vingers.delete(e.pointerId);
+    if (knijp) {
+      if (vingers.size === 0) {
+        if (tweeTik && !tweeTik.bewogen && Date.now() - tweeTik.tijd < 300) { ongedaan(); melding('↩️ Terug'); }
+        knijp = null; tweeTik = null;
+      }
+      return;
+    }
+  }
+  if (e.pointerId !== actievePointer) return;
+  actievePointer = null; schuif = null;
+  eindStreek();
+}
+werkvlak.addEventListener('pointerup', loslaten);
+werkvlak.addEventListener('pointercancel', loslaten);
+
+// ═══════════════════════════════════════════════
+//  KLEURKIEZER
+// ═══════════════════════════════════════════════
+let hsv = rgb2hsv(kleur);
+const svVlak = document.getElementById('svVlak'), hueBalk = document.getElementById('hueBalk');
+function tekenKiezer() {
+  const x = svVlak.getContext('2d'), W = svVlak.width, H = svVlak.height;
+  x.fillStyle = rgbCss(hsv2rgb(hsv.h, 1, 1)); x.fillRect(0, 0, W, H);
+  let g = x.createLinearGradient(0, 0, W, 0); g.addColorStop(0, '#fff'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+  g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, '#000'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+  x.lineWidth = 4; x.strokeStyle = hsv.v > 0.55 ? '#2b2233' : '#fff'; x.beginPath(); x.arc(hsv.s * W, (1 - hsv.v) * H, 12, 0, 6.283); x.stroke();
+  const h = hueBalk.getContext('2d'), HW = hueBalk.width, HH = hueBalk.height;
+  const hg = h.createLinearGradient(0, 0, HW, 0);
+  for (let i = 0; i <= 6; i++) hg.addColorStop(i / 6, rgbCss(hsv2rgb(i * 60, 1, 1)));
+  h.clearRect(0, 0, HW, HH); h.fillStyle = hg; h.fillRect(0, 0, HW, HH);
+  h.lineWidth = 4; h.strokeStyle = '#fff'; h.strokeRect(hsv.h / 360 * HW - 5, 2, 10, HH - 4);
+  const kl = hsv2rgb(hsv.h, hsv.s, hsv.v);
+  document.getElementById('kiesVoorbeeld').style.background = rgb2hex(kl);
+  if (document.activeElement !== document.getElementById('hexVeld')) document.getElementById('hexVeld').value = rgb2hex(kl);
+}
+function sleepKiezer(el, fn) {
+  let bezig = false;
+  const doe = e => { const r = el.getBoundingClientRect(); fn(Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)), Math.max(0, Math.min(1, (e.clientY - r.top) / r.height))); tekenKiezer(); zetKleur(hsv2rgb(hsv.h, hsv.s, hsv.v), true); };
+  el.addEventListener('pointerdown', e => { bezig = true; try { el.setPointerCapture(e.pointerId); } catch (x) {} doe(e); });
+  el.addEventListener('pointermove', e => { if (bezig) doe(e); });
+  el.addEventListener('pointerup', () => { bezig = false; zetKleur(kleur); });
+}
+sleepKiezer(svVlak, (x, y) => { hsv.s = x; hsv.v = 1 - y; });
+sleepKiezer(hueBalk, x => { hsv.h = x * 359.9; });
+function hexIngetypt(w) { if (/^#?[0-9a-f]{6}$/i.test(w)) { zetKleur(hex2rgb(w)); hsv = rgb2hsv(kleur); tekenKiezer(); } }
+function openKleur() { hsv = rgb2hsv(kleur); tekenKiezer(); updateMix(); document.getElementById('kleurModal').classList.add('open'); }
+function sluitKleur() {
+  document.getElementById('kleurModal').classList.remove('open');
+  if (tool === 'gum' || TOOL[tool].soort === 'klik' || tool === 'hand' || tool === 'vegen' || tool === 'vervagen') kiesTool(vorigeTool && TOOL[vorigeTool].soort === 'buffer' ? vorigeTool : 'pen');
+}
+function kleurTab(id) {
+  document.querySelectorAll('.v-tab').forEach(b => b.classList.toggle('actief', b.dataset.deel === id));
+  document.querySelectorAll('.v-deel').forEach(d => d.classList.toggle('actief', d.id === 'deel-' + id));
+}
+const PALET = ['#ffe0ee','#ffb3d4','#ff7bb5','#ff3d8f','#d81b6a','#9c0f4a','#ff9a8a','#ff5a4f',
+  '#e8261f','#ffb066','#ff7a1a','#fff6c2','#ffe76b','#ffd21f','#f2b705','#d99a00',
+  '#dcf7d4','#a6e89a','#5fcf6b','#2ea44f','#1f7a4d','#b8f2e6','#7fe3f0','#d6efff',
+  '#9fd7ff','#4db3ff','#1f7ae0','#0d47a1','#eee0ff','#cfb3ff','#a77bff','#7c3aed',
+  '#5b21b6','#e3a6ff','#fde4cf','#f5c9a3','#e0a878','#b87a4b','#8a5230','#5c3a21',
+  '#ffffff','#e6e1e8','#bdb5c2','#8c8394','#4d4552','#1e1a22','#c0c0c0','#d4af37'];
+(function bouwPalet() {
+  const g = document.getElementById('paletGrid');
+  PALET.forEach(h => { const b = document.createElement('button'); b.style.background = h; b.setAttribute('aria-label', h); b.addEventListener('click', function () { zetKleur(hex2rgb(h)); piep(1300, 0.04, 0.05); }); g.appendChild(b); });
+})();
+
+// Mengen met twee kleuren
+let mixA = hex2rgb('#1f7ae0'), mixB = hex2rgb('#ffd21f');
+function zetMix(welke) { if (welke === 'a') mixA = kleur; else mixB = kleur; updateMix(); piep(1300, 0.04, 0.05); }
+function updateMix() {
+  document.getElementById('mixA').style.background = rgb2hex(mixA);
+  document.getElementById('mixB').style.background = rgb2hex(mixB);
+  document.getElementById('mixUit').style.background = rgb2hex(meng(mixA, mixB, document.getElementById('mixT').value / 100));
+}
+function gebruikMix() { zetKleur(meng(mixA, mixB, document.getElementById('mixT').value / 100)); melding('Gemengde kleur gekozen 🫧'); piep(880, 0.12, 0.1, 1320); }
+
+// Verfpalet: echte natte verf die mengt
+const mp = document.getElementById('mengpalet'), mpx = mp.getContext('2d');
+let mpModus = 'verf', mpStreek = null;
+function leegMengpalet() { mpx.clearRect(0, 0, mp.width, mp.height); try { localStorage.removeItem('tekenstudio-mengpalet'); } catch (e) {} }
+function mengModus(m) { mpModus = m; document.getElementById('mpVerf').classList.toggle('actief', m === 'verf'); document.getElementById('mpPak').classList.toggle('actief', m === 'pak'); }
+function mpPunt(e) { const r = mp.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * mp.width, (e.clientY - r.top) / r.height * mp.height]; }
+function mpStempel(x, y) {
+  const px = mpx.getImageData(Math.max(0, Math.min(mp.width - 1, x | 0)), Math.max(0, Math.min(mp.height - 1, y | 0)), 1, 1).data;
+  if (px[3] > 40) mpStreek.lading = meng(mpStreek.lading, { r: px[0], g: px[1], b: px[2] }, 0.22);
+  mpx.globalAlpha = 0.5; mpx.drawImage(zachteStempel(44, mpStreek.lading, 0.6), x - 22, y - 22); mpx.globalAlpha = 1;
+}
+mp.addEventListener('pointerdown', e => {
+  e.preventDefault(); const p = mpPunt(e);
+  if (mpModus === 'pak') {
+    const d = mpx.getImageData(p[0] | 0, p[1] | 0, 1, 1).data;
+    if (d[3] < 20) { melding('Tik op een plek met verf'); return; }
+    zetKleur({ r: d[0], g: d[1], b: d[2] }); hsv = rgb2hsv(kleur); tekenKiezer(); melding('Kleur van je palet gepakt 💧'); piep(1200, 0.08, 0.08);
+    return;
+  }
+  try { mp.setPointerCapture(e.pointerId); } catch (x) {}
+  mpStreek = { x: p[0], y: p[1], lading: { r: kleur.r, g: kleur.g, b: kleur.b } }; mpStempel(p[0], p[1]);
+});
+mp.addEventListener('pointermove', e => {
+  if (!mpStreek) return;
+  const p = mpPunt(e), dx = p[0] - mpStreek.x, dy = p[1] - mpStreek.y, n = Math.ceil(Math.hypot(dx, dy) / 5);
+  for (let i = 1; i <= n; i++) mpStempel(mpStreek.x + dx * i / n, mpStreek.y + dy * i / n);
+  mpStreek.x = p[0]; mpStreek.y = p[1];
+});
+mp.addEventListener('pointerup', () => { if (mpStreek) { mpStreek = null; try { localStorage.setItem('tekenstudio-mengpalet', mp.toDataURL()); } catch (e) {} } });
+(function laadMengpalet() {
+  try { const d = localStorage.getItem('tekenstudio-mengpalet'); if (d) { const i = new Image(); i.onload = () => mpx.drawImage(i, 0, 0); i.src = d; } } catch (e) {}
+})();
+
+// ═══════════════════════════════════════════════
+//  FOTO ALS VOORBEELD OM OVER TE TEKENEN
+// ═══════════════════════════════════════════════
+function fotoGekozen(input) {
+  const bestand = input.files && input.files[0]; input.value = '';
+  if (!bestand) return;
+  const url = URL.createObjectURL(bestand), img = new Image();
+  img.onload = function () {
+    const L = maakLaag('Foto'), k = Math.min(DOC.w / img.width, DOC.h / img.height), w = img.width * k, h = img.height * k;
+    L.ctx.drawImage(img, (DOC.w - w) / 2, (DOC.h - h) / 2, w, h); L.dekking = 0.5;
+    lagen.unshift(L);
+    if (lagen.length === 2 && isLeeg(lagen[1])) actief = 1; else { lagen.splice(1, 0, maakLaag('Overtrekken')); actief = 1; }
+    geschiedenis = []; vooruit = []; updateKnoppen();
+    toonLagen(); planOpslaan(); URL.revokeObjectURL(url);
+    melding('📷 Foto staat onderaan. Teken er overheen!');
+  };
+  img.src = url;
+}
+function isLeeg(L) { const d = maakCanvas(40, 30); const x = d.getContext('2d'); x.drawImage(L.c, 0, 0, 40, 30); return !x.getImageData(0, 0, 40, 30).data.some((v, i) => i % 4 === 3 && v > 0); }
+
+// ═══════════════════════════════════════════════
+//  BEWAREN IN DE BROWSER (IndexedDB)
+// ═══════════════════════════════════════════════
+let dbBelofte = null;
+function db() {
+  if (!dbBelofte) dbBelofte = new Promise((ok, fout) => {
+    const r = indexedDB.open('milou-tekenstudio', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('tekeningen', { keyPath: 'id' });
+    r.onsuccess = () => ok(r.result); r.onerror = () => fout(r.error);
+  });
+  return dbBelofte;
+}
+async function dbDoe(modus, fn) {
+  const d = await db();
+  return new Promise((ok, fout) => { const t = d.transaction('tekeningen', modus), s = t.objectStore('tekeningen'), r = fn(s); t.oncomplete = () => ok(r && r.result); t.onerror = () => fout(t.error); });
+}
+const alsBlob = c => new Promise(ok => c.toBlob(ok, 'image/png'));
+function samenvoegen(breedte) {
+  const k = breedte ? breedte / DOC.w : 1, c = maakCanvas(Math.round(DOC.w * k), Math.round(DOC.h * k)), x = c.getContext('2d');
+  x.fillStyle = papier; x.fillRect(0, 0, c.width, c.height);
+  lagen.forEach(l => { if (l.zichtbaar) { x.globalAlpha = l.dekking; x.drawImage(l.c, 0, 0, c.width, c.height); } });
+  x.globalAlpha = 1; return c;
+}
+let opslaanTimer = null, bezigMetOpslaan = false;
+function planOpslaan() { clearTimeout(opslaanTimer); opslaanTimer = setTimeout(bewaarNu, 1500); }
+async function bewaarNu() {
+  if (!huidigId || bezigMetOpslaan) return;
+  bezigMetOpslaan = true;
+  try {
+    const data = { id: huidigId, datum: Date.now(), w: DOC.w, h: DOC.h, papier: papier, actief: actief, lagen: [] };
+    for (const l of lagen) data.lagen.push({ naam: l.naam, zichtbaar: l.zichtbaar, dekking: l.dekking, blob: await alsBlob(l.c) });
+    data.thumb = samenvoegen(360).toDataURL('image/jpeg', 0.8);
+    await dbDoe('readwrite', s => s.put(data));
+  } catch (e) { console.warn('Bewaren lukte niet', e); }
+  bezigMetOpslaan = false;
+}
+async function openTekening(id) {
+  const data = await dbDoe('readonly', s => s.get(id));
+  if (!data) return;
+  initDoek(data.w, data.h, data.papier); huidigId = id;
+  for (const l of data.lagen) {
+    const L = maakLaag(l.naam); L.zichtbaar = l.zichtbaar; L.dekking = l.dekking;
+    const bmp = await new Promise(ok => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(null); i.src = URL.createObjectURL(l.blob); });
+    if (bmp) { L.ctx.drawImage(bmp, 0, 0); URL.revokeObjectURL(bmp.src); }
+    lagen.push(L);
+  }
+  actief = Math.min(data.actief || 0, lagen.length - 1);
+  naarStudio();
+}
+
+// ═══════════════════════════════════════════════
+//  STARTSCHERM EN NIEUWE TEKENING
+// ═══════════════════════════════════════════════
+let keuzeFormaat = 'staand', keuzePapier = '#ffffff';
+async function toonStart() {
+  const grid = document.getElementById('startGrid'); grid.innerHTML = '';
+  const nieuw = document.createElement('button'); nieuw.className = 'tk-nieuw'; nieuw.innerHTML = '<span>＋</span>Nieuwe tekening';
+  nieuw.addEventListener('click', openNieuw); grid.appendChild(nieuw);
+  let lijst = [];
+  try { lijst = await dbDoe('readonly', s => s.getAll()); } catch (e) {}
+  lijst.sort((a, b) => b.datum - a.datum).forEach(t => {
+    const k = document.createElement('div'); k.className = 'tk-kaart';
+    const datum = new Date(t.datum).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long' });
+    k.innerHTML = `<img alt="Tekening van ${datum}" src="${t.thumb}"><div class="tk-info">${datum}</div><button class="tk-weg" aria-label="Weggooien">✕</button>`;
+    k.querySelector('img').addEventListener('click', () => openTekening(t.id));
+    k.querySelector('.tk-weg').addEventListener('click', async () => { if (confirm('Deze tekening weggooien?')) { await dbDoe('readwrite', s => s.delete(t.id)); toonStart(); } });
+    grid.appendChild(k);
+  });
+}
+function openNieuw() {
+  const f = document.getElementById('formaten'); f.innerHTML = '';
+  FORMATEN.forEach(fm => {
+    const b = document.createElement('button'); b.className = 'formaat' + (fm.id === keuzeFormaat ? ' actief' : '');
+    b.innerHTML = `<i style="width:${fm.w / 40}px;height:${fm.h / 40}px"></i>${fm.naam}`;
+    b.addEventListener('click', () => { keuzeFormaat = fm.id; openNieuw(); }); f.appendChild(b);
+  });
+  const p = document.getElementById('papieren'); p.innerHTML = '';
+  PAPIEREN.forEach(pp => {
+    const b = document.createElement('button'); b.className = 'papier' + (pp[0] === keuzePapier ? ' actief' : '');
+    b.style.background = pp[0]; b.style.color = (pp[0] === '#2b2233' || pp[0] === '#1c1a4a') ? '#fff' : '#2b2233'; b.textContent = pp[1];
+    b.addEventListener('click', () => { keuzePapier = pp[0]; openNieuw(); }); p.appendChild(b);
+  });
+  document.getElementById('nieuwModal').classList.add('open');
+}
+function maakNieuw() {
+  const fm = FORMATEN.find(x => x.id === keuzeFormaat);
+  initDoek(fm.w, fm.h, keuzePapier);
+  lagen.push(maakLaag('Laag 1')); actief = 0;
+  huidigId = 't' + Date.now();
+  document.getElementById('nieuwModal').classList.remove('open');
+  naarStudio(); bewaarNu();
+}
+function naarStudio() {
+  document.getElementById('start').style.display = 'none';
+  document.getElementById('studio').classList.add('open');
+  toonLagen(); updateKnoppen(); kiesTool(tool); bouwRecent();
+  requestAnimationFrame(passend);
+}
+async function naarStart() {
+  clearTimeout(opslaanTimer); await bewaarNu();
+  document.getElementById('studio').classList.remove('open');
+  document.getElementById('lagenPaneel').classList.remove('open');
+  document.getElementById('start').style.display = '';
+  huidigId = null; toonStart();
+}
+
+// ═══════════════════════════════════════════════
+//  OPSLAAN IN FOTO'S
+// ═══════════════════════════════════════════════
+function exporteer() {
+  samenvoegen().toBlob(async function (blob) {
+    const naam = 'tekening-' + new Date().toISOString().slice(0, 10) + '.png';
+    try {
+      const f = new File([blob], naam, { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [f] })) { await navigator.share({ files: [f], title: 'Mijn tekening' }); return; }
+    } catch (e) { if (e && e.name === 'AbortError') return; }
+    const url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = naam; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000); melding('Opgeslagen! 💾');
+  }, 'image/png');
+}
+
+let meldTimer = null;
+function melding(t) { const m = document.getElementById('melding'); m.textContent = t; m.classList.add('toon'); clearTimeout(meldTimer); meldTimer = setTimeout(() => m.classList.remove('toon'), 2200); }
+document.addEventListener('visibilitychange', () => { if (document.hidden && huidigId) bewaarNu(); });
+
+bouwRecent(); updateBalk(); toonStart();
+</script>
+</body>
+</html>

@@ -66,6 +66,15 @@
     background: #2ea44f; color: white; font-weight: 900; font-size: 1.1rem; display: flex;
     align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2); z-index: 2;
   }
+  .vg-level { margin-top: 8px; font-size: 0.85rem; color: var(--muted); font-weight: 700; }
+  .vg-level b { color: var(--pink-d); }
+  .level-kop { grid-column: 1 / -1; margin: 10px 0 0; padding: 12px 16px; border-radius: 18px; background: linear-gradient(135deg, #ffe0ee, #eee0ff); }
+  .level-kop.dicht { background: #f1eef2; }
+  .lk-titel { font-weight: 900; font-size: 1.1rem; }
+  .lk-sub { font-size: 0.82rem; color: var(--muted); font-weight: 700; margin-top: 2px; }
+  .lvl-badge { position: absolute; top: 6px; left: 6px; background: rgba(255,255,255,0.92); border-radius: 999px; padding: 2px 8px; font-size: 0.72rem; font-weight: 900; box-shadow: 0 1px 4px rgba(0,0,0,0.12); z-index: 2; }
+  .kaart.dicht svg { opacity: 0.35; filter: grayscale(1); }
+  .slot { position: absolute; top: 34%; left: 50%; transform: translate(-50%, -50%); font-size: 2.4rem; z-index: 2; }
   .tab .tel { opacity: 0.75; font-size: 0.78rem; margin-left: 4px; }
   #klaarKnop.is-klaar { background: #2ea44f; color: white; }
   .confetti { position: fixed; top: -12px; width: 10px; height: 14px; border-radius: 2px; z-index: 30; pointer-events: none; animation: vallen 1.8s ease-in forwards; }
@@ -92,6 +101,19 @@
     filter: drop-shadow(0 4px 16px rgba(180,100,140,0.18));
   }
   #plaat .pen { pointer-events: none; }
+  .omlijn { fill: none; stroke: var(--lijn); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; pointer-events: none; }
+  #plaat.hand { cursor: grab; }
+  .doek { position: relative; }
+  .zoomknoppen { position: absolute; right: 18px; bottom: 12px; display: flex; flex-direction: column; gap: 8px; z-index: 3; }
+  .zoomknoppen button {
+    width: 46px; height: 46px; border-radius: 50%; background: var(--card); color: var(--text); font-size: 1.25rem; font-weight: 900;
+    box-shadow: 0 2px 10px rgba(180,100,140,0.25); display: flex; align-items: center; justify-content: center;
+  }
+  .zoomknoppen button.actief { background: var(--pink-d); color: white; }
+  .lijntjes {
+    width: 100%; height: 44px; border-radius: 14px; background: #f6eef4; color: var(--text); font-weight: 900; font-size: 0.85rem;
+  }
+  .lijntjes.aan { background: #dcf7d4; color: #1f7a4d; }
   #plaat.gum .pen { pointer-events: stroke; }
 
   .paneel {
@@ -161,6 +183,7 @@
   <div class="voortgang">
     <div class="vg-tekst"><div id="vgTekst"></div><span id="vgSub"></span></div>
     <div class="vg-balk"><div id="vgVul"></div></div>
+    <div class="vg-level" id="vgLevel"></div>
   </div>
   <div class="tabs" id="tabs"></div>
   <div class="grid" id="grid"></div>
@@ -173,12 +196,19 @@
     <h2 id="edTitel"></h2>
     <button class="knop" onclick="ongedaan()" aria-label="Ongedaan maken">↩️<span class="tekst">Terug</span></button>
     <button class="knop" onclick="wisAlles()" aria-label="Opnieuw beginnen">🗑️<span class="tekst">Opnieuw</span></button>
+    <button class="knop" id="geluidKnop" onclick="wisselGeluid()" aria-label="Geluid aan of uit">🔊</button>
     <button class="knop" id="klaarKnop" onclick="wisselKlaar()" aria-label="Klaar">✅<span class="tekst">Klaar!</span></button>
     <button class="knop roze" onclick="opslaan()" aria-label="Opslaan">💾<span class="tekst">Opslaan</span></button>
   </div>
   <div class="ed-main">
     <div class="doek">
       <svg id="plaat" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div class="zoomknoppen">
+        <button onclick="zoomKnop(0.7)" aria-label="Inzoomen">＋</button>
+        <button onclick="zoomKnop(1.43)" aria-label="Uitzoomen">－</button>
+        <button id="handKnop" onclick="kiesTool(tool === 'hand' ? 'vul' : 'hand', tool === 'hand' ? document.querySelector('[data-tool=vul]') : null)" aria-label="Verschuiven">✋</button>
+        <button id="zoomReset" onclick="zoomTerug()" aria-label="Hele plaat">⤢</button>
+      </div>
     </div>
     <div class="paneel">
       <div class="rij">
@@ -193,6 +223,7 @@
           <input type="range" id="dikte" min="2" max="40" value="8" oninput="updateVoorbeeld()">
           <div class="voorbeeld"><span id="voorbeeldStip"></span></div>
         </div>
+        <button class="lijntjes" id="lijntjesKnop" onclick="wisselLijntjes()"></button>
       </div>
       <div class="rij">
         <div class="kleur-nu" id="kleurNu"></div>
@@ -1318,6 +1349,7 @@ PLATEN.push(
 
 const CATS = [
   { id: 'alles', naam: 'Alles ✨' },
+  { id: 'levels', naam: 'Levels 🏆' },
   { id: 'naam', naam: 'Mijn naam ⭐' },
   { id: 'dieren', naam: 'Dieren 🐱' },
   { id: 'kpop', naam: 'K-pop & muziek 🎤' },
@@ -1368,7 +1400,7 @@ const SPECIALE_DEFS = `
     <circle cx="4" cy="4" r="1.6" fill="#ffffff"/><circle cx="12" cy="10" r="1.2" fill="#ffe0ee"/>
     <circle cx="9" cy="3" r="0.8" fill="#ffffff"/><circle cx="3" cy="13" r="1" fill="#fff6c2"/>
   </pattern>`;
-const SVG_STIJL = '<style>.r{stroke:#2b2233;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}.d{fill:none;stroke:#2b2233;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.dt{fill:none;stroke:#2b2233;stroke-width:2}</style>';
+const SVG_STIJL = '<style>.r{stroke:#2b2233;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}.d{fill:none;stroke:#2b2233;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.dt{fill:none;stroke:#2b2233;stroke-width:2}.omlijn{fill:none;stroke:#2b2233;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}</style>';
 
 document.getElementById('specialeDefs').innerHTML = SPECIALE_DEFS;
 
@@ -1385,7 +1417,8 @@ function bewaarStaat() {
     const v = el.getAttribute('fill'); return v === '#ffffff' ? '' : v;
   });
   const pen = Array.from(plaat.querySelectorAll('.pen')).map(el =>
-    [el.getAttribute('d'), el.getAttribute('stroke'), el.getAttribute('stroke-width'), el.classList.contains('potlood') ? 'potlood' : 'pen']);
+    [el.getAttribute('d'), el.getAttribute('stroke'), el.getAttribute('stroke-width'), el.classList.contains('potlood') ? 'potlood' : 'pen',
+     el.closest('.kleurgroep') ? +el.closest('.kleurgroep').getAttribute('data-r') : -1]);
   try { localStorage.setItem('kleurplaat-' + huidig.id, JSON.stringify({ f: fills, p: pen })); } catch (e) {}
 }
 function pasStaatToe(svg, staat) {
@@ -1393,7 +1426,8 @@ function pasStaatToe(svg, staat) {
   const regs = svg.querySelectorAll('.r');
   (staat.f || []).forEach((v, i) => { if (v && regs[i]) regs[i].setAttribute('fill', v); });
   (staat.p || []).forEach(p => {
-    svg.querySelector(p[3] === 'potlood' ? '.potloodlaag' : '.penlaag').appendChild(maakPenPad(p[0], p[1], p[2], p[3]));
+    const idx = p.length > 4 ? p[4] : -1;
+    laagVoor(svg, p[3], idx).appendChild(maakPenPad(p[0], p[1], p[2], p[3]));
   });
 }
 function maakPenPad(d, kleur, dikte, soort) {
@@ -1424,12 +1458,22 @@ function updateKlaarKnop() {
 }
 function wisselKlaar() {
   if (!huidig) return;
+  const voor = hoogsteLevel();
   const nu = !isKlaar(huidig.id), aantal = zetKlaar(huidig.id, nu);
+  const na = hoogsteLevel();
   bewaarStaat(); updateKlaarKnop();
   if (nu) {
-    confetti();
+    confetti(); geluid('klaar');
     const mijlpalen = { 10: '10 kleurplaten af! 🌟', 25: 'Al 25 klaar! Super! 🎉', 50: 'Halverwege: 50 klaar! 🏆', 75: '75 klaar, bijna alles! 🚀', 100: 'ALLE 100 KLAAR! Jij bent een kleurkampioen! 👑' };
-    melding(mijlpalen[aantal] || `Afgevinkt! ${aantal} van ${PLATEN.length} klaar ✅`);
+    if (na > voor) {
+      const L = LEVELS[na - 1];
+      melding(`🎉 Level ${L.n} open: ${L.emoji} ${L.naam}!`);
+      setTimeout(function () { confetti(); geluid('klaar'); }, 700);
+    } else {
+      const inLevel = klaarInLevel(huidig.level, laadKlaar()), nodig = NODIG_VOOR_VOLGENDE - inLevel;
+      melding(mijlpalen[aantal] || (huidig.level === na && na < LEVELS.length && nodig > 0
+        ? `Afgevinkt! Nog ${nodig} voor Level ${na + 1} ✅` : `Afgevinkt! ${aantal} van ${PLATEN.length} klaar ✅`));
+    }
   } else {
     melding('Vinkje weggehaald');
   }
@@ -1449,8 +1493,43 @@ function confetti() {
 function updateVoortgang() {
   const klaar = laadKlaar().filter(id => PLATEN.some(p => p.id === id)).length, totaal = PLATEN.length;
   document.getElementById('vgTekst').textContent = `✅ ${klaar} van de ${totaal} kleurplaten klaar`;
+  const lijst = laadKlaar(), h = hoogsteLevel(lijst), L = LEVELS[h - 1];
+  const nodig = NODIG_VOOR_VOLGENDE - klaarInLevel(h, lijst);
+  document.getElementById('vgLevel').innerHTML = `<b>${L.emoji} Level ${L.n}: ${L.naam}</b>` +
+    (h < LEVELS.length ? ` · nog ${Math.max(0, nodig)} klaar in dit level voor ${LEVELS[h].emoji} Level ${h + 1}` : ' · alle levels open!');
   document.getElementById('vgSub').textContent = klaar === totaal ? 'Alles af! 👑' : `nog ${totaal - klaar} te gaan`;
   document.getElementById('vgVul').style.width = (klaar / totaal * 100) + '%';
+}
+
+// ═══════════════════════════════════════
+//  LEVELS: steeds meer (en kleinere) vlakjes
+// ═══════════════════════════════════════
+const LEVELS = [
+  { n: 1, naam: 'Starter', emoji: '🌱' },
+  { n: 2, naam: 'Kleurtalent', emoji: '🌸' },
+  { n: 3, naam: 'Kleurster', emoji: '⭐' },
+  { n: 4, naam: 'Kleurkunstenaar', emoji: '💎' },
+  { n: 5, naam: 'Kleurkampioen', emoji: '👑' },
+];
+const NODIG_VOOR_VOLGENDE = 10;   // zoveel klaar in een level om het volgende te openen
+(function bepaalLevels() {
+  // Hoe meer vlakjes, hoe moeilijker
+  PLATEN.forEach(p => { p.vlakken = (p.teken().match(/class="r"/g) || []).length; });
+  const gesorteerd = PLATEN.slice().sort((a, b) => a.vlakken - b.vlakken || PLATEN.indexOf(a) - PLATEN.indexOf(b));
+  const per = Math.ceil(PLATEN.length / LEVELS.length);
+  gesorteerd.forEach((p, i) => { p.level = Math.min(LEVELS.length, Math.floor(i / per) + 1); });
+})();
+function klaarInLevel(n, klaar) { return PLATEN.filter(p => p.level === n && klaar.indexOf(p.id) > -1).length; }
+function levelOpen(n, klaar) {
+  klaar = klaar || laadKlaar();
+  for (let l = 2; l <= n; l++) if (klaarInLevel(l - 1, klaar) < NODIG_VOOR_VOLGENDE) return false;
+  return true;
+}
+function hoogsteLevel(klaar) {
+  klaar = klaar || laadKlaar();
+  let h = 1;
+  while (h < LEVELS.length && levelOpen(h + 1, klaar)) h++;
+  return h;
 }
 
 // ═══════════════════════════════════════
@@ -1460,7 +1539,7 @@ let actieveCat = 'alles';
 function bouwTabs() {
   const klaar = laadKlaar();
   document.getElementById('tabs').innerHTML = CATS.map(c => {
-    const platen = PLATEN.filter(p => c.id === 'alles' || p.cat === c.id);
+    const platen = PLATEN.filter(p => c.id === 'alles' || c.id === 'levels' || p.cat === c.id);
     const af = platen.filter(p => klaar.indexOf(p.id) > -1).length;
     return `<button class="tab${c.id === actieveCat ? ' actief' : ''}" onclick="kiesCat('${c.id}')">${c.naam}<span class="tel">${af}/${platen.length}</span></button>`;
   }).join('');
@@ -1470,15 +1549,38 @@ function kiesCat(id) { actieveCat = id; bouwTabs(); bouwGrid(); }
 function bouwGrid() {
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
-  PLATEN.filter(p => actieveCat === 'alles' || p.cat === actieveCat).forEach(p => {
+  const klaarLijst = laadKlaar();
+  let lijst = PLATEN.filter(p => actieveCat === 'alles' || actieveCat === 'levels' || p.cat === actieveCat);
+  if (actieveCat === 'levels') lijst = lijst.slice().sort((a, b) => a.level - b.level || a.vlakken - b.vlakken);
+  let vorigLevel = 0;
+  lijst.forEach(p => {
+    if (actieveCat === 'levels' && p.level !== vorigLevel) {
+      vorigLevel = p.level;
+      const L = LEVELS[p.level - 1], open = levelOpen(p.level, klaarLijst), af = klaarInLevel(p.level, klaarLijst);
+      const kop = document.createElement('div');
+      kop.className = 'level-kop' + (open ? '' : ' dicht');
+      const tot = PLATEN.filter(x => x.level === p.level).length;
+      kop.innerHTML = `<div class="lk-titel">${open ? L.emoji : '🔒'} Level ${L.n}: ${L.naam}</div><div class="lk-sub">${open
+        ? `${af} van ${tot} klaar` + (p.level < LEVELS.length ? (af >= NODIG_VOOR_VOLGENDE ? ' · volgende level is open!' : ` · nog ${NODIG_VOOR_VOLGENDE - af} voor Level ${p.level + 1}`) : '')
+        : `Maak eerst ${NODIG_VOOR_VOLGENDE} kleurplaten af in Level ${p.level - 1}`}</div>`;
+      grid.appendChild(kop);
+    }
     const staat = laadStaat(p.id);
     const kaart = document.createElement('button');
-    const af = isKlaar(p.id);
-    kaart.className = 'kaart' + (af ? ' klaar' : '');
+    const af = isKlaar(p.id), open = levelOpen(p.level, klaarLijst);
+    kaart.className = 'kaart' + (af ? ' klaar' : '') + (open ? '' : ' dicht');
     kaart.innerHTML = `<svg viewBox="0 0 400 400">${p.teken()}<g class="potloodlaag" filter="url(#potlood-korrel)"></g><g class="penlaag"></g></svg>
-      ${af ? '<div class="vink-badge">✓</div>' : ''}<div class="naam">${p.naam}</div>${af ? '<div class="bezig" style="color:#2ea44f">✅ Klaar</div>' : staat ? '<div class="bezig">✨ Mee bezig</div>' : ''}`;
+      ${af ? '<div class="vink-badge">✓</div>' : ''}<div class="lvl-badge">${LEVELS[p.level - 1].emoji} ${p.level}</div>${open ? '' : '<div class="slot">🔒</div>'}<div class="naam">${p.naam}</div>${af ? '<div class="bezig" style="color:#2ea44f">✅ Klaar</div>' : staat ? '<div class="bezig">✨ Mee bezig</div>' : ''}`;
+    kaart.querySelector('svg').setAttribute('data-pfx', 't-' + p.id);
     pasStaatToe(kaart.querySelector('svg'), staat);
-    kaart.addEventListener('click', function () { openEditor(p); });
+    kaart.addEventListener('click', function () {
+      if (!levelOpen(p.level)) {
+        const nodig = NODIG_VOOR_VOLGENDE - klaarInLevel(p.level - 1, laadKlaar());
+        melding(`🔒 Maak nog ${nodig} kleurplaten af in Level ${p.level - 1}`);
+        geluid('terug'); return;
+      }
+      openEditor(p);
+    });
     grid.appendChild(kaart);
   });
 }
@@ -1492,11 +1594,13 @@ let penGezien = false, lijn = null, punten = [], gumBezig = false, actievePointe
 
 function openEditor(p) {
   huidig = p; geschiedenis = [];
+  plaat.setAttribute('data-pfx', 'e');
   plaat.innerHTML = SVG_STIJL + '<defs>' + SPECIALE_DEFS + '</defs>' + p.teken() + '<g class="potloodlaag" filter="url(#potlood-korrel)"></g><g class="penlaag"></g>';
   pasStaatToe(plaat, laadStaat(p.id));
   document.getElementById('edTitel').textContent = p.naam;
-  updateKlaarKnop();
+  updateKlaarKnop(); updateGeluidKnop(); updateLijntjesKnop();
   document.getElementById('editor').classList.add('open');
+  zoomTerug();
   document.body.style.overflow = 'hidden';
 }
 function sluitEditor() {
@@ -1511,14 +1615,18 @@ function kiesTool(t, knop) {
   document.querySelectorAll('.tool').forEach(b => b.classList.toggle('actief', b === knop));
   document.getElementById('dikteRij').style.display = (t === 'pen' || t === 'potlood') ? 'flex' : 'none';
   plaat.classList.toggle('gum', t === 'gum');
+  plaat.classList.toggle('hand', t === 'hand');
+  document.getElementById('handKnop').classList.toggle('actief', t === 'hand');
+  if (knop) geluid('kleur');
 }
 function kiesKleur(k, knop) {
   kleur = k;
   document.querySelectorAll('.vak').forEach(b => b.classList.toggle('actief', b === knop));
   const sp = SPECIAAL.find(s => 'url(#' + s.id + ')' === k);
   document.getElementById('kleurNu').style.background = sp ? sp.css : k;
-  if (tool === 'gum') kiesTool('vul', document.querySelector('[data-tool="vul"]'));
+  if (tool === 'gum' || tool === 'hand') kiesTool('vul', document.querySelector('[data-tool="vul"]'));
   updateVoorbeeld();
+  if (knop) geluid('kleur');
 }
 function updateVoorbeeld() {
   const d = document.getElementById('dikte').value, stip = document.getElementById('voorbeeldStip');
@@ -1569,6 +1677,7 @@ function vul(el) {
   const oud = el.getAttribute('fill');
   if (oud === kleur) return;
   el.setAttribute('fill', kleur);
+  geluid('vul');
   geschiedenis.push({ type: 'vul', el: el, oud: oud });
   bewaarStaat();
 }
@@ -1577,61 +1686,283 @@ function gumOp(e) {
   if (!el || !plaat.contains(el)) return;
   if (el.classList.contains('pen')) {
     geschiedenis.push({ type: 'wis', el: el, ouder: el.parentNode, volgende: el.nextSibling });
-    el.remove(); bewaarStaat();
+    el.remove(); bewaarStaat(); geluid('gum');
   } else if (!gumBezig && el.classList.contains('r') && el.getAttribute('fill') !== '#ffffff') {
     geschiedenis.push({ type: 'vul', el: el, oud: el.getAttribute('fill') });
-    el.setAttribute('fill', '#ffffff'); bewaarStaat();
+    el.setAttribute('fill', '#ffffff'); bewaarStaat(); geluid('gum');
   }
 }
 
-plaat.addEventListener('pointerdown', function (e) {
-  if (e.pointerType === 'pen') penGezien = true;
-  // Handpalm negeren zodra de Apple Pencil gebruikt is
-  if (penGezien && e.pointerType === 'touch') return;
-  if (actievePointer !== null) return;
+// ═══════════════════════════════════════
+//  GELUIDJES
+// ═══════════════════════════════════════
+var geluidAan = true;
+try { geluidAan = localStorage.getItem('kleurplaat-geluid') !== 'uit'; } catch (e) {}
+var actx = null;
+function audio() {
+  if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; } }
+  if (actx.state === 'suspended') actx.resume();
+  return actx;
+}
+function toon(freq, duur, type, vol, naar, wacht) {
+  const a = audio(); if (!a) return;
+  const t = a.currentTime + (wacht || 0), o = a.createOscillator(), g = a.createGain();
+  o.type = type || 'sine'; o.frequency.setValueAtTime(freq, t);
+  if (naar) o.frequency.exponentialRampToValueAtTime(naar, t + duur);
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol || 0.2, t + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + duur);
+  o.connect(g); g.connect(a.destination); o.start(t); o.stop(t + duur + 0.02);
+}
+function ruis(duur, freq, vol) {
+  const a = audio(); if (!a) return;
+  const n = Math.floor(a.sampleRate * duur), buf = a.createBuffer(1, n, a.sampleRate), d = buf.getChannelData(0);
+  for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+  const s = a.createBufferSource(), fl = a.createBiquadFilter(), g = a.createGain();
+  s.buffer = buf; fl.type = 'bandpass'; fl.frequency.value = freq; g.gain.value = vol;
+  s.connect(fl); fl.connect(g); g.connect(a.destination); s.start();
+}
+const NOTEN = [523, 587, 659, 784, 880, 1047, 1175];
+function geluid(naam) {
+  if (!geluidAan) return;
+  if (naam === 'vul') { const n = NOTEN[Math.floor(Math.random() * NOTEN.length)]; toon(n, 0.18, 'triangle', 0.22, n * 1.5); toon(n * 2, 0.12, 'sine', 0.06); }
+  if (naam === 'pen') ruis(0.14, 2400, 0.09);
+  if (naam === 'gum') { toon(1300, 0.07, 'sine', 0.12, 900); toon(1300, 0.07, 'sine', 0.12, 900, 0.09); }
+  if (naam === 'terug') toon(700, 0.2, 'sine', 0.16, 300);
+  if (naam === 'kleur') toon(1500, 0.05, 'sine', 0.08);
+  if (naam === 'klaar') { [523, 659, 784, 1047].forEach((n, i) => toon(n, 0.25, 'triangle', 0.2, null, i * 0.1)); toon(2093, 0.4, 'sine', 0.08, null, 0.42); }
+  if (naam === 'wis') ruis(0.4, 900, 0.12);
+}
+function wisselGeluid() {
+  geluidAan = !geluidAan;
+  try { localStorage.setItem('kleurplaat-geluid', geluidAan ? 'aan' : 'uit'); } catch (e) {}
+  updateGeluidKnop();
+  if (geluidAan) geluid('kleur');
+}
+function updateGeluidKnop() {
+  document.getElementById('geluidKnop').innerHTML = geluidAan ? '🔊' : '🔇';
+}
+
+// ═══════════════════════════════════════
+//  BINNEN DE LIJNTJES
+// ═══════════════════════════════════════
+var binnenLijntjes = true;
+try { binnenLijntjes = localStorage.getItem('kleurplaat-lijntjes') !== 'uit'; } catch (e) {}
+function wisselLijntjes() {
+  binnenLijntjes = !binnenLijntjes;
+  try { localStorage.setItem('kleurplaat-lijntjes', binnenLijntjes ? 'aan' : 'uit'); } catch (e) {}
+  updateLijntjesKnop();
+  melding(binnenLijntjes ? '🎯 Je kleurt nu binnen de lijntjes' : 'Je kunt nu overal tekenen');
+}
+function updateLijntjesKnop() {
+  const k = document.getElementById('lijntjesKnop');
+  k.classList.toggle('aan', binnenLijntjes);
+  k.innerHTML = binnenLijntjes ? '🎯 Binnen de lijntjes: aan' : '🎯 Binnen de lijntjes: uit';
+}
+// Transformaties van alle ouders optellen (werkt ook zonder dat het plaatje zichtbaar is)
+function relMatrix(el, svg) {
+  const keten = [];
+  let n = el;
+  while (n && n !== svg) {
+    if (n.transform && n.transform.baseVal && n.transform.baseVal.numberOfItems) keten.unshift(n.transform.baseVal.consolidate().matrix);
+    n = n.parentNode;
+  }
+  let m = svg.createSVGMatrix();
+  keten.forEach(c => { m = m.multiply(c); });
+  return m;
+}
+const mStr = m => `matrix(${f(m.a * 1000) / 1000} ${f(m.b * 1000) / 1000} ${f(m.c * 1000) / 1000} ${f(m.d * 1000) / 1000} ${f(m.e)} ${f(m.f)})`;
+function kleurGroep(svg, idx) {
+  let g = svg.querySelector(`g.kleurgroep[data-r="${idx}"]`);
+  if (g) return g;
+  const regio = svg.querySelectorAll('.r')[idx];
+  if (!regio) return null;
+  const anker = regio.tagName.toLowerCase() === 'tspan' ? regio.parentNode : regio;
+  const ns = 'http://www.w3.org/2000/svg', pfx = svg.getAttribute('data-pfx') || 'x', clipId = `kc-${pfx}-${idx}`;
+  // Knipvorm in de coördinaten van de hele kleurplaat
+  const cp = document.createElementNS(ns, 'clipPath');
+  cp.setAttribute('id', clipId); cp.setAttribute('clipPathUnits', 'userSpaceOnUse');
+  const vorm = anker.cloneNode(true);
+  vorm.removeAttribute('class'); vorm.removeAttribute('transform');
+  vorm.querySelectorAll && vorm.querySelectorAll('tspan').forEach(t => t.removeAttribute('class'));
+  vorm.setAttribute('transform', mStr(relMatrix(anker, svg)));
+  cp.appendChild(vorm);
+  let defs = svg.querySelector('defs');
+  if (!defs) { defs = document.createElementNS(ns, 'defs'); svg.insertBefore(defs, svg.firstChild); }
+  defs.appendChild(cp);
+  // Groep direct na het vlak, zodat vlakken erboven er gewoon overheen blijven liggen
+  g = document.createElementNS(ns, 'g');
+  g.setAttribute('class', 'kleurgroep'); g.setAttribute('data-r', idx);
+  g.setAttribute('transform', mStr(relMatrix(anker.parentNode, svg).inverse()));
+  const gIn = document.createElementNS(ns, 'g');
+  gIn.setAttribute('clip-path', `url(#${clipId})`);
+  const pen = document.createElementNS(ns, 'g'); pen.setAttribute('class', 'sub-pen');
+  const pot = document.createElementNS(ns, 'g'); pot.setAttribute('class', 'sub-potlood'); pot.setAttribute('filter', 'url(#potlood-korrel)');
+  gIn.appendChild(pot); gIn.appendChild(pen); g.appendChild(gIn);
+  // Lijntje er opnieuw overheen, zodat de rand zichtbaar blijft
+  const rand = anker.cloneNode(true);
+  rand.setAttribute('class', 'omlijn'); rand.setAttribute('fill', 'none');
+  rand.querySelectorAll && rand.querySelectorAll('tspan').forEach(t => { t.removeAttribute('class'); t.setAttribute('fill', 'none'); });
+  anker.parentNode.insertBefore(g, anker.nextSibling);
+  anker.parentNode.insertBefore(rand, g.nextSibling);
+  return g;
+}
+function laagVoor(svg, soort, idx) {
+  if (idx >= 0) { const g = kleurGroep(svg, idx); if (g) return g.querySelector(soort === 'potlood' ? '.sub-potlood' : '.sub-pen'); }
+  return svg.querySelector(soort === 'potlood' ? '.potloodlaag' : '.penlaag');
+}
+
+// ═══════════════════════════════════════
+//  IN- EN UITZOOMEN
+// ═══════════════════════════════════════
+var vb = { x: 0, y: 0, w: 400 };
+function zetViewBox() {
+  vb.w = Math.max(60, Math.min(400, vb.w));
+  vb.x = Math.max(0, Math.min(400 - vb.w, vb.x));
+  vb.y = Math.max(0, Math.min(400 - vb.w, vb.y));
+  plaat.setAttribute('viewBox', `${f(vb.x)} ${f(vb.y)} ${f(vb.w)} ${f(vb.w)}`);
+  document.getElementById('zoomReset').style.opacity = vb.w < 399 ? '1' : '0.45';
+}
+function schermInfo() {
+  const r = plaat.getBoundingClientRect(), k = Math.min(r.width, r.height) / vb.w;
+  return { r: r, k: k, ox: (r.width - vb.w * k) / 2, oy: (r.height - vb.w * k) / 2 };
+}
+function naarPlaat(cx, cy) {
+  const s = schermInfo();
+  return [vb.x + (cx - s.r.left - s.ox) / s.k, vb.y + (cy - s.r.top - s.oy) / s.k];
+}
+function zoomBij(cx, cy, factor) {
+  const p = naarPlaat(cx, cy);
+  vb.w = Math.max(60, Math.min(400, vb.w * factor));
+  const s = schermInfo();
+  vb.x = p[0] - (cx - s.r.left - s.ox) / s.k;
+  vb.y = p[1] - (cy - s.r.top - s.oy) / s.k;
+  zetViewBox();
+}
+function zoomKnop(factor) {
+  const r = plaat.getBoundingClientRect();
+  zoomBij(r.left + r.width / 2, r.top + r.height / 2, factor);
+}
+function zoomTerug() { vb = { x: 0, y: 0, w: 400 }; zetViewBox(); }
+plaat.addEventListener('wheel', function (e) {
   e.preventDefault();
+  zoomBij(e.clientX, e.clientY, Math.exp(e.deltaY * (e.ctrlKey ? 0.01 : 0.002)));
+}, { passive: false });
+
+// ═══════════════════════════════════════
+//  AANRAKEN, TEKENEN, KNIJPEN
+// ═══════════════════════════════════════
+const vingers = new Map();
+let knijp = null, wachtVul = null, schuif = null, lijnIdx = -1;
+
+function afstand(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
+function startKnijp() {
+  const p = Array.from(vingers.values());
+  // Een net begonnen streep of vulling annuleren: ze wil zoomen
+  if (lijn) { lijn.remove(); lijn = null; }
+  wachtVul = null; actievePointer = null; gumBezig = false;
+  knijp = { d0: afstand(p[0], p[1]), w0: vb.w, m: naarPlaat((p[0].x + p[1].x) / 2, (p[0].y + p[1].y) / 2) };
+}
+function updateKnijp() {
+  const p = Array.from(vingers.values());
+  if (p.length < 2) return;
+  const cx = (p[0].x + p[1].x) / 2, cy = (p[0].y + p[1].y) / 2;
+  vb.w = Math.max(60, Math.min(400, knijp.w0 * knijp.d0 / Math.max(10, afstand(p[0], p[1]))));
+  const s = schermInfo();
+  vb.x = knijp.m[0] - (cx - s.r.left - s.ox) / s.k;
+  vb.y = knijp.m[1] - (cy - s.r.top - s.oy) / s.k;
+  zetViewBox();
+}
+
+plaat.addEventListener('pointerdown', function (e) {
+  audio();
+  if (e.pointerType === 'pen') penGezien = true;
+  if (e.pointerType === 'touch') {
+    vingers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (vingers.size === 2) { startKnijp(); return; }
+    if (vingers.size > 2 || penGezien) return;   // handpalm negeren zodra de Apple Pencil gebruikt is
+  }
+  if (knijp || actievePointer !== null) return;
+  e.preventDefault();
+
+  if (tool === 'hand') {
+    actievePointer = e.pointerId;
+    try { plaat.setPointerCapture(e.pointerId); } catch (err) {}
+    schuif = { x: e.clientX, y: e.clientY, vx: vb.x, vy: vb.y, k: schermInfo().k };
+    return;
+  }
+  const geraakt = (e.target && e.target !== plaat) ? e.target : document.elementFromPoint(e.clientX, e.clientY);
   if (tool === 'vul') {
-    const el = e.target.closest ? e.target.closest('.r') : null;
-    if (el) vul(el);
+    const el = geraakt && geraakt.closest ? geraakt.closest('.r') : null;
+    if (!el) return;
+    if (e.pointerType === 'touch') wachtVul = { id: e.pointerId, el: el, x: e.clientX, y: e.clientY };
+    else vul(el);
     return;
   }
   actievePointer = e.pointerId;
   try { plaat.setPointerCapture(e.pointerId); } catch (err) {}
   if (tool === 'gum') { gumOp(e); gumBezig = true; return; }
+
+  // Pen of potlood
+  lijnIdx = -1;
+  if (binnenLijntjes) {
+    const regio = geraakt && geraakt.closest ? geraakt.closest('.r') : null;
+    if (!regio) { actievePointer = null; return; }
+    lijnIdx = Array.prototype.indexOf.call(plaat.querySelectorAll('.r'), regio);
+  }
   punten = [svgPunt(e)];
   lijn = maakPenPad(padVanPunten(punten), kleur, document.getElementById('dikte').value, tool);
-  plaat.querySelector(tool === 'potlood' ? '.potloodlaag' : '.penlaag').appendChild(lijn);
+  laagVoor(plaat, tool, lijnIdx).appendChild(lijn);
+  geluid('pen');
 });
+
 plaat.addEventListener('pointermove', function (e) {
+  if (vingers.has(e.pointerId)) {
+    vingers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (knijp) { e.preventDefault(); updateKnijp(); return; }
+    if (wachtVul && wachtVul.id === e.pointerId && Math.hypot(e.clientX - wachtVul.x, e.clientY - wachtVul.y) > 12) wachtVul = null;
+  }
   if (e.pointerId !== actievePointer) return;
   e.preventDefault();
+  if (schuif) {
+    vb.x = schuif.vx - (e.clientX - schuif.x) / schuif.k;
+    vb.y = schuif.vy - (e.clientY - schuif.y) / schuif.k;
+    zetViewBox(); return;
+  }
   const events = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
   if (tool === 'gum') { (events.length ? events : [e]).forEach(gumOp); return; }
   if (!lijn) return;
   (events.length ? events : [e]).forEach(ev => {
     const p = svgPunt(ev), l = punten[punten.length - 1];
-    if (Math.abs(p[0] - l[0]) + Math.abs(p[1] - l[1]) > 0.8) punten.push(p);
+    if (Math.abs(p[0] - l[0]) + Math.abs(p[1] - l[1]) > 0.8 * vb.w / 400) punten.push(p);
   });
   lijn.setAttribute('d', padVanPunten(punten));
 });
+
 function stopPointer(e) {
+  if (vingers.has(e.pointerId)) {
+    vingers.delete(e.pointerId);
+    if (knijp) { if (vingers.size === 0) knijp = null; return; }
+    if (wachtVul && wachtVul.id === e.pointerId) { vul(wachtVul.el); wachtVul = null; }
+  }
   if (e.pointerId !== actievePointer) return;
-  actievePointer = null; gumBezig = false;
+  actievePointer = null; gumBezig = false; schuif = null;
   if (lijn) { geschiedenis.push({ type: 'pen', el: lijn }); lijn = null; bewaarStaat(); }
 }
 plaat.addEventListener('pointerup', stopPointer);
 plaat.addEventListener('pointercancel', stopPointer);
 
+
 function ongedaan() {
   const a = geschiedenis.pop();
   if (!a) { melding('Niets meer om terug te doen'); return; }
+  geluid('terug');
   if (a.type === 'vul') a.el.setAttribute('fill', a.oud);
   else if (a.type === 'pen') a.el.remove();
   else if (a.type === 'wis') a.ouder.insertBefore(a.el, a.volgende && a.volgende.parentNode === a.ouder ? a.volgende : null);
   else if (a.type === 'reset') {
     const regs = plaat.querySelectorAll('.r');
     a.fills.forEach((v, i) => regs[i].setAttribute('fill', v));
-    a.pen.forEach(el => plaat.querySelector(el.classList.contains('potlood') ? '.potloodlaag' : '.penlaag').appendChild(el));
+    a.pen.forEach(x => x[1].appendChild(x[0]));
   }
   bewaarStaat();
 }
@@ -1639,10 +1970,10 @@ function wisAlles() {
   if (!confirm('Wil je deze kleurplaat helemaal opnieuw beginnen?')) return;
   const regs = Array.from(plaat.querySelectorAll('.r'));
   const pen = Array.from(plaat.querySelectorAll('.pen'));
-  geschiedenis.push({ type: 'reset', fills: regs.map(r => r.getAttribute('fill')), pen: pen });
+  geschiedenis.push({ type: 'reset', fills: regs.map(r => r.getAttribute('fill')), pen: pen.map(el => [el, el.parentNode]) });
   regs.forEach(r => r.setAttribute('fill', '#ffffff'));
   pen.forEach(el => el.remove());
-  bewaarStaat();
+  bewaarStaat(); geluid('wis');
   melding('Weer helemaal leeg 🧼');
 }
 
