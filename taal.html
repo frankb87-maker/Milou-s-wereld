@@ -467,10 +467,19 @@ function confetti() {
 
 // ── Voorlezen (Nederlandse stem van de iPad) ──
 let nlStem = null;
+// Voorkeur voor een lieve vrouwenstem. Claire (iPad/iPhone), Ellen (Vlaams), en de vrouwenstemmen van Google/Microsoft.
+const VROUWENSTEMMEN = ['claire', 'ellen', 'fleur', 'google nederlands', 'colette', 'fenna', 'hanna', 'maartje'];
+const MANNENSTEMMEN = ['xander', 'frank', 'maarten', 'arnaud'];
 function zoekStem() {
   if (!('speechSynthesis' in window)) return;
-  const stemmen = speechSynthesis.getVoices();
-  nlStem = stemmen.find(v => v.lang === 'nl-NL') || stemmen.find(v => (v.lang || '').indexOf('nl') === 0) || null;
+  const nl = speechSynthesis.getVoices().filter(v => (v.lang || '').replace('_', '-').toLowerCase().indexOf('nl') === 0);
+  const naam = v => (v.name || '').toLowerCase();
+  const isVrouw = v => VROUWENSTEMMEN.some(n => naam(v).indexOf(n) >= 0);
+  const kwaliteit = v => /premium|enhanced|verbeterd|natural/.test(naam(v)) ? 2 : 1;
+  const vrouwen = nl.filter(isVrouw).sort((a, b) => kwaliteit(b) - kwaliteit(a) || (b.lang === 'nl-NL') - (a.lang === 'nl-NL'));
+  nlStem = vrouwen[0]
+    || nl.find(v => v.lang === 'nl-NL' && !MANNENSTEMMEN.some(n => naam(v).indexOf(n) >= 0))
+    || nl.find(v => v.lang === 'nl-NL') || nl[0] || null;
 }
 if ('speechSynthesis' in window) { zoekStem(); speechSynthesis.onvoiceschanged = zoekStem; }
 function kanSpreken() { return 'speechSynthesis' in window; }
@@ -479,6 +488,7 @@ function spreek(tekst, tempo) {
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(tekst);
   u.lang = 'nl-NL'; if (nlStem) u.voice = nlStem; u.rate = tempo || 0.9;
+  u.pitch = 1.1; // net iets hoger en zachter
   speechSynthesis.speak(u);
 }
 function stopSpreken() { if (kanSpreken()) speechSynthesis.cancel(); }
