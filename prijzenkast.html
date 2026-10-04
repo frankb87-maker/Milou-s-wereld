@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>🏆 Milou's Prijzenkast</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+:root { --roze: #ff6eb4; --roze2: #ffd6ec; --roze3: #fff4fa; --bg: #fff9fc; --wit: #fff; --tekst: #3a2a3a; --muted: #8a7a8a; --hout: #c98b5a; --hout2: #a8693d; --shadow: 0 4px 20px rgba(200,100,160,0.12); }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { -webkit-text-size-adjust: 100%; }
+body { font-family: 'Nunito', system-ui, sans-serif; background: var(--bg); color: var(--tekst); min-height: 100vh; padding-bottom: env(safe-area-inset-bottom, 0px); }
+button { font-family: inherit; color: inherit; }
+header { position: sticky; top: 0; z-index: 20; background: linear-gradient(135deg, #ff6eb4, #ffb347); padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; box-shadow: 0 4px 16px rgba(255,110,180,0.3); }
+.logo { font-family: 'Pacifico', cursive; font-size: 1.1rem; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.18); }
+.kop-knop { background: rgba(255,255,255,0.3); border: none; border-radius: 50px; padding: 7px 14px; color: #fff; font-weight: 800; font-size: 0.82rem; text-decoration: none; }
+.teller { background: rgba(255,255,255,0.3); border-radius: 50px; padding: 6px 12px; color: #fff; font-weight: 900; font-size: 0.9rem; }
+.container { max-width: 680px; margin: 0 auto; padding: 18px 14px 40px; }
+h1 { font-family: 'Pacifico', cursive; font-weight: 400; color: var(--roze); font-size: 1.8rem; text-align: center; }
+.sub { text-align: center; color: var(--muted); font-size: 0.92rem; font-weight: 800; margin: 2px 0 16px; }
+
+/* De kast */
+.kast { background: linear-gradient(180deg, #fbe7d6, #f5d6bd); border: 10px solid var(--hout); border-radius: 22px; padding: 14px 12px 6px; box-shadow: inset 0 0 0 3px rgba(255,255,255,0.4), 0 10px 30px rgba(168,105,61,0.25); position: relative; }
+.kast::before { content: ''; position: absolute; inset: 0; border-radius: 12px; background: linear-gradient(120deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 35%); pointer-events: none; }
+.kast-titel { text-align: center; font-family: 'Pacifico', cursive; color: var(--hout2); font-size: 1.15rem; margin-bottom: 8px; }
+.plank { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 0 2px 10px; border-bottom: 12px solid var(--hout); border-radius: 0 0 4px 4px; margin-bottom: 16px; box-shadow: 0 8px 0 -4px var(--hout2); }
+.prijs { min-width: 0; background: rgba(255,255,255,0.75); border: none; border-radius: 16px; padding: 10px 6px 8px; text-align: center; cursor: pointer; position: relative; overflow-wrap: anywhere; -webkit-hyphens: auto; hyphens: auto; }
+.prijs .em { font-size: 2.4rem; line-height: 1.1; display: block; filter: drop-shadow(0 3px 3px rgba(0,0,0,0.15)); }
+.prijs .nm { display: block; font-weight: 900; font-size: 0.74rem; line-height: 1.25; margin-top: 4px; }
+.prijs .st { display: inline-block; margin-top: 6px; font-size: 0.66rem; font-weight: 900; border-radius: 999px; padding: 3px 8px; }
+.prijs.open .st { background: #ffe066; color: #6b4e00; }
+.prijs.klaar .st { background: #d9f2dc; color: #23632a; }
+.prijs.open { box-shadow: 0 0 0 3px #ffe066, 0 0 18px rgba(255,224,102,0.8); animation: glim 2.4s ease-in-out infinite; }
+@keyframes glim { 50% { box-shadow: 0 0 0 3px #ffe066, 0 0 28px rgba(255,200,60,0.95); } }
+.prijs.leeg { background: rgba(255,255,255,0.35); border: 2px dashed rgba(168,105,61,0.4); text-decoration: none; color: inherit; display: block; }
+.prijs.leeg .em { filter: grayscale(1) opacity(0.35); }
+.prijs.leeg .nm { color: var(--muted); font-weight: 800; }
+.uitleg { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px 14px; justify-content: center; font-size: 0.78rem; font-weight: 800; color: var(--muted); }
+.uitleg span b { border-radius: 999px; padding: 2px 8px; }
+
+/* Venster met de prijs */
+.overlay { position: fixed; inset: 0; z-index: 50; background: rgba(58,42,58,.55); display: flex; align-items: center; justify-content: center; padding: 20px; }
+.venster { width: 100%; max-width: 380px; background: #fff; border-radius: 24px; padding: 22px 20px 18px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.3); animation: pop .4s cubic-bezier(.2,1.4,.4,1); }
+@keyframes pop { from { transform: scale(.7); } to { transform: scale(1); } }
+.venster .em { font-size: 4rem; line-height: 1; }
+.venster h2 { font-size: 1.25rem; font-weight: 900; margin: 8px 0 4px; line-height: 1.3; }
+.venster .info { font-size: 0.86rem; font-weight: 700; color: var(--muted); line-height: 1.5; }
+.venster .status { margin: 14px 0 4px; border-radius: 14px; padding: 10px; font-weight: 900; font-size: 0.92rem; }
+.venster .status.open { background: #fff8d6; color: #6b4e00; }
+.venster .status.klaar { background: #effaf0; color: #23632a; }
+.knoppen { display: grid; gap: 8px; margin-top: 14px; }
+.knop { border: none; border-radius: 999px; padding: 12px 18px; font-weight: 900; font-size: 0.92rem; cursor: pointer; background: var(--roze); color: #fff; }
+.knop.licht { background: var(--roze3); color: var(--tekst); }
+.knop.papa { background: #3a2a3a; }
+.pin { margin-top: 12px; display: none; }
+.pin input { width: 100%; text-align: center; font-size: 1.4rem; letter-spacing: 8px; border: 2px solid var(--roze2); border-radius: 14px; padding: 10px; font-family: inherit; font-weight: 900; }
+.pin .fout { color: #e5484d; font-size: 0.82rem; font-weight: 800; margin-top: 6px; min-height: 1em; }
+.leeg-kast { text-align: center; padding: 26px 10px; font-weight: 800; color: var(--hout2); line-height: 1.6; }
+@media (prefers-reduced-motion: reduce) { .prijs.open, .venster { animation: none; } }
+</style>
+</head>
+<body>
+<header>
+  <a href="index.html" class="kop-knop">← Terug</a>
+  <span class="logo">🏆 Prijzenkast</span>
+  <div class="teller">🏆 <span id="teller">0</span></div>
+</header>
+
+<div class="container">
+  <h1>Mijn prijzenkast</h1>
+  <p class="sub" id="sub"></p>
+
+  <div class="kast">
+    <div class="kast-titel">✨ Milou's prijzen ✨</div>
+    <div id="planken"></div>
+  </div>
+  <div class="uitleg">
+    <span><b style="background:#ffe066;color:#6b4e00">🎟️ Nog verzilveren</b> deze prijs krijg je nog</span>
+    <span><b style="background:#d9f2dc;color:#23632a">✅ Verzilverd</b> heb je al gekregen</span>
+    <span>❔ nog te winnen</span>
+  </div>
+</div>
+
+<script src="beloningen.js"></script>
+<script>
+const OUDER_PIN = '1987'; // ✏️ dezelfde pincode als in het ouderdashboard
+function emojiVan(t) { try { const m = t.match(/\p{Extended_Pictographic}/gu); return m ? m[m.length - 1] : '🎁'; } catch (e) { return '🎁'; } }
+function kortNaam(t) { return t.replace(/\p{Extended_Pictographic}|\uFE0F/gu, '').replace(/\(.*?\)/g, '').replace(/\s+/g, ' ').trim(); }
+function datum(iso) { return iso ? MB.datumNL(iso) : ''; }
+
+function render() {
+  MB.check();
+  const bonnen = MB.bonnen().slice().reverse(); // oudste eerst, zoals een echte prijzenkast
+  const open = MB.ladder().filter(b => !b.bereikt);
+  const verz = bonnen.filter(b => b.ingewisseld).length;
+  document.getElementById('teller').textContent = bonnen.length;
+  document.getElementById('sub').textContent = bonnen.length
+    ? bonnen.length + (bonnen.length === 1 ? ' prijs' : ' prijzen') + ' gewonnen · ' + verz + ' verzilverd' + (bonnen.length - verz ? ' · ' + (bonnen.length - verz) + ' nog te krijgen 🎟️' : '')
+    : 'Nog leeg… maar niet lang meer! 💪';
+
+  // Gewonnen prijzen + een paar lege plekken voor wat nog komt
+  const vakken = bonnen.map(b => ({ bon: b }));
+  open.slice(0, 3).forEach(b => vakken.push({ komt: b })); // de eerstvolgende prijzen als lege plekjes
+  while (vakken.length % 3) vakken.push({});
+  const pl = document.getElementById('planken'); pl.innerHTML = '';
+  if (!bonnen.length) {
+    const t = document.createElement('div'); t.className = 'leeg-kast';
+    t.innerHTML = '🏆 Hier komen al jouw prijzen te staan.<br>Maak je eerste pakket af en zet je eerste prijs in de kast!';
+    pl.appendChild(t);
+  }
+  for (let i = 0; i < vakken.length; i += 3) {
+    const plank = document.createElement('div'); plank.className = 'plank';
+    vakken.slice(i, i + 3).forEach(v => {
+      let el;
+      if (v.bon) {
+        el = document.createElement('button');
+        el.className = 'prijs ' + (v.bon.ingewisseld ? 'klaar' : 'open');
+        el.innerHTML = '<span class="em"></span><span class="nm"></span><span class="st">' + (v.bon.ingewisseld ? '✅ Verzilverd' : '🎟️ Nog verzilveren') + '</span>';
+        el.querySelector('.em').textContent = emojiVan(v.bon.beloning);
+        el.querySelector('.nm').textContent = kortNaam(v.bon.beloning);
+        el.addEventListener('click', () => toonPrijs(v.bon.code));
+      } else if (v.komt) {
+        el = document.createElement('a');
+        el.className = 'prijs leeg';
+        el.href = 'spaarkaart.html?id=' + encodeURIComponent(v.komt.id);
+        el.innerHTML = '<span class="em"></span><span class="nm">❔ Nog te winnen</span>';
+        el.querySelector('.em').textContent = emojiVan(v.komt.beloning);
+      } else {
+        el = document.createElement('div'); el.className = 'prijs leeg'; el.style.visibility = 'hidden';
+      }
+      plank.appendChild(el);
+    });
+    pl.appendChild(plank);
+  }
+}
+
+function toonPrijs(code) {
+  const b = MB.bonnen().find(x => x.code === code); if (!b) return;
+  const o = document.createElement('div'); o.className = 'overlay';
+  o.innerHTML = `<div class="venster">
+    <div class="em"></div><h2></h2>
+    <div class="info">Gewonnen op ${datum(b.datum)}<br><span class="mp"></span><br>Boncode: <b>${b.code}</b></div>
+    <div class="status ${b.ingewisseld ? 'klaar' : 'open'}">${b.ingewisseld ? '✅ Verzilverd' + (b.ingewisseldOp ? ' op ' + datum(b.ingewisseldOp) : '') : '🎟️ Deze prijs krijg je nog van papa!'}</div>
+    <div class="knoppen">
+      <button class="knop licht" data-a="bon">🎟️ Bekijk mijn bon</button>
+      <button class="knop papa" data-a="papa">${b.ingewisseld ? '🔒 Papa: toch niet verzilverd' : '🔒 Papa: zet op verzilverd'}</button>
+      <button class="knop" data-a="dicht">Sluiten</button>
+    </div>
+    <div class="pin"><input type="password" inputmode="numeric" maxlength="6" placeholder="••••" autocomplete="off"><div class="fout"></div></div>
+  </div>`;
+  o.querySelector('.em').textContent = emojiVan(b.beloning);
+  o.querySelector('h2').textContent = b.beloning;
+  o.querySelector('.mp').textContent = b.mijlpaal;
+  const pin = o.querySelector('.pin'), inp = pin.querySelector('input'), fout = pin.querySelector('.fout');
+  o.querySelector('[data-a="dicht"]').addEventListener('click', () => o.remove());
+  o.addEventListener('click', e => { if (e.target === o) o.remove(); });
+  o.querySelector('[data-a="bon"]').addEventListener('click', () => { o.remove(); MB.toonBon(b, true); });
+  o.querySelector('[data-a="papa"]').addEventListener('click', () => { pin.style.display = 'block'; inp.focus(); fout.textContent = 'Vul de pincode van papa in'; });
+  inp.addEventListener('input', () => {
+    if (inp.value.length < OUDER_PIN.length) return;
+    if (inp.value !== OUDER_PIN) { fout.textContent = '❌ Verkeerde pincode'; inp.value = ''; return; }
+    const lijst = MB.bonnen(), x = lijst.find(y => y.code === code);
+    x.ingewisseld = !x.ingewisseld;
+    x.ingewisseldOp = x.ingewisseld ? new Date().toISOString() : null;
+    MB.bewaarBonnen(lijst);
+    o.remove(); render();
+  });
+  document.body.appendChild(o);
+}
+render();
+</script>
+</body>
+</html>

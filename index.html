@@ -659,6 +659,11 @@
     <div class="home-wil-rij" id="home-wil-rij"></div>
   </div>
   <div class="home-grid">
+    <a href="prijzenkast.html" class="home-tile" style="text-decoration:none">
+      <div class="tile-emoji">🏆</div>
+      <div class="tile-label">Prijzenkast</div>
+      <div class="tile-sub">Wat je hebt gewonnen</div>
+    </a>
     <a href="spaarkaart.html" class="home-tile" style="text-decoration:none">
       <div class="tile-emoji">🎁</div>
       <div class="tile-label">Beloningen</div>
@@ -1574,7 +1579,7 @@
     <!-- 🎟️ Verdiende bonnen -->
     <div class="card accent-pink">
       <h2>🎟️ Verdiende bonnen</h2>
-      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:10px">Heeft ze haar beloning gekregen? Zet de bon dan op ingewisseld.</p>
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:10px">Heeft ze haar beloning gekregen? Vink hem dan aan als verzilverd. Dat kan ook in haar <a href="prijzenkast.html" style="color:#ff6eb4;font-weight:800">🏆 prijzenkast</a> met je pincode.</p>
       <div id="bon-beheer" style="display:grid;gap:8px"></div>
       <div style="border-top:1px solid var(--pink2);margin-top:14px;padding-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <button onclick="blTestMail()" style="background:var(--card);border:2px solid var(--pink2);cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:8px 14px;border-radius:50px;color:var(--text);font-size:0.8rem">📧 Stuur testmail</button>
@@ -3020,7 +3025,7 @@ function laadBeloningBeheer() {
     r.innerHTML = '<input type="checkbox"' + (b.ingewisseld ? ' checked' : '') + ' style="width:20px;height:20px;accent-color:#ff6eb4">'
       + '<div style="flex:1"><div style="font-weight:800;font-size:0.88rem"></div><div style="font-size:0.75rem;color:var(--muted)">' + htmlVeilig(b.mijlpaal) + ' · ' + new Date(b.datum).toLocaleDateString('nl-NL') + ' · ' + b.code + '</div></div>';
     r.querySelector('div div').textContent = b.beloning;
-    r.querySelector('input').addEventListener('change', function () { const x = MB.bonnen(); x[i].ingewisseld = this.checked; MB.bewaarBonnen(x); laadBeloningBeheer(); });
+    r.querySelector('input').addEventListener('change', function () { const x = MB.bonnen(); x[i].ingewisseld = this.checked; x[i].ingewisseldOp = this.checked ? new Date().toISOString() : null; MB.bewaarBonnen(x); laadBeloningBeheer(); });
     be.appendChild(r);
   });
   const q = MB.wachtrij().length;
