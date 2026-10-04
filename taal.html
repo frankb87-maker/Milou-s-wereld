@@ -101,6 +101,18 @@ h1.titel { font-family: 'Pacifico', cursive; font-weight: 400; color: var(--roze
 .lees-tekst { background: var(--wit); border-radius: 20px; padding: 18px 18px 14px; box-shadow: var(--shadow); margin-bottom: 14px; }
 .lees-tekst h3 { font-size: 1.1rem; font-weight: 900; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .lees-tekst p { font-size: 1.05rem; line-height: 1.75; max-width: 62ch; }
+.lees-hulp { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 10px; }
+.tempo-knop { border: 2px solid #f0e3ec; background: var(--wit); border-radius: 999px; padding: 6px 12px; font-weight: 900; font-size: 0.8rem; cursor: pointer; }
+.lees-tip { font-size: 0.78rem; font-weight: 800; color: var(--muted); }
+.lees-zinnen .zin { border-radius: 6px; transition: background .2s; }
+.lees-zinnen .zin.nu { background: #fff1a8; box-shadow: 0 0 0 3px #fff1a8; }
+.lees-zinnen .wrd { cursor: pointer; border-radius: 4px; }
+.lees-zinnen .wrd:active, .lees-zinnen .wrd.tik { background: var(--kleur2); box-shadow: 0 0 0 2px var(--kleur2); }
+.woord-hulp { margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 12px; background: var(--kleur2); border-radius: 16px; padding: 12px; }
+.woord-hulp[hidden] { display: none; }
+.woord-hulp b { font-size: 1.9rem; font-weight: 900; letter-spacing: 1px; }
+.vraag-rij { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.mini-spreek { border: 2px solid var(--kleur); background: var(--wit); border-radius: 50%; width: 40px; height: 40px; font-size: 1.1rem; cursor: pointer; flex-shrink: 0; }
 .spreek-knop { border: 2px solid var(--kleur); background: var(--wit); color: var(--kleur); border-radius: 999px; padding: 6px 12px; font-weight: 900; font-size: 0.8rem; cursor: pointer; flex-shrink: 0; }
 .vraag-kaart { background: var(--wit); border-radius: 22px; padding: 22px 18px; box-shadow: var(--shadow); }
 .vraag-label { font-size: 0.8rem; font-weight: 800; color: var(--muted); margin-bottom: 8px; }
@@ -481,15 +493,42 @@ function zoekStem() {
 }
 if ('speechSynthesis' in window) { zoekStem(); speechSynthesis.onvoiceschanged = zoekStem; }
 function kanSpreken() { return 'speechSynthesis' in window; }
+// Voorleestempo: Milou kan kiezen tussen rustig en heel langzaam
+let leesTempo = 0.85;
+try { leesTempo = parseFloat(localStorage.getItem('milou_leestempo')) || 0.85; } catch (e) {}
+let spreekToken = 0;
+function maakUitspraak(tekst, tempo) {
+  if (!nlStem) zoekStem(); // op de iPad komen de stemmen soms pas later binnen
+  const u = new SpeechSynthesisUtterance(tekst);
+  u.lang = 'nl-NL'; if (nlStem) u.voice = nlStem;
+  u.rate = tempo || leesTempo; u.pitch = 1; u.volume = 1; // gewone toonhoogte: het best te verstaan
+  return u;
+}
 function spreek(tekst, tempo) {
   if (!kanSpreken()) return;
+  const mijn = ++spreekToken;
   speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(tekst);
-  u.lang = 'nl-NL'; if (nlStem) u.voice = nlStem; u.rate = tempo || 0.9;
-  u.pitch = 1.1; // net iets hoger en zachter
-  speechSynthesis.speak(u);
+  // Op de iPad blijft het soms stil als je direct na het stoppen weer begint: even wachten
+  setTimeout(function () { if (mijn === spreekToken) speechSynthesis.speak(maakUitspraak(tekst, tempo)); }, 120);
 }
-function stopSpreken() { if (kanSpreken()) speechSynthesis.cancel(); }
+// Lees stukjes (zinnen) één voor één voor, zodat lange teksten niet halverwege stoppen
+function spreekReeks(stukken, bijStuk, klaar, tempo) {
+  if (!kanSpreken()) return;
+  const mijn = ++spreekToken;
+  speechSynthesis.cancel();
+  let i = 0;
+  function volgende() {
+    if (mijn !== spreekToken) return;
+    if (i >= stukken.length) { if (klaar) klaar(); return; }
+    if (bijStuk) bijStuk(i);
+    const u = maakUitspraak(stukken[i], tempo);
+    u.onend = function () { i++; setTimeout(volgende, 180); };
+    u.onerror = function () { if (mijn === spreekToken) { i++; setTimeout(volgende, 180); } };
+    speechSynthesis.speak(u);
+  }
+  setTimeout(volgende, 120);
+}
+function stopSpreken() { spreekToken++; if (kanSpreken()) speechSynthesis.cancel(); }
 function zonderHtml(h) { const d = document.createElement('div'); d.innerHTML = h.replace(/<br>/g, '. '); return d.textContent; }
 
 // ════════════════════════════════════════════════════════════
@@ -643,9 +682,9 @@ function toonVraag() {
   const herh = q.herhaling ? '<div class="vraag-label">🔁 Nog een keer, je kunt het!</div>' : '';
 
   if (q.type === 'lees') {
-    lp.innerHTML = `<div class="lees-tekst"><h3><span>${esc(q.tekst.titel)}</span>${kanSpreken() ? '<button class="spreek-knop" id="lees-voor">🔊 Lees voor</button>' : ''}</h3><p>${esc(q.tekst.tekst)}</p></div>`;
-    const lv = $('lees-voor'); if (lv) lv.addEventListener('click', function () { spreek(q.tekst.titel + '. ' + q.tekst.tekst, 0.85); });
-    k.innerHTML = herh + `<div class="vraag-tekst">${esc(q.vraag)}</div><div class="opties" id="opties"></div><div class="feedback" id="fb"></div>`;
+    toonLeestekst(lp, q.tekst);
+    k.innerHTML = herh + `<div class="vraag-rij"><div class="vraag-tekst">${esc(q.vraag)}</div>${kanSpreken() ? '<button class="mini-spreek" id="vraag-voor" aria-label="Lees de vraag voor">🔊</button>' : ''}</div><div class="opties" id="opties"></div><div class="feedback" id="fb"></div>`;
+    const vv = $('vraag-voor'); if (vv) vv.addEventListener('click', function () { spreek(q.vraag); });
     renderOpties(q, false);
   } else if (q.type === 'gat') {
     k.innerHTML = herh + `<div class="vraag-label">Welke letters horen op de streep?</div><div class="gat-woord">${esc(q.voor)}<span class="gat">&nbsp;</span>${esc(q.na)}</div><div class="opties ${q.opties.length === 2 ? 'twee' : ''}" id="opties"></div><div class="feedback" id="fb"></div>`;
@@ -655,11 +694,11 @@ function toonVraag() {
     renderOpties(q, q.goed.length <= 4);
   } else if (q.type === 'dictee') {
     k.innerHTML = herh + `<div class="vraag-label">🎧 Luister en schrijf het woord op.${q.vraag ? ' Hint: ' + esc(q.vraag.replace(/…/g, '').trim()) : ''}</div><button class="luister-knop" id="luister" aria-label="Luister naar het woord">🔊</button><input class="dictee-veld" id="dictee" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="typ hier"><div class="feedback" id="fb"></div>`;
-    $('luister').addEventListener('click', function () { spreek(q.woord, 0.8); });
+    $('luister').addEventListener('click', function () { spreek(q.woord, 0.7); });
     $('dictee').addEventListener('keydown', function (e) { if (e.key === 'Enter') controleerDictee(); });
     $('volgende-rij').innerHTML = '<button class="knop" id="check-knop">Controleer</button>';
     $('check-knop').addEventListener('click', controleerDictee);
-    setTimeout(function () { spreek(q.woord, 0.8); }, 350);
+    setTimeout(function () { spreek(q.woord, 0.7); }, 350);
   } else if (q.type === 'tik') {
     k.innerHTML = herh + `<div class="vraag-tekst">${esc(q.opdracht)}</div><div class="zin-woorden" id="woorden"></div><div class="feedback" id="fb"></div>`;
     const w = $('woorden');
@@ -677,6 +716,48 @@ function toonVraag() {
     $('volgende-rij').innerHTML = '<button class="knop" id="check-knop" disabled>Controleer</button>';
     $('check-knop').addEventListener('click', controleerTik);
   }
+}
+// ── Leeshulp: zelf lezen, en op een woord tikken als het lastig is ──
+function toonLeestekst(plek, t) {
+  const zinnen = (t.tekst.match(/[^.!?]+[.!?]+["'”]?\s*|[^.!?]+$/g) || [t.tekst]).map(z => z.trim()).filter(Boolean);
+  const woordHTML = z => z.split(/\s+/).map(w => `<span class="wrd">${esc(w)}</span>`).join(' ');
+  plek.innerHTML = `<div class="lees-tekst">
+    <h3><span>${esc(t.titel)}</span></h3>
+    ${kanSpreken() ? `<div class="lees-hulp">
+      <button class="spreek-knop" id="lees-voor">🔊 Lees voor</button>
+      <button class="tempo-knop" id="lees-tempo">${leesTempo < 0.8 ? '🐢 Heel langzaam' : '🙂 Rustig'}</button>
+      <span class="lees-tip">💡 Tik op een woord om het te horen</span>
+    </div>` : ''}
+    <p class="lees-zinnen">${zinnen.map((z, i) => `<span class="zin" data-i="${i}">${woordHTML(z)}</span>`).join(' ')}</p>
+    <div class="woord-hulp" id="woord-hulp" hidden></div>
+  </div>`;
+  if (!kanSpreken()) return;
+  const knop = $('lees-voor'), zinEls = plek.querySelectorAll('.zin');
+  let bezig = false;
+  function markeer(i) { zinEls.forEach((z, n) => z.classList.toggle('nu', n === i)); }
+  function stop() { bezig = false; stopSpreken(); markeer(-1); knop.textContent = '🔊 Lees voor'; }
+  knop.addEventListener('click', function () {
+    if (bezig) { stop(); return; }
+    bezig = true; knop.textContent = '⏹ Stop';
+    spreekReeks([t.titel + '.'].concat(zinnen), i => markeer(i - 1), stop);
+  });
+  $('lees-tempo').addEventListener('click', function () {
+    leesTempo = leesTempo < 0.8 ? 0.85 : 0.65;
+    try { localStorage.setItem('milou_leestempo', leesTempo); } catch (e) {}
+    this.textContent = leesTempo < 0.8 ? '🐢 Heel langzaam' : '🙂 Rustig';
+  });
+  plek.querySelectorAll('.wrd').forEach(w => w.addEventListener('click', function () {
+    if (bezig) stop();
+    const woord = this.textContent.replace(/[.,!?:;"'“”()]/g, '');
+    plek.querySelectorAll('.wrd.tik').forEach(x => x.classList.remove('tik'));
+    this.classList.add('tik');
+    const h = $('woord-hulp');
+    h.hidden = false;
+    h.innerHTML = '<b></b><button class="mini-spreek" aria-label="Nog een keer">🔊</button>';
+    h.querySelector('b').textContent = woord;
+    h.querySelector('button').addEventListener('click', () => spreek(woord, 0.55));
+    spreek(woord, 0.6);
+  }));
 }
 function renderOpties(q, groot) {
   const o = $('opties');
