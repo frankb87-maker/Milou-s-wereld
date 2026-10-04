@@ -496,6 +496,12 @@
   }
   .hw-btn:hover { transform: scale(1.2); background: rgba(255,255,255,0.35); }
   .hw-btn.gekozen { background: rgba(255,255,255,0.5); transform: scale(1.15); }
+  .home-wil { margin: 12px 0 4px; }
+  .home-wil-titel { font-size: 0.85rem; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+  .home-wil-rij { display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 4px; }
+  .home-wil-rij::-webkit-scrollbar { display: none; }
+  .home-wil-rij a { flex-shrink: 0; width: 112px; overflow-wrap: anywhere; -webkit-hyphens: auto; hyphens: auto; text-decoration: none; color: var(--text); background: var(--card); border: 2px solid var(--pink2); border-radius: 16px; padding: 10px 8px; text-align: center; font-size: 0.76rem; font-weight: 800; line-height: 1.25; }
+  .home-wil-rij a span { display: block; font-size: 1.7rem; margin-bottom: 4px; }
   .home-vraag { display: flex; gap: 8px; margin: 10px 0 4px; }
   .home-vraag input { flex: 1; min-width: 0; border: 2px solid var(--pink2); border-radius: 14px; padding: 11px 14px; font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); background: var(--card); }
   .home-vraag input:focus { outline: none; border-color: #ff6eb4; }
@@ -648,10 +654,10 @@
   </div>
   <!-- 🌸 Dagdoel & spaarkaart (vult zich via beloningen.js) -->
   <div id="home-dagdoel" style="margin:18px 0 4px"></div>
-  <form class="home-vraag" onsubmit="event.preventDefault(); const v=this.vraag.value.trim(); if (v) location.href='spaarkaart.html?vraag='+encodeURIComponent(v);">
-    <input name="vraag" type="text" enterkeyhint="search" autocomplete="off" placeholder="💬 Wat wil je verdienen? Bijv. een nagellakje">
-    <button type="submit" aria-label="Vraag">🔎</button>
-  </form>
+  <div class="home-wil" id="home-wil" hidden>
+    <div class="home-wil-titel">🎁 Wat wil je hebben? Tik erop en zie wat je nog moet doen:</div>
+    <div class="home-wil-rij" id="home-wil-rij"></div>
+  </div>
   <div class="home-grid">
     <a href="spaarkaart.html" class="home-tile" style="text-decoration:none">
       <div class="tile-emoji">🎁</div>
@@ -3048,6 +3054,20 @@ function blToevoegen() {
 function laadHomeBeloning() {
   if (typeof MB === 'undefined') return;
   MB.widget(document.getElementById('home-dagdoel'), { link: 'spaarkaart.html' });
+  // Beloningen om op te tikken (Milou's idee: niet typen of praten, gewoon kiezen)
+  const rij = document.getElementById('home-wil-rij'), open = MB.ladder().filter(b => !b.bereikt);
+  document.getElementById('home-wil').hidden = !open.length;
+  rij.innerHTML = '';
+  open.forEach(b => {
+    const m = b.beloning.match(/\p{Extended_Pictographic}/gu), em = m ? m[m.length - 1] : '🎁';
+    const kort = b.beloning.replace(/\p{Extended_Pictographic}|\uFE0F/gu, '').replace(/\(.*?\)/g, '').replace(/\s+/g, ' ').trim();
+    const a = document.createElement('a');
+    a.href = 'spaarkaart.html?id=' + encodeURIComponent(b.id);
+    a.innerHTML = '<span></span>';
+    a.querySelector('span').textContent = em;
+    a.appendChild(document.createTextNode(kort));
+    rij.appendChild(a);
+  });
   MB.check(); // nog niet getoonde bonnen alsnog laten zien
 }
 window.addEventListener('load', laadHomeBeloning);

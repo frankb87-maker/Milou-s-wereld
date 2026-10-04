@@ -80,6 +80,13 @@ h2 { font-size: 1.1rem; font-weight: 900; margin: 26px 0 10px; }
 .vz { display: flex; gap: 8px; }
 .vz input { flex: 1; min-width: 0; border: 2px solid var(--roze2); border-radius: 14px; padding: 12px 14px; font-family: inherit; font-size: 16px; font-weight: 700; color: var(--tekst); }
 .vz input:focus { outline: none; border-color: var(--roze); }
+.wil-lijst { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.wil { min-width: 0; overflow-wrap: anywhere; -webkit-hyphens: auto; hyphens: auto; display: flex; align-items: center; gap: 8px; text-align: left; border: 2px solid var(--roze2); background: #fff; border-radius: 16px; padding: 10px; font: inherit; font-weight: 800; font-size: 0.85rem; line-height: 1.25; cursor: pointer; color: var(--tekst); }
+.wil .em { font-size: 1.6rem; flex-shrink: 0; }
+.wil .tk { min-width: 0; }
+.wil.gekozen { border-color: var(--roze); background: #fff4fa; }
+.zelf-typen { margin-top: 10px; }
+.zelf-typen summary { font-size: 0.82rem; font-weight: 800; color: var(--muted); cursor: pointer; margin-bottom: 8px; }
 .vz .mic { background: #fff; border: 2px solid var(--roze2); color: var(--tekst); }
 .vz .mic.luistert { background: #ffe3f1; border-color: var(--roze); animation: mic 1s ease-in-out infinite; }
 @keyframes mic { 50% { transform: scale(1.08); } }
@@ -111,12 +118,15 @@ h2 { font-size: 1.1rem; font-weight: 900; margin: 26px 0 10px; }
   <p class="sub">Tik op een beloning om te zien wat je ervoor moet doen!</p>
 
   <div class="kaart vraag-kaart">
-    <div style="font-weight:900;font-size:1rem;margin-bottom:8px">💬 Wat wil je verdienen?</div>
-    <div class="vz">
-      <input id="vraag" type="text" enterkeyhint="search" autocomplete="off" placeholder="Bijv. ik wil een nagellakje kopen">
-      <button id="mic" class="mic" hidden aria-label="Zeg het maar">🎤</button>
-      <button onclick="beantwoord()" aria-label="Vraag">🔎</button>
-    </div>
+    <div style="font-weight:900;font-size:1rem;margin-bottom:8px">🎁 Wat wil je hebben? Tik erop!</div>
+    <div class="wil-lijst" id="wil-lijst"></div>
+    <details class="zelf-typen">
+      <summary>✍️ Of typ het zelf</summary>
+      <div class="vz">
+        <input id="vraag" type="text" enterkeyhint="search" autocomplete="off" placeholder="Bijv. ik wil een nagellakje kopen">
+        <button onclick="beantwoord()" aria-label="Vraag">🔎</button>
+      </div>
+    </details>
     <div id="vraag-antwoord"></div>
   </div>
 
@@ -205,12 +215,19 @@ function beantwoord(vraag) {
   const plek = document.getElementById('vraag-antwoord'); plek.innerHTML = '';
   const v = document.createElement('div'); v.className = 'bubbel v'; v.textContent = vraag; plek.appendChild(v);
   const a = document.createElement('div'); a.className = 'bubbel a'; plek.appendChild(a);
-  const b = MB.zoekBeloning(vraag), l = MB.ladder(), nv = MB.volgende();
+  toonAntwoord(MB.zoekBeloning(vraag), vraag);
+}
+function toonAntwoord(b, vraag) {
+  const plek = document.getElementById('vraag-antwoord');
+  if (!vraag) plek.innerHTML = '';
+  let a = plek.querySelector('.bubbel.a');
+  if (!a) { a = document.createElement('div'); a.className = 'bubbel a'; plek.appendChild(a); }
+  const l = MB.ladder(), nv = MB.volgende();
   if (!b) {
     a.innerHTML = 'Die beloning staat nog niet in je lijst 🤔. Vraag het eens aan papa! Dit kun je wel verdienen:<div class="chips"></div>';
     l.filter(x => !x.bereikt).slice(0, 6).forEach(x => {
       const c = document.createElement('button'); c.textContent = x.beloning;
-      c.addEventListener('click', () => beantwoord(x.beloning));
+      c.addEventListener('click', () => toonAntwoord(x, null));
       a.querySelector('.chips').appendChild(c);
     });
     return;
@@ -253,6 +270,7 @@ function spreekAntwoord(t) {
   }, 150);
 }
 (function () {
+  return; // inspreken is uitgezet: Milou kiest liever door te tikken
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition, mic = document.getElementById('mic');
   if (!SR) return;
   mic.hidden = false;
@@ -268,8 +286,30 @@ function spreekAntwoord(t) {
     try { r.start(); } catch (e) { r.onerror(); }
   });
 })();
+function emojiVan(t) { try { const m = t.match(/\p{Extended_Pictographic}/gu); return m ? m[m.length - 1] : '🎁'; } catch (e) { return '🎁'; } }
+function kortNaam(t) { return t.replace(/\p{Extended_Pictographic}|\uFE0F/gu, '').replace(/\(.*?\)/g, '').replace(/\s+/g, ' ').trim(); }
+function renderWil() {
+  const lijst = document.getElementById('wil-lijst'); lijst.innerHTML = '';
+  const open = MB.ladder().filter(b => !b.bereikt);
+  if (!open.length) { lijst.innerHTML = '<div class="leeg" style="grid-column:1/-1">🎉 Je hebt alles al verdiend!</div>'; return; }
+  open.forEach(b => {
+    const k = document.createElement('button');
+    k.className = 'wil';
+    k.innerHTML = '<span class="em"></span><span class="tk"></span>';
+    k.querySelector('.em').textContent = emojiVan(b.beloning);
+    k.querySelector('.tk').textContent = kortNaam(b.beloning);
+    k.addEventListener('click', function () {
+      lijst.querySelectorAll('.wil').forEach(x => x.classList.toggle('gekozen', x === k));
+      toonAntwoord(b, null);
+    });
+    lijst.appendChild(k);
+  });
+}
 render();
-(function () { const q = new URLSearchParams(location.search).get('vraag'); if (q) beantwoord(q); })();
+renderWil();
+(function () { const q = new URLSearchParams(location.search).get('vraag'); const id = new URLSearchParams(location.search).get('id');
+  if (id) { const b = MB.ladder().find(x => x.id === id); if (b) { toonAntwoord(b, null); return; } }
+  if (q) beantwoord(q); })();
 </script>
 </body>
 </html>
