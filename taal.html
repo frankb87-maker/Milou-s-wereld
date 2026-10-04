@@ -105,6 +105,11 @@ h1.titel { font-family: 'Pacifico', cursive; font-weight: 400; color: var(--roze
 .meer { margin-top: 14px; }
 .meer summary { font-weight: 900; font-size: 0.9rem; color: var(--kleur); cursor: pointer; }
 .meer[open] summary { margin-bottom: 8px; }
+.afmaak-woord { display: flex; justify-content: center; align-items: baseline; gap: 2px; font-size: 2.3rem; font-weight: 900; margin: 14px 0 6px; flex-wrap: wrap; }
+.afmaak-veld { font: inherit; font-size: 2.1rem; font-weight: 900; text-align: center; color: var(--kleur); border: none; border-bottom: 4px solid var(--kleur); background: var(--kleur2); border-radius: 10px 10px 0 0; padding: 0 4px; min-width: 2.5ch; outline: none; }
+.afmaak-veld.goed { color: #23632a; border-color: var(--groen); background: var(--groen2); }
+.afmaak-veld.fout { color: #7a4a00; border-color: var(--oranje); background: var(--oranje2); }
+.afmaak-info { display: flex; justify-content: center; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 800; color: var(--muted); }
 .spiek { background: #f7f3ff; border: 2px dashed var(--kleur2); border-radius: 14px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.9rem; line-height: 1.5; }
 .sp-rij { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
 .sp-rij span { background: var(--wit); border-radius: 999px; padding: 4px 10px; font-weight: 800; font-size: 0.88rem; }
@@ -704,7 +709,14 @@ function maakVraag(vak, ni, item, dictee) {
   if (item.indexOf('>') >= 0) {
     const p = item.indexOf('>'), opties = item.slice(p + 1).split('|');
     const vr = { type: 'kies', vraag: item.slice(0, p), goed: opties[0], opties: schud(opties), woord: opties[0], label: item.slice(0, p) };
-    if (dictee) { vr.type = 'dictee'; }
+    if (dictee) {
+      // Maak het woord af: geef het begin dat gelijk is aan het basiswoord, zij typt de rest
+      const goed = opties[0], m2 = vr.vraag.match(/(?:één\s+)?([a-zà-ÿ]+)\s*→/i);
+      let voor = '';
+      if (m2) { const basis = m2[1].toLowerCase(); while (voor.length < basis.length && voor.length < goed.length - 2 && basis[voor.length] === goed[voor.length]) voor += goed[voor.length]; }
+      if (!voor) voor = goed.slice(0, 1);
+      Object.assign(vr, { type: 'afmaken', voor: voor, na: '', deel: goed.slice(voor.length) });
+    }
     return vr;
   }
   const m = item.match(/^(.*)\[([^\]]+)\](.*)$/);
@@ -712,7 +724,8 @@ function maakVraag(vak, ni, item, dictee) {
     const binnen = m[2].split('|');
     const goed = binnen[0], opties = binnen.length > 1 ? binnen : niv.opties;
     const woord = m[1] + goed + m[3];
-    return { type: dictee ? 'dictee' : 'gat', voor: m[1], na: m[3], goed: goed, opties: binnen.length > 1 ? schud(opties) : opties.slice(), woord: woord, label: woord };
+    if (dictee) return { type: 'afmaken', voor: m[1], na: m[3], deel: goed, woord: woord, label: woord };
+    return { type: 'gat', voor: m[1], na: m[3], goed: goed, opties: binnen.length > 1 ? schud(opties) : opties.slice(), woord: woord, label: woord };
   }
   if (item.indexOf('*') >= 0) {
     const tokens = [], doel = [];
@@ -815,6 +828,17 @@ function toonVraag() {
     $('volgende-rij').innerHTML = '<button class="knop" id="check-knop">Controleer</button>';
     $('check-knop').addEventListener('click', controleerDictee);
     setTimeout(function () { spreekWoord(q.woord, true); }, 350);
+  } else if (q.type === 'afmaken') {
+    const hint = q.vraag ? '<div class="vraag-tekst" style="text-align:center;margin-bottom:4px">' + esc(q.vraag.replace(/…/g, '').trim()) + '</div>' : '';
+    k.innerHTML = herh + `<div class="vraag-label">✏️ Maak het woord af.</div>${hint}
+      <div class="afmaak-woord"><span>${esc(q.voor)}</span><input class="afmaak-veld" id="afmaak" style="width:${Math.max(2, q.deel.length) + 1.2}ch" maxlength="${q.deel.length + 3}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Ontbrekende letters"><span>${esc(q.na)}</span></div>
+      <div class="afmaak-info">${q.deel.length} ${q.deel.length === 1 ? 'letter' : 'letters'} · ${kanSpreken() ? '<button class="mini-spreek" id="luister" aria-label="Luister naar het woord">🔊</button>' : ''}</div>
+      <div class="feedback" id="fb"></div>`;
+    const lb = $('luister'); if (lb) lb.addEventListener('click', function () { spreekWoord(q.woord); });
+    $('afmaak').addEventListener('keydown', function (e) { if (e.key === 'Enter') controleerAfmaken(); });
+    $('volgende-rij').innerHTML = '<button class="knop" id="check-knop">Controleer</button>';
+    $('check-knop').addEventListener('click', controleerAfmaken);
+    setTimeout(function () { const v = $('afmaak'); if (v) v.focus(); }, 300);
   } else if (q.type === 'tik') {
     const nivT = DATA[ronde.vak].niveaus[q.herkomst != null ? q.herkomst : ronde.ni];
     k.innerHTML = herh + (nivT.spiek ? `<div class="spiek">${nivT.spiek}</div>` : '') + `<div class="vraag-tekst">${esc(q.opdracht)}</div><div class="zin-woorden" id="woorden"></div><div class="feedback" id="fb"></div>`;
@@ -921,6 +945,16 @@ function controleerDictee() {
   veld.classList.add(juist ? 'goed' : 'fout'); veld.disabled = true;
   verwerk(juist, q.woord);
 }
+function controleerAfmaken() {
+  if (beantwoord) return;
+  const q = ronde.vragen[ronde.i], veld = $('afmaak');
+  if (!veld.value.trim()) { veld.focus(); return; }
+  const juist = normaal(veld.value) === normaal(q.deel);
+  veld.classList.add(juist ? 'goed' : 'fout'); veld.disabled = true;
+  if (!juist) veld.value = q.deel; // laat meteen zien hoe het wel moet
+  verwerk(juist, q.woord);
+  if (kanSpreken()) setTimeout(() => spreekWoord(q.woord), 300);
+}
 function controleerTik() {
   if (beantwoord) return;
   const q = ronde.vragen[ronde.i];
@@ -950,11 +984,11 @@ function verwerk(juist, goedAntwoord) {
     MB.bewaarVoortgang(v);
   }
   if (juist) {
-    const s = !eerste ? 0 : (q.type === 'dictee' ? 2 : 1);
+    const s = !eerste ? 0 : (q.type === 'dictee' || q.type === 'afmaken' ? 2 : 1);
     if (eerste) ronde.score++;
     if (ronde.instap) ronde.instap.goed++;
     fb.className = 'feedback goed';
-    fb.innerHTML = ['Goed zo! 🎉', 'Top! ⭐', 'Helemaal goed!', 'Knap gedaan! 💪', 'Yes! 🌸'][Math.floor(Math.random() * 5)] + (s === 2 ? ' Dictee goed: dubbele sterren!' : '');
+    fb.innerHTML = ['Goed zo! 🎉', 'Top! ⭐', 'Helemaal goed!', 'Knap gedaan! 💪', 'Yes! 🌸'][Math.floor(Math.random() * 5)] + (s === 2 ? ' Zelf geschreven: dubbele sterren! ⭐⭐' : '');
     if (ronde.woordUitleg) fb.innerHTML += '<div class="wu">' + ronde.woordUitleg + '</div>';
     if (s) { ronde.verdiend += s; voegSterToe(s); }
   } else {
