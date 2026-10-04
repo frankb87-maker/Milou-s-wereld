@@ -449,6 +449,17 @@
 .mbp-stand{font-size:.76rem;font-weight:800;color:#9a8a9a}
 .mbp-doe{background:#ff6eb4;color:#fff;text-decoration:none;font-weight:900;font-size:.8rem;border-radius:999px;padding:8px 12px;white-space:nowrap}
 .mbp-sluit{background:#ff6eb4;color:#fff}
+.mbc{display:block;text-decoration:none;color:#3a2a3a;background:#fff;border-radius:16px;padding:11px 14px;box-shadow:0 2px 12px rgba(200,100,160,.12);border:2px solid #ffd6ec;font-family:'Nunito',sans-serif}
+.mbc-boven{display:flex;align-items:center;gap:8px}
+.mbc-em{font-size:1.2rem}
+.mbc-naam{flex:1;min-width:0;font-weight:900;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mbc-pct{font-weight:900;font-size:.8rem;color:#ff6eb4}
+.mbc-balk{height:7px;background:#ffe3f1;border-radius:7px;overflow:hidden;margin:7px 0 6px}
+.mbc-balk>div{height:100%;background:linear-gradient(90deg,#ff6eb4,#ffb347);border-radius:7px}
+.mbc-chips{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.mbc-chip{background:#fff4fa;border-radius:999px;padding:3px 8px;font-size:.72rem;font-weight:800}
+.mbc-chip.klaar{background:#effaf0;color:#23632a}
+.mbc-dag{margin-left:auto;font-size:.72rem;font-weight:900;color:#8a7a8a}
 .mbw{display:block;text-decoration:none;color:#3a2a3a;background:#fff;border-radius:22px;padding:16px;box-shadow:0 4px 20px rgba(200,100,160,.14);border:2px solid #ffd6ec;font-family:'Nunito',sans-serif}
 .mbw-label{font-size:.76rem;font-weight:800;color:#9a8a9a}
 .mbw-naam{font-weight:900;font-size:1.08rem;line-height:1.3;margin:2px 0 8px}
@@ -559,10 +570,25 @@
   }
 
   // ── Kaart "Je pakket": dezelfde op home, leerboek en taalboek ──
+  // Compacte balk voor leerboek en taalboek: klein, niet in de weg
+  function widgetCompact(el, opties) {
+    const st = vandaagStatus(), nv = volgende();
+    const chips = nv ? nv.stand.taken.map(function (x) {
+      return '<span class="mbc-chip' + (x.klaar ? ' klaar' : '') + '">' + (x.klaar ? '\u2705' : TAKEN[x.soort].emoji) + ' ' + x.gedaan + '/' + x.nodig + '</span>';
+    }).join('') : '';
+    el.innerHTML = '<a class="mbc" href="' + (opties.link || 'spaarkaart.html') + '">'
+      + '<div class="mbc-boven"><span class="mbc-em">\uD83C\uDF81</span><span class="mbc-naam"></span><span class="mbc-pct">' + (nv ? nv.pct + '%' : '') + '</span></div>'
+      + (nv ? '<div class="mbc-balk"><div style="width:' + nv.pct + '%"></div></div><div class="mbc-chips">' + chips
+        + '<span class="mbc-dag">' + (st.gehaald ? '\u2705 oefendag' : Math.min(st.sterren, st.doel) + '/' + st.doel + ' \u2B50') + '</span></div>' : '')
+      + '</a>';
+    el.querySelector('.mbc-naam').textContent = nv ? nv.b.beloning : 'Alle pakketten af! \uD83C\uDF89';
+  }
+
   function widget(el, opties) {
     if (!el) return;
     stijl();
     opties = opties || {};
+    if (opties.compact) return widgetCompact(el, opties);
     const s = vandaagStatus(), nv = volgende(), vd = volgendeDagen();
     const dagen = s.week.map(w => `<div class="mbw-dag${w.aan ? ' aan' : ''}${w.vandaag ? ' nu' : ''}"><span>${w.aan ? '✅' : (w.toekomst ? '' : '·')}</span><small>${w.label}</small></div>`).join('');
     const chips = nv ? nv.stand.taken.map(x => `<div class="mbw-chip${x.klaar ? ' klaar' : ''}"><span>${x.klaar ? '✅' : TAKEN[x.soort].emoji}</span><b>${x.gedaan}/${x.nodig}</b></div>`).join('') : '';

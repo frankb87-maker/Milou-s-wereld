@@ -131,9 +131,15 @@
   .home-hero p { color: rgba(255,255,255,0.85); font-size: 1rem; font-weight: 600; }
 
   .home-grid {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 14px;
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
   }
+  .groep-kop {
+    font-weight: 900; font-size: 0.95rem; color: var(--text);
+    margin: 22px 2px 10px; display: flex; align-items: center; gap: 8px;
+  }
+  .groep-kop::after { content: ''; flex: 1; height: 2px; border-radius: 2px; background: var(--pink2); }
+  .home-tile { text-decoration: none; }
   .home-tile {
     background: var(--card);
     border-radius: var(--radius);
@@ -657,77 +663,85 @@
   <!-- 🌸 Dagdoel & spaarkaart (vult zich via beloningen.js) -->
   <div id="home-dagdoel" style="margin:18px 0 4px"></div>
   <a class="home-wil-knop" href="spaarkaart.html">🎁 Wat wil je halen? <span>Typ het in ›</span></a>
+  <div class="groep-kop">📚 Leren</div>
   <div class="home-grid">
-    <a href="prijzenkast.html" class="home-tile" style="text-decoration:none">
+    <a href="leren.html" class="home-tile">
+      <div class="tile-emoji">📚</div>
+      <div class="tile-label">Leerboek</div>
+      <div class="tile-sub">Rekenen & klokkijken</div>
+    </a>
+    <a href="taal.html" class="home-tile">
+      <div class="tile-emoji">📝</div>
+      <div class="tile-label">Taalboek</div>
+      <div class="tile-sub">Spelling, lezen & taal</div>
+    </a>
+  </div>
+
+  <div class="groep-kop">🎁 Mijn beloningen</div>
+  <div class="home-grid">
+    <a href="spaarkaart.html" class="home-tile">
+      <div class="tile-emoji">🎁</div>
+      <div class="tile-label">Wat wil ik halen?</div>
+      <div class="tile-sub">Zie wat je moet doen</div>
+    </a>
+    <a href="prijzenkast.html" class="home-tile">
       <div class="tile-emoji">🏆</div>
       <div class="tile-label">Prijzenkast</div>
       <div class="tile-sub">Wat je hebt gewonnen</div>
     </a>
-    <a href="spaarkaart.html" class="home-tile" style="text-decoration:none">
-      <div class="tile-emoji">🎁</div>
-      <div class="tile-label">Beloningen</div>
-      <div class="tile-sub">Pakketten & bonnen</div>
+  </div>
+
+  <div class="groep-kop">🎨 Leuke dingen</div>
+  <div class="home-grid">
+    <a href="teken.html" class="home-tile">
+      <div class="tile-emoji">🎨</div>
+      <div class="tile-label">Tekenstudio</div>
+      <div class="tile-sub">Verven & mengen</div>
     </a>
-    <button class="home-tile" onclick="toon('schema', navBtn('schema'))">
-      <div class="tile-emoji">🗓️</div>
-      <div class="tile-label">Mijn Schema</div>
-      <div class="tile-sub">Slaaptijden & juf</div>
-    </button>
-    <button class="home-tile" onclick="toon('recepten', navBtn('recepten'))">
-      <div class="tile-emoji">🍽️</div>
-      <div class="tile-label">Koken & Bakken</div>
-      <div class="tile-sub">Mijn favoriete gerechten</div>
+    <a href="kleurplaat.html" class="home-tile">
+      <div class="tile-emoji">🖍️</div>
+      <div class="tile-label">Kleurplaten</div>
+      <div class="tile-sub">Tik en kleur in</div>
+    </a>
+    <button class="home-tile" onclick="toon('creatief', navBtn('creatief'))">
+      <div class="tile-emoji">🖌️</div>
+      <div class="tile-label">Creatief</div>
+      <div class="tile-sub">Tekenen & knutselen</div>
     </button>
     <button class="home-tile" onclick="toon('blackpink', navBtn('blackpink'))">
       <div class="tile-emoji">🎵</div>
       <div class="tile-label">BLACKPINK</div>
       <div class="tile-sub">Jisoo, Jennie, Rosé & Lisa</div>
     </button>
-    <button class="home-tile" onclick="toon('creatief', navBtn('creatief'))">
-      <div class="tile-emoji">🎨</div>
-      <div class="tile-label">Creatief</div>
-      <div class="tile-sub">Tekenen & verven</div>
+    <button class="home-tile" onclick="toon('quiz', navBtn('quiz'))">
+      <div class="tile-emoji">❓</div>
+      <div class="tile-label">BLACKPINK Quiz</div>
+      <div class="tile-sub">Test je kennis!</div>
+    </button>
+    <a href="recepten" class="home-tile">
+      <div class="tile-emoji">🍽️</div>
+      <div class="tile-label">Koken & Bakken</div>
+      <div class="tile-sub">Recepten zoeken</div>
+    </a>
+  </div>
+
+  <div class="groep-kop">💚 Voor jou</div>
+  <div class="home-grid">
+    <button class="home-tile" onclick="toon('dagboek', navBtn('dagboek'))">
+      <div class="tile-emoji">📓</div>
+      <div class="tile-label">Mijn Dagboek</div>
+      <div class="tile-sub">Papa mag meelezen 💌</div>
     </button>
     <button class="home-tile" onclick="toon('rust', navBtn('rust'))">
       <div class="tile-emoji">💚</div>
       <div class="tile-label">Even Uitblazen</div>
       <div class="tile-sub">Rustmoment voor jou</div>
     </button>
-    <button class="home-tile" onclick="toon('dagboek', navBtn('dagboek'))" style="position:relative">
-      <div class="tile-emoji">📓</div>
-      <div class="tile-label">Mijn Dagboek</div>
-      <div class="tile-sub">Papa mag meelezen 💌</div>
-      <span style="position:absolute;top:8px;right:8px;background:var(--pink);color:white;font-size:0.6rem;font-weight:900;padding:2px 6px;border-radius:10px">NIEUW</span>
+    <button class="home-tile" onclick="toon('schema', navBtn('schema'))">
+      <div class="tile-emoji">🗓️</div>
+      <div class="tile-label">Mijn Schema</div>
+      <div class="tile-sub">Slaaptijden & juf</div>
     </button>
-    <button class="home-tile" onclick="toon('quiz', navBtn('quiz'))" style="position:relative">
-      <div class="tile-emoji">🎵</div>
-      <div class="tile-label">BLACKPINK Quiz</div>
-      <div class="tile-sub">Test je kennis!</div>
-      <span style="position:absolute;top:8px;right:8px;background:var(--pink);color:white;font-size:0.6rem;font-weight:900;padding:2px 6px;border-radius:10px">NIEUW</span>
-    </button>
-    <a href="leren.html" class="home-tile" style="text-decoration:none;position:relative">
-      <div class="tile-emoji">📚</div>
-      <div class="tile-label">Leerboek</div>
-      <div class="tile-sub">Rekenen, klokkijken & meer</div>
-      <span style="position:absolute;top:8px;right:8px;background:linear-gradient(135deg,#ff6eb4,#ffb347);color:white;font-size:0.6rem;font-weight:900;padding:2px 6px;border-radius:10px">NIEUW</span>
-    </a>
-    <a href="taal.html" class="home-tile" style="text-decoration:none;position:relative">
-      <div class="tile-emoji">📝</div>
-      <div class="tile-label">Taalboek</div>
-      <div class="tile-sub">Spelling, lezen & grammatica</div>
-      <span style="position:absolute;top:8px;right:8px;background:linear-gradient(135deg,#9b7fd6,#4f9fe8);color:white;font-size:0.6rem;font-weight:900;padding:2px 6px;border-radius:10px">NIEUW</span>
-    </a>
-    <a href="teken.html" class="home-tile" style="text-decoration:none;position:relative">
-      <div class="tile-emoji">🎨</div>
-      <div class="tile-label">Tekenstudio</div>
-      <div class="tile-sub">Verven & mengen</div>
-      <span style="position:absolute;top:8px;right:8px;background:linear-gradient(135deg,#ff7bb5,#a77bff);color:white;font-size:0.6rem;font-weight:900;padding:2px 6px;border-radius:10px">NIEUW</span>
-    </a>
-    <a href="kleurplaat.html" class="home-tile" style="text-decoration:none;position:relative">
-      <div class="tile-emoji">🖍️</div>
-      <div class="tile-label">Kleurplaten</div>
-      <div class="tile-sub">Tik en kleur in</div>
-    </a>
     <div class="home-tile" id="weer-tile" style="cursor:default">
       <div id="weer-emoji" style="font-size:2.4rem;margin-bottom:4px">🌤️</div>
       <div class="tile-label" id="weer-temp">Beverwijk</div>
@@ -2939,7 +2953,8 @@ function laadLeerDashboard() {
   // Overzicht per onderdeel
   let h = '<div style="display:grid;gap:8px">';
   const tk = MB.taken();
-  h += '<div style="font-weight:800">📅 ' + MB.oefendagen() + ' oefendagen · ⭐ ' + MB.sterren() + ' sterren</div>';
+  const od = MB.oefendagen();
+  h += '<div style="font-weight:800">📅 ' + od + (od === 1 ? ' oefendag' : ' oefendagen') + ' · ⭐ ' + MB.sterren() + ' sterren</div>';
   h += '<div style="font-size:0.8rem;color:var(--muted);font-weight:700">Totaal gedaan: ' + MB.VOLGORDE.map(k => MB.TAKEN[k].emoji + ' ' + tk[k] + ' ' + MB.TAKEN[k].meer).join(' · ') + '</div>';
   h += '<label style="display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:0.82rem;font-weight:700;background:var(--bg);border-radius:12px;padding:8px 12px">'
     + '<span>🎯 Dagdoel: sterren per dag voor een oefendag</span>'
@@ -3058,6 +3073,85 @@ function blToevoegen() {
 function laadHomeBeloning() {
   if (typeof MB === 'undefined') return;
   MB.widget(document.getElementById('home-dagdoel'), { link: 'spaarkaart.html' });
+  MB.check(); // nog niet getoonde bonnen alsnog laten zien
+}
+
+// ── Grafiekje van Milou's stemmingen in het ouderdashboard ──
+function tekenStemmingGrafiek() {
+  const canvas = document.getElementById('stemmingGrafiek');
+  if (!canvas) return;
+  canvas.width = canvas.offsetWidth;
+  const ctx = canvas.getContext('2d');
+  let weekData = {}; try { weekData = JSON.parse(localStorage.getItem('milou_stemmingen') || '{}'); } catch (e) {}
+  const nu = new Date();
+  const SCORE = { '😊':5,'🥰':5,'🤩':5,'😌':4,'😐':3,'💬':3,'😴':2,'😟':2,'😢':1,'😠':1 };
+  const DN = ['Zo','Ma','Di','Wo','Do','Vr','Za'];
+  const labels = [], scores = [], kleuren = [], emojis = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(nu); d.setDate(d.getDate() - i);
+    const key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    labels.push(DN[d.getDay()]);
+    const dag = weekData[key];
+    if (dag && dag.length) {
+      const gem = dag.reduce((s, e) => s + (SCORE[e.emoji] || 3), 0) / dag.length;
+      scores.push(gem); kleuren.push(gem >= 4 ? '#a8e6cf' : gem >= 3 ? '#ffe49a' : '#f9c9d8');
+      emojis.push(dag[dag.length - 1].emoji);
+    } else { scores.push(0); kleuren.push('#f0e6ee'); emojis.push(''); }
+  }
+  const W = canvas.width, H = canvas.height, pad = 26, bw = (W - pad * 2) / 7;
+  ctx.clearRect(0, 0, W, H);
+  ctx.font = '600 11px Nunito, sans-serif'; ctx.textAlign = 'center';
+  scores.forEach((sc, i) => {
+    const h = sc ? (sc / 5) * (H - 62) : 4;
+    const x = pad + i * bw + bw * 0.18, bb = bw * 0.64, y = H - 30 - h;
+    ctx.fillStyle = kleuren[i];
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(x, y, bb, h, 8); else ctx.rect(x, y, bb, h);
+    ctx.fill();
+    if (emojis[i]) { ctx.font = '15px serif'; ctx.fillText(emojis[i], x + bb / 2, y - 6); ctx.font = '600 11px Nunito, sans-serif'; }
+    ctx.fillStyle = '#8a7a8a';
+    ctx.fillText(labels[i], x + bb / 2, H - 12);
+  });
+  const ingevuld = scores.filter(x => x > 0);
+  const el = document.getElementById('stemming-samenvatting');
+  if (el) {
+    const gem = ingevuld.length ? (ingevuld.reduce((a, b) => a + b, 0) / ingevuld.length) : 0;
+    el.innerHTML = ingevuld.length
+      ? '📅 <strong>' + ingevuld.length + ' van 7 dagen</strong> ingevuld<br>😊 Gemiddeld: <strong>' + gem.toFixed(1) + '/5</strong>'
+        + (gem >= 4 ? '<br>💚 Fijne week!' : gem >= 3 ? '<br>💛 Gemiddelde week' : '<br>🧡 Milou heeft wat extra aandacht nodig')
+      : 'Milou heeft deze week nog niets ingevuld.';
+  }
+}
+
+// ── Dagboek in het ouderdashboard ──
+function laadDagboekStats() {
+  const el = document.getElementById('dagboek-stats');
+  if (!el) return;
+  let e = []; try { e = JSON.parse(localStorage.getItem('milou_dagboek') || '[]'); } catch (ex) {}
+  const gedeeld = e.filter(i => !isPrive(i));
+  el.innerHTML = !e.length ? 'Milou heeft nog niets in haar dagboek geschreven.'
+    : '📝 <strong>' + e.length + "</strong> pagina's geschreven · 📅 laatste: <strong>" + (e[0] ? e[0].datum : '-') + '</strong>';
+  const lijst = document.getElementById('dagboek-ouder'); if (!lijst) return;
+  lijst.innerHTML = e.length && !gedeeld.length ? '<div style="font-size:0.85rem;color:var(--muted)">Nog geen gedeelde pagina\'s.</div>' : '';
+  gedeeld.slice(0, 15).forEach(i => {
+    const d = document.createElement('div');
+    d.style.cssText = 'background:var(--bg);border-radius:12px;padding:10px 12px;border-left:4px solid var(--lavender)';
+    d.innerHTML = '<div style="font-size:0.75rem;font-weight:800;color:var(--muted)"></div><div style="font-size:0.88rem;line-height:1.6;white-space:pre-wrap;margin-top:2px"></div>';
+    d.children[0].textContent = '📅 ' + i.datum;
+    d.children[1].textContent = i.tekst;
+    lijst.appendChild(d);
+  });
+}
+
+// ── Beloningen van papa laden & testmail ──
+function blPapaLadder() {
+  if (!confirm('De beloningsladder wordt vervangen door de beloningen van papa (7 pakketten + extra beloningen). Al verdiende beloningen en bonnen blijven bewaard, en het tellen van taken begint opnieuw. Doorgaan?')) return;
+  MB.laadPapaLadder();
+  laadBeloningBeheer();
+}
+function blTestMail() {
+  const s = document.getElementById('mail-status'); s.textContent = '⏳ Bezig met versturen…';
+  MB.testMail(function (ok, err) { s.textContent = ok ? '✅ Testmail verstuurd! Kijk in je inbox.' : '❌ Niet gelukt: ' + ((err && (err.text || err.status)) || 'controleer de EmailJS-template'); });
 }
 
 // ════════════════════════════════════════════════════

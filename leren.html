@@ -1678,7 +1678,7 @@ function updateKlokLive() {
 laadSterren();
 function renderLeerStrook() {
   if (typeof MB === 'undefined') return;
-  MB.widget(document.getElementById('leer-strook'), { link: 'spaarkaart.html' });
+  MB.widget(document.getElementById('leer-strook'), { link: 'spaarkaart.html', compact: true });
 }
 renderLeerStrook();
 // Directe links vanuit het pakket, bijv. leren.html?open=klok

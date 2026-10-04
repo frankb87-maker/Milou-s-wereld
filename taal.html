@@ -126,6 +126,8 @@ h1.titel { font-family: 'Pacifico', cursive; font-weight: 400; color: var(--roze
 .hulp-paneel { background: var(--wit); border-radius: 20px; padding: 16px; box-shadow: var(--shadow); margin-bottom: 14px; border: 2px solid var(--kleur2); }
 .hulp-paneel[hidden] { display: none; }
 .stem-info { margin-top: 22px; text-align: center; font-size: 0.78rem; font-weight: 700; color: var(--muted); line-height: 1.5; }
+.stem-info summary { cursor: pointer; font-weight: 800; }
+.stem-info .si-in { margin-top: 8px; }
 .stem-info button { border: 2px solid #f0e3ec; background: var(--wit); border-radius: 999px; padding: 5px 12px; font-weight: 900; font-size: 0.78rem; cursor: pointer; margin-left: 6px; }
 .lees-hulp { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 10px; }
 .tempo-knop { border: 2px solid #f0e3ec; background: var(--wit); border-radius: 999px; padding: 6px 12px; font-weight: 900; font-size: 0.8rem; cursor: pointer; }
@@ -640,7 +642,7 @@ function renderMenu() {
   });
   renderStrook();
 }
-function renderStrook() { MB.widget($('beloning-strook'), { link: 'spaarkaart.html' }); }
+function renderStrook() { MB.widget($('beloning-strook'), { link: 'spaarkaart.html', compact: true }); }
 
 // ════════════════════════════════════════════════════════════
 //  NIVEAUS
@@ -1106,8 +1108,8 @@ function renderStemInfo() {
   zoekStem();
   const naam = nlStem ? nlStem.name : 'standaardstem';
   const goed = nlStemKwaliteit >= 2;
-  el.innerHTML = '🔊 Voorleesstem: <b></b>' + (goed ? ' ✓' : '<br>Tip voor papa: download op de iPad de stem <b>Claire (verbeterd)</b>, die is veel duidelijker.') + ' <button id="stem-test">Test</button>';
-  el.querySelector('b').textContent = naam + (goed ? ' (verbeterd)' : '');
+  el.innerHTML = '<details><summary>🔊 Voorleesstem</summary><div class="si-in"><b></b>' + (goed ? ' ✓ goede stem' : '<br>Tip voor papa: zet op de iPad de stem <b>Claire (verbeterd)</b> aan, die is veel duidelijker.') + ' <button id="stem-test">Test</button></div></details>';
+  el.querySelector('.si-in b').textContent = naam;
   $('stem-test').addEventListener('click', () => spreekReeks(['Hoi Milou!', 'Zo klink ik als ik voorlees.', 'Het woord is: trein.']));
 }
 renderMenu();
