@@ -154,7 +154,7 @@ h1.titel { font-family: 'Pacifico', cursive; font-weight: 400; color: var(--roze
 .beloning-lijst { margin-top: 24px; }
 .beloning-lijst h3 { font-size: 1rem; font-weight: 900; margin-bottom: 10px; }
 .bl-rij { background: var(--wit); border-radius: 16px; padding: 12px 14px; margin-bottom: 8px; box-shadow: var(--shadow); }
-.bl-rij .bl-boven { display: flex; justify-content: space-between; gap: 10px; font-weight: 800; font-size: 0.9rem; margin-bottom: 6px; }
+.bl-rij .bl-boven { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; font-weight: 800; font-size: 0.9rem; margin-bottom: 6px; }
 .bl-rij small { color: var(--muted); font-weight: 700; }
 
 .ster-pop { position: fixed; z-index: 999; font-size: 1.6rem; pointer-events: none; animation: sterVlieg .9s ease-out forwards; }
@@ -235,10 +235,11 @@ h1.titel { font-family: 'Pacifico', cursive; font-weight: 400; color: var(--roze
   <div class="scherm" id="scherm-bonnen">
     <div class="terug-rij">
       <button class="terug-knop" onclick="naarMenu()">← Menu</button>
-      <div class="scherm-kop">🏆 Mijn bonnen</div>
+      <div class="scherm-kop">🎁 Mijn beloningen</div>
     </div>
+    <div class="beloning-lijst" id="beloning-lijst" style="margin-top:0"></div>
+    <h3 style="font-size:1rem;font-weight:900;margin:24px 0 10px">🎟️ Mijn bonnen</h3>
     <div class="bon-lijst" id="bon-lijst"></div>
-    <div class="beloning-lijst" id="beloning-lijst"></div>
   </div>
 
 </div>
@@ -505,7 +506,7 @@ function renderMenu() {
 }
 function renderStrook() {
   const el = $('beloning-strook'), nv = MB.volgende(), nb = MB.bonnen().filter(b => !b.ingewisseld).length;
-  const knop = `<button class="bs-bonnen" onclick="openBonnen()">🎟️<br>Mijn bonnen${nb ? ' (' + nb + ')' : ''}</button>`;
+  const knop = `<button class="bs-bonnen" onclick="openBonnen()">🎁<br>Alle beloningen${nb ? '<br>🎟️ ' + nb : ''}</button>`;
   if (!nv) { el.innerHTML = `<div class="bs-trofee">🏆</div><div class="bs-midden"><div class="bs-label">Beloningen</div><div class="bs-naam">Alles verdiend! Papa bedenkt vast iets nieuws.</div></div>${knop}`; return; }
   const eenh = nv.b.type === 'sterren' ? '⭐' : nv.b.type === 'oefendagen' ? 'dagen' : '';
   const standTxt = nv.b.type === 'niveau' ? MB.ONDERDELEN[nv.b.onderdeel] + ': niveau ' + nv.stand + ' van ' + nv.b.drempel : nv.stand + ' van ' + nv.b.drempel + ' ' + eenh;
@@ -824,12 +825,17 @@ function openBonnen() {
     r.addEventListener('click', function () { MB.toonBon(b, true); });
     lijst.appendChild(r);
   });
-  const open = MB.ladder().filter(b => !b.bereikt), bl = $('beloning-lijst');
-  bl.innerHTML = open.length ? '<h3>🎁 Nog te verdienen</h3>' : '';
-  open.forEach(b => {
+  // Het beloningspad: alles wat ze kan verdienen, in de volgorde van papa
+  const alle = MB.ladder(), bl = $('beloning-lijst'), nv = MB.volgende();
+  bl.innerHTML = alle.length ? '<p style="font-size:0.88rem;font-weight:700;color:var(--muted);margin-bottom:12px">Dit kun je allemaal verdienen met oefenen in je leerboek en taalboek. Elke ⭐ en elke oefendag telt!</p>' : '<div class="leeg">Papa zet hier binnenkort leuke beloningen neer. 🎁</div>';
+  alle.forEach(b => {
     const st = Math.min(MB.stand(b), b.drempel), pct = Math.round(st / b.drempel * 100);
+    const eerstvolgend = nv && !b.bereikt && nv.b.id === b.id;
     const r = document.createElement('div'); r.className = 'bl-rij';
-    r.innerHTML = `<div class="bl-boven"><span></span><small>${esc(MB.omschrijf(b))}</small></div><div class="balk"><div style="width:${pct}%"></div></div>`;
+    if (b.bereikt) r.style.opacity = '.55';
+    if (eerstvolgend) r.style.cssText += ';border:3px solid var(--roze);';
+    const nog = b.type === 'niveau' ? 'nu niveau ' + st : 'nog ' + (b.drempel - st) + (b.type === 'sterren' ? ' ⭐' : (b.drempel - st === 1 ? ' dag' : ' dagen'));
+    r.innerHTML = `<div class="bl-boven"><span></span><small>${b.bereikt ? '✅ verdiend!' : (eerstvolgend ? '👉 ' : '') + esc(MB.omschrijf(b)) + ' · ' + esc(nog)}</small></div>${b.bereikt ? '' : `<div class="balk"><div style="width:${pct}%"></div></div>`}`;
     r.querySelector('span').textContent = b.beloning;
     bl.appendChild(r);
   });
@@ -837,6 +843,8 @@ function openBonnen() {
 }
 
 renderMenu();
+if (location.hash === '#beloningen') openBonnen();
+window.addEventListener('hashchange', function () { if (location.hash === '#beloningen') openBonnen(); });
 </script>
 </body>
 </html>

@@ -663,6 +663,15 @@
     <p style="font-size:0.78rem;color:var(--muted)">Je verdient een ster voor elke dag dat je de app gebruikt en je stemming invult! 🌟</p>
   </div>
 
+  <!-- 🎁 Beloningen (vult zich via beloningen.js) -->
+  <a href="taal.html#beloningen" id="home-beloning" class="card accent-pink" style="display:none;text-decoration:none;color:inherit">
+    <h2>🎁 Hier werk je naartoe</h2>
+    <div id="hb-naam" style="font-weight:800;font-size:1rem;margin:6px 0 8px"></div>
+    <div style="height:10px;background:var(--pink2);border-radius:10px;overflow:hidden"><div id="hb-balk" style="height:100%;width:0;background:linear-gradient(90deg,#ff6eb4,#ffb347);border-radius:10px"></div></div>
+    <div id="hb-stand" style="font-size:0.78rem;color:var(--muted);font-weight:700;margin-top:6px"></div>
+    <div style="font-size:0.82rem;font-weight:800;margin-top:10px;color:#ff6eb4">Bekijk alle beloningen ›</div>
+  </a>
+
   <!-- Geheim berichtje van papa/mama -->
   <div id="geheim-berichtje-card" style="display:none" class="card accent-pink">
     <h2>💌 Verrassing voor jou!</h2>
@@ -1488,6 +1497,7 @@
     <div class="card accent-yellow">
       <h2>🏆 Beloningsladder</h2>
       <p style="font-size:0.8rem;color:var(--muted);margin-bottom:12px">Zet hier wat Milou verdient. Haalt ze een mijlpaal, dan krijgt ze een bon in de app en krijg jij een mailtje.</p>
+      <button onclick="blPapaLadder()" style="width:100%;background:linear-gradient(135deg,#ff6eb4,#ffb347);border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:11px;border-radius:12px;color:white;font-size:0.88rem;margin-bottom:12px">🎁 Laad de beloningen van papa</button>
       <div id="bl-lijst" style="display:grid;gap:8px;margin-bottom:14px"></div>
       <div style="background:var(--bg);border-radius:14px;padding:12px;display:grid;gap:8px">
         <div style="font-weight:800;font-size:0.85rem">➕ Nieuwe beloning</div>
@@ -2726,6 +2736,25 @@ function blToevoegen() {
   if (t === 'sterren') b.basis = MB.sterren();
   const l = MB.ladder(); l.push(b); MB.bewaarLadder(l);
   document.getElementById('bl-drempel').value = ''; document.getElementById('bl-beloning').value = '';
+  laadBeloningBeheer();
+}
+function laadHomeBeloning() {
+  const kaart = document.getElementById('home-beloning');
+  if (!kaart || typeof MB === 'undefined') return;
+  const nv = MB.volgende();
+  if (!nv) { kaart.style.display = 'none'; return; }
+  kaart.style.display = 'block';
+  document.getElementById('hb-naam').textContent = nv.b.beloning;
+  document.getElementById('hb-balk').style.width = nv.pct + '%';
+  const rest = nv.b.drempel - nv.stand;
+  document.getElementById('hb-stand').textContent = nv.b.type === 'niveau'
+    ? MB.ONDERDELEN[nv.b.onderdeel] + ': niveau ' + nv.stand + ' van ' + nv.b.drempel
+    : 'Nog ' + rest + (nv.b.type === 'sterren' ? ' ⭐' : (rest === 1 ? ' oefendag' : ' oefendagen')) + ' te gaan!';
+}
+window.addEventListener('load', laadHomeBeloning);
+function blPapaLadder() {
+  if (!confirm('De huidige beloningsladder wordt vervangen door de 10 beloningen van papa. Verdiende bonnen blijven bewaard. Doorgaan?')) return;
+  MB.laadPapaLadder();
   laadBeloningBeheer();
 }
 function blTestMail() {

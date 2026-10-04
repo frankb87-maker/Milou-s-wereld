@@ -53,17 +53,31 @@
   function oefendagen() { return Object.keys(lees(K.log, {})).length; }
 
   // ── Beloningsladder ──
-  const STANDAARD = [
-    { id: 'b1', type: 'sterren', drempel: 100, beloning: 'Samen een ijsje halen 🍦' },
-    { id: 'b2', type: 'oefendagen', drempel: 10, beloning: 'Jij kiest de film voor de filmavond 🎬' },
-    { id: 'b3', type: 'niveau', onderdeel: 'spelling', drempel: 5, beloning: 'Een uitje naar keuze 🎉' }
+  // ✏️ Beloningsladder van papa (knop "Laad de beloningen van papa" in het ouderdashboard)
+  const PAPA_LADDER = [
+    { type: 'oefendagen', drempel: 3,  beloning: 'Komkommersushi halen bij de DekaMarkt 🍣' },
+    { type: 'sterren',    drempel: 75, beloning: 'Een nagellakje uitzoeken bij de Kruidvat 💅' },
+    { type: 'oefendagen', drempel: 6,  beloning: 'Jij kiest wat we eten, we halen het samen bij de supermarkt 🛒' },
+    { type: 'sterren',    drempel: 175, beloning: 'Een ijsje bij Scoops (max. 3 bolletjes) of McDonald\'s 🍦' },
+    { type: 'oefendagen', drempel: 10, beloning: 'Iets uitzoeken bij de Action (max. €5) 🛍️' },
+    { type: 'sterren',    drempel: 300, beloning: 'Clickeez uitzoeken bij de Intertoys 🧩' },
+    { type: 'oefendagen', drempel: 15, beloning: 'Jij kiest wat we bestellen (butter chicken, Sushi Point…) 🥡' },
+    { type: 'niveau', onderdeel: 'lezen', drempel: 3, beloning: 'Een nieuw schetsboek ✏️' },
+    { type: 'sterren',    drempel: 450, beloning: 'Robux voor €11,99 🎮' },
+    { type: 'oefendagen', drempel: 20, beloning: '🏆 Een cadeautje uitzoeken bij de Intertoys (max. €15) 🎁' },
+    { type: 'oefendagen', drempel: 30, beloning: '👑 Shoppen bij de Normal (max. €20) 🛍️💄' }
   ];
+  function laadPapaLadder() {
+    const basis = sterren(), nu = Date.now();
+    const l = PAPA_LADDER.map((b, i) => Object.assign({ id: 'p' + nu + i, bereikt: false }, b, b.type === 'sterren' ? { basis: basis } : {}));
+    bewaarLadder(l);
+    return l;
+  }
   function ladder() {
     let l = lees(K.ladder, null);
     if (!l) {
       // Sterren die ze al had tellen niet mee voor de eerste beloning
-      l = STANDAARD.map(b => Object.assign({ bereikt: false }, b, b.type === 'sterren' ? { basis: sterren() } : {}));
-      schrijf(K.ladder, l);
+      l = laadPapaLadder();
     }
     return l;
   }
@@ -256,7 +270,7 @@
 
   window.MB = {
     ONDERDELEN, sterren, voortgang, bewaarVoortgang, hoogsteNiveau, logOefening, oefendagen,
-    ladder, bewaarLadder, bonnen, bewaarBonnen: b => schrijf(K.bonnen, b), stand, omschrijf, eenheid, volgende,
+    ladder, bewaarLadder, laadPapaLadder, bonnen, bewaarBonnen: b => schrijf(K.bonnen, b), stand, omschrijf, eenheid, volgende,
     check, niveauGehaald, mail, testMail, verwerkWachtrij, toonBon, samenvatting, datumNL,
     oefenlog: () => lees(K.log, {}), wachtrij: () => lees(K.wachtrij, [])
   };
