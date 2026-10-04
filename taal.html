@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>📝 Milou's Taalboek</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+:root {
+  --roze: #ff6eb4; --roze2: #ffd6ec; --roze3: #fff4fa;
+  --groen: #43a047; --groen2: #e3f6e4;
+  --rood: #e5484d; --rood2: #fde8e9;
+  --geel: #ffe066; --blauw: #4f9fe8; --blauw2: #e4f1fd;
+  --paars: #9b7fd6; --paars2: #efe9fb; --oranje: #ffb347; --oranje2: #fff1de;
+  --bg: #fff9fc; --wit: #fff; --tekst: #3a2a3a; --muted: #8a7a8a;
+  --shadow: 0 4px 20px rgba(200,100,160,0.12);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { -webkit-text-size-adjust: 100%; }
+body { font-family: 'Nunito', system-ui, sans-serif; background: var(--bg); color: var(--tekst); min-height: 100vh; overflow-x: hidden; padding-bottom: env(safe-area-inset-bottom, 0px); }
+button { font-family: inherit; color: inherit; }
+button:focus-visible, a:focus-visible { outline: 3px solid var(--blauw); outline-offset: 2px; }
+
+header {
+  position: sticky; top: 0; z-index: 20;
+  background: linear-gradient(135deg, #ff6eb4, #ffb347);
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 10px;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  box-shadow: 0 4px 16px rgba(255,110,180,0.3);
+}
+.header-logo { font-family: 'Pacifico', cursive; font-size: 1.1rem; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.18); }
+.kop-knop { background: rgba(255,255,255,0.3); border: none; border-radius: 50px; padding: 7px 14px; color: #fff; font-weight: 800; font-size: 0.82rem; cursor: pointer; text-decoration: none; }
+.sterren-teller { background: rgba(255,255,255,0.3); border-radius: 50px; padding: 6px 12px; color: #fff; font-weight: 900; font-size: 0.9rem; }
+
+.container { max-width: 640px; margin: 0 auto; padding: 18px 16px 40px; }
+.scherm { display: none; }
+.scherm.actief { display: block; }
+
+h1.titel { font-family: 'Pacifico', cursive; font-weight: 400; color: var(--roze); font-size: 1.6rem; text-align: center; }
+.sub { text-align: center; color: var(--muted); font-size: 0.9rem; margin-top: 2px; }
+
+/* Beloningsstrook: het kaartje bovenaan dat laat zien waar ze naartoe werkt */
+.beloning-strook {
+  margin: 18px 0 20px; background: var(--wit); border-radius: 22px; box-shadow: var(--shadow);
+  display: flex; gap: 14px; align-items: center; padding: 14px 16px; border: 2px dashed var(--roze2);
+}
+.bs-trofee { font-size: 2.2rem; }
+.bs-midden { flex: 1; min-width: 0; }
+.bs-label { font-size: 0.75rem; font-weight: 800; color: var(--muted); }
+.bs-naam { font-weight: 900; font-size: 1rem; line-height: 1.25; margin: 1px 0 7px; }
+.balk { height: 10px; background: var(--roze3); border-radius: 10px; overflow: hidden; }
+.balk > div { height: 100%; background: linear-gradient(90deg, #ff6eb4, #ffb347); border-radius: 10px; transition: width .6s ease; }
+.bs-stand { font-size: 0.75rem; font-weight: 800; color: var(--muted); margin-top: 4px; }
+.bs-bonnen { background: var(--roze3); border: none; border-radius: 14px; padding: 9px 10px; font-weight: 900; font-size: 0.78rem; color: var(--roze); cursor: pointer; text-align: center; line-height: 1.2; }
+
+.vak-lijst { display: grid; gap: 14px; }
+.vak-kaart {
+  display: flex; align-items: center; gap: 16px; text-align: left; width: 100%;
+  background: var(--wit); border: none; border-radius: 22px; padding: 18px; box-shadow: var(--shadow); cursor: pointer;
+  border-left: 8px solid var(--kleur);
+}
+.vak-kaart:active { transform: scale(0.98); }
+.vak-emoji { font-size: 2.4rem; width: 56px; height: 56px; display: grid; place-items: center; background: var(--kleur2); border-radius: 18px; flex-shrink: 0; }
+.vak-info { flex: 1; min-width: 0; }
+.vak-naam { font-weight: 900; font-size: 1.15rem; }
+.vak-sub { font-size: 0.82rem; color: var(--muted); font-weight: 700; margin: 1px 0 8px; }
+.vak-kaart .balk > div { background: var(--kleur); }
+
+/* Niveaus */
+.terug-rij { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.terug-knop { background: var(--wit); border: none; box-shadow: var(--shadow); border-radius: 50px; padding: 8px 14px; font-weight: 800; font-size: 0.85rem; cursor: pointer; }
+.scherm-kop { font-weight: 900; font-size: 1.3rem; }
+.instap-kaart { background: var(--kleur2); border-radius: 20px; padding: 16px; margin-bottom: 16px; display: flex; gap: 12px; align-items: center; }
+.instap-kaart p { font-size: 0.88rem; font-weight: 700; line-height: 1.4; flex: 1; }
+.knop { border: none; border-radius: 999px; padding: 12px 22px; font-weight: 900; font-size: 0.95rem; cursor: pointer; background: var(--kleur, var(--roze)); color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+.knop:disabled { opacity: .45; cursor: default; }
+.knop.licht { background: var(--wit); color: var(--tekst); box-shadow: var(--shadow); }
+.niveau-lijst { display: grid; gap: 10px; }
+.niveau-rij { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; background: var(--wit); border: none; border-radius: 18px; padding: 14px; box-shadow: var(--shadow); cursor: pointer; }
+.niveau-rij.op-slot { opacity: .5; cursor: default; box-shadow: none; background: #f6eff4; }
+.nv-nr { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; font-weight: 900; font-size: 1.05rem; background: var(--kleur2); color: var(--kleur); flex-shrink: 0; }
+.niveau-rij.klaar .nv-nr { background: var(--kleur); color: #fff; }
+.nv-info { flex: 1; min-width: 0; }
+.nv-titel { font-weight: 900; font-size: 0.98rem; }
+.nv-groep { font-size: 0.75rem; color: var(--muted); font-weight: 700; }
+.nv-status { font-size: 1.3rem; }
+
+/* Uitleg */
+.uitleg-kaart { background: var(--wit); border-radius: 22px; padding: 22px; box-shadow: var(--shadow); border-top: 6px solid var(--kleur); }
+.uitleg-kaart h2 { font-size: 1.25rem; font-weight: 900; margin-bottom: 4px; }
+.uitleg-kaart .nv-groep { margin-bottom: 14px; }
+.regel { font-size: 1rem; line-height: 1.6; }
+.regel b { color: var(--kleur); }
+.voorbeeld { margin-top: 14px; background: var(--kleur2); border-radius: 14px; padding: 12px 14px; font-weight: 800; line-height: 1.6; }
+.knop-rij { display: flex; gap: 10px; justify-content: center; margin-top: 18px; flex-wrap: wrap; }
+
+/* Oefenen */
+.oefen-kop { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.oefen-titel { font-weight: 900; font-size: 0.95rem; color: var(--muted); }
+.stippen { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
+.stip { width: 11px; height: 11px; border-radius: 50%; background: #eadde6; }
+.stip.goed { background: var(--groen); } .stip.fout { background: var(--rood); } .stip.nu { background: var(--kleur); transform: scale(1.3); }
+.lees-tekst { background: var(--wit); border-radius: 20px; padding: 18px 18px 14px; box-shadow: var(--shadow); margin-bottom: 14px; }
+.lees-tekst h3 { font-size: 1.1rem; font-weight: 900; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.lees-tekst p { font-size: 1.05rem; line-height: 1.75; max-width: 62ch; }
+.spreek-knop { border: 2px solid var(--kleur); background: var(--wit); color: var(--kleur); border-radius: 999px; padding: 6px 12px; font-weight: 900; font-size: 0.8rem; cursor: pointer; flex-shrink: 0; }
+.vraag-kaart { background: var(--wit); border-radius: 22px; padding: 22px 18px; box-shadow: var(--shadow); }
+.vraag-label { font-size: 0.8rem; font-weight: 800; color: var(--muted); margin-bottom: 8px; }
+.vraag-tekst { font-size: 1.15rem; font-weight: 800; line-height: 1.5; }
+.gat-woord { font-size: 2.3rem; font-weight: 900; text-align: center; letter-spacing: 1px; margin: 10px 0 4px; }
+.gat { display: inline-block; min-width: 1.6em; border-bottom: 4px solid var(--kleur); color: var(--kleur); margin: 0 2px; }
+.opties { display: grid; gap: 10px; margin-top: 18px; }
+.opties.twee { grid-template-columns: 1fr 1fr; }
+.optie { border: 3px solid #f0e3ec; background: var(--wit); border-radius: 16px; padding: 14px 12px; font-weight: 800; font-size: 1.05rem; cursor: pointer; text-align: center; line-height: 1.35; }
+.optie.groot { font-size: 1.6rem; padding: 16px; }
+.optie:active { transform: scale(0.97); }
+.optie.goed { border-color: var(--groen); background: var(--groen2); }
+.optie.fout { border-color: var(--rood); background: var(--rood2); }
+.optie:disabled { cursor: default; }
+.zin-woorden { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; line-height: 1; }
+.woord { border: 3px solid #f0e3ec; background: var(--wit); border-radius: 12px; padding: 10px 12px; font-weight: 800; font-size: 1.1rem; cursor: pointer; }
+.woord.gekozen { border-color: var(--kleur); background: var(--kleur2); }
+.woord.goed { border-color: var(--groen); background: var(--groen2); }
+.woord.fout { border-color: var(--rood); background: var(--rood2); text-decoration: line-through; }
+.woord.gemist { border-color: var(--groen); border-style: dashed; }
+.dictee-veld { width: 100%; margin-top: 16px; border: 3px solid #f0e3ec; border-radius: 16px; padding: 14px; font-size: 1.5rem; font-weight: 800; text-align: center; font-family: inherit; color: var(--tekst); outline: none; }
+.dictee-veld:focus { border-color: var(--kleur); }
+.dictee-veld.goed { border-color: var(--groen); background: var(--groen2); }
+.dictee-veld.fout { border-color: var(--rood); background: var(--rood2); }
+.luister-knop { display: block; margin: 8px auto 0; font-size: 2.6rem; width: 90px; height: 90px; border-radius: 50%; border: none; background: var(--kleur2); cursor: pointer; }
+.feedback { margin-top: 16px; border-radius: 16px; padding: 14px 16px; font-weight: 700; line-height: 1.5; font-size: 0.95rem; display: none; }
+.feedback.goed { display: block; background: var(--groen2); color: #23632a; }
+.feedback.fout { display: block; background: var(--oranje2); color: #7a4a00; }
+.feedback b { font-weight: 900; }
+.volgende-rij { text-align: center; margin-top: 16px; min-height: 48px; }
+
+/* Resultaat */
+.resultaat { text-align: center; background: var(--wit); border-radius: 26px; padding: 30px 20px; box-shadow: var(--shadow); }
+.res-emoji { font-size: 4rem; line-height: 1; }
+.res-score { font-size: 3rem; font-weight: 900; color: var(--kleur); margin: 10px 0 2px; }
+.res-tekst { font-size: 1.05rem; font-weight: 800; line-height: 1.5; max-width: 34ch; margin: 0 auto; }
+.res-sterren { margin-top: 12px; font-weight: 900; color: #b8860b; }
+
+/* Bonnen */
+.bon-lijst { display: grid; gap: 12px; }
+.bon-rij { display: flex; align-items: center; gap: 12px; background: var(--wit); border: 2px dashed var(--roze2); border-radius: 18px; padding: 14px; text-align: left; width: 100%; cursor: pointer; }
+.bon-rij.ingewisseld { opacity: .6; }
+.bon-rij .em { font-size: 1.8rem; }
+.bon-rij .tk { flex: 1; }
+.bon-rij b { display: block; font-size: 1rem; }
+.bon-rij small { color: var(--muted); font-weight: 700; }
+.leeg { text-align: center; color: var(--muted); font-weight: 700; padding: 30px 10px; line-height: 1.6; }
+.beloning-lijst { margin-top: 24px; }
+.beloning-lijst h3 { font-size: 1rem; font-weight: 900; margin-bottom: 10px; }
+.bl-rij { background: var(--wit); border-radius: 16px; padding: 12px 14px; margin-bottom: 8px; box-shadow: var(--shadow); }
+.bl-rij .bl-boven { display: flex; justify-content: space-between; gap: 10px; font-weight: 800; font-size: 0.9rem; margin-bottom: 6px; }
+.bl-rij small { color: var(--muted); font-weight: 700; }
+
+.ster-pop { position: fixed; z-index: 999; font-size: 1.6rem; pointer-events: none; animation: sterVlieg .9s ease-out forwards; }
+@keyframes sterVlieg { to { transform: translate(40vw, -60vh) scale(.4); opacity: 0; } }
+.confetti-stuk { position: fixed; width: 9px; height: 14px; border-radius: 2px; z-index: 998; top: -20px; pointer-events: none; animation: val linear forwards; }
+@keyframes val { to { transform: translateY(110vh) rotate(720deg); } }
+@media (prefers-reduced-motion: reduce) { .ster-pop, .confetti-stuk { display: none; } .balk > div { transition: none; } }
+@media (min-width: 560px) { .opties.vier { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="kop-knop">← Terug</a>
+  <span class="header-logo">📝 Taalboek</span>
+  <div class="sterren-teller">⭐ <span id="sterren">0</span></div>
+</header>
+
+<div class="container">
+
+  <!-- MENU -->
+  <div class="scherm actief" id="scherm-menu">
+    <h1 class="titel">Milou's Taalboek</h1>
+    <p class="sub">Elke dag een beetje, en je wordt steeds sterker!</p>
+    <div class="beloning-strook" id="beloning-strook"></div>
+    <div class="vak-lijst" id="vak-lijst"></div>
+  </div>
+
+  <!-- NIVEAUS -->
+  <div class="scherm" id="scherm-niveaus">
+    <div class="terug-rij">
+      <button class="terug-knop" onclick="naarMenu()">← Menu</button>
+      <div class="scherm-kop" id="niveaus-kop"></div>
+    </div>
+    <div id="instap-plek"></div>
+    <div class="niveau-lijst" id="niveau-lijst"></div>
+  </div>
+
+  <!-- UITLEG -->
+  <div class="scherm" id="scherm-uitleg">
+    <div class="terug-rij"><button class="terug-knop" onclick="naarNiveaus()">← Niveaus</button></div>
+    <div class="uitleg-kaart">
+      <h2 id="uitleg-titel"></h2>
+      <div class="nv-groep" id="uitleg-groep"></div>
+      <div class="regel" id="uitleg-regel"></div>
+      <div class="voorbeeld" id="uitleg-voorbeeld"></div>
+      <div class="knop-rij">
+        <button class="knop licht" id="uitleg-spreek" onclick="spreekUitleg()">🔊 Lees voor</button>
+        <button class="knop" onclick="startOefenen()">Start oefenen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OEFENEN -->
+  <div class="scherm" id="scherm-oefen">
+    <div class="oefen-kop">
+      <button class="terug-knop" onclick="stopOefenen()">✕ Stop</button>
+      <div class="stippen" id="stippen"></div>
+    </div>
+    <div class="oefen-titel" id="oefen-titel" style="margin-bottom:10px"></div>
+    <div id="lees-plek"></div>
+    <div class="vraag-kaart" id="vraag-kaart"></div>
+    <div class="volgende-rij" id="volgende-rij"></div>
+  </div>
+
+  <!-- RESULTAAT -->
+  <div class="scherm" id="scherm-resultaat">
+    <div class="resultaat">
+      <div class="res-emoji" id="res-emoji"></div>
+      <div class="res-score" id="res-score"></div>
+      <div class="res-tekst" id="res-tekst"></div>
+      <div class="res-sterren" id="res-sterren"></div>
+      <div class="knop-rij" id="res-knoppen"></div>
+    </div>
+  </div>
+
+  <!-- BONNEN -->
+  <div class="scherm" id="scherm-bonnen">
+    <div class="terug-rij">
+      <button class="terug-knop" onclick="naarMenu()">← Menu</button>
+      <div class="scherm-kop">🏆 Mijn bonnen</div>
+    </div>
+    <div class="bon-lijst" id="bon-lijst"></div>
+    <div class="beloning-lijst" id="beloning-lijst"></div>
+  </div>
+
+</div>
+
+<script src="beloningen.js"></script>
+<script>
+// ════════════════════════════════════════════════════════════
+//  LEERSTOF — opgebouwd volgens de SLO-leerlijnen (groep 4 t/m 8)
+//  Spelling-items:  "tr[ei]n"            → gat, opties uit het niveau
+//                   "gezell[ig|ug|ich]"  → gat, eerste optie is goed
+//                   "vraag>goed|fout|fout" → meerkeuze
+//  Grammatica:      "De *hond* rent."    → tik de woorden met *
+// ════════════════════════════════════════════════════════════
+const DATA = {
+  spelling: {
+    naam: 'Spelling', emoji: '✏️', kleur: '#ff6eb4', kleur2: '#ffe3f1',
+    niveaus: [
+      { titel: 'ei of ij', groep: 'Herhaling groep 4', opties: ['ei', 'ij'], dictee: true,
+        regel: "De <b>ei</b> en de <b>ij</b> klinken precies hetzelfde. Daarom moet je ze <b>onthouden</b>. Ezelsbruggetje: de <b>ij</b> heet ook wel de <i>lange ij</i>, de <b>ei</b> de <i>korte ei</i>.",
+        voorbeeld: "tr<b>ei</b>n · kl<b>ei</b>n · <b>ij</b>s · t<b>ij</b>d",
+        tip: "Ei en ij moet je onthouden. Kijk goed naar het woord en schrijf het een keer extra op.",
+        items: ["tr[ei]n","kl[ei]n","[ij]s","p[ij]n","schr[ij]ven","g[ei]t","r[ei]s","t[ij]d","b[ij]l","m[ei]sje","r[ij]st","pl[ei]n","z[ei]l","[ij]zer","k[ij]ken","r[ei]ger","w[ei]nig","l[ij]m","pr[ij]s","gr[ij]s","[ei]land","l[ei]ding","f[ei]st","l[ij]n"] },
+      { titel: 'au of ou', groep: 'Herhaling groep 4', opties: ['au', 'ou'], dictee: true,
+        regel: "Ook de <b>au</b> en <b>ou</b> klinken hetzelfde. Je moet ze <b>onthouden</b>. Vaak staat er nog een <b>w</b> achter: bl<b>auw</b>, vr<b>ouw</b>.",
+        voorbeeld: "bl<b>au</b>w · s<b>au</b>s · g<b>ou</b>d · k<b>ou</b>d",
+        tip: "Au en ou moet je onthouden. Zeg het woord en zie het voor je.",
+        items: ["bl[au]w","s[au]s","p[au]w","[au]to","k[au]wgom","fl[au]w","g[au]w","kl[au]w","l[au]w","[au]gustus","[ou]d","g[ou]d","h[ou]t","z[ou]t","k[ou]d","vr[ou]w","t[ou]w","m[ou]w","sch[ou]der","h[ou]den","f[ou]t","b[ou]wen","kab[ou]ter","g[ou]den"] },
+      { titel: 'g of ch', groep: 'Groep 5', opties: ['g', 'ch'], dictee: true,
+        regel: "Aan het eind van een woord klinken <b>g</b> en <b>ch</b> hetzelfde. <b>Verleng het woord</b> en luister: ber<b>g</b> → ber<b>g</b>en, dus met g. Li<b>ch</b>t → li<b>ch</b>ten, dus met ch.",
+        voorbeeld: "vla<b>g</b> (vlaggen) · na<b>ch</b>t (nachten)",
+        tip: "Twijfel je tussen g en ch? Maak het woord langer: vlag → vlaggen.",
+        items: ["li[ch]t","na[ch]t","gra[ch]t","la[ch]en","zu[ch]t","kra[ch]t","to[ch]t","ri[ch]ting","ber[g]","vla[g]","oo[g]","we[g]","dra[g]en","zor[g]","vroe[g]","ploe[g]","boo[g]","ze[g]","dro[g]e","ju[ch]en","le[g]","za[ch]t"] },
+      { titel: '-ig, -lijk en -heid', groep: 'Groep 5', dictee: true,
+        regel: "Je hoort vaak <i>-ug</i> of <i>-luk</i>, maar je schrijft <b>-ig</b> en <b>-lijk</b>. En je hoort <i>-hijd</i>, maar je schrijft <b>-heid</b>.",
+        voorbeeld: "gezell<b>ig</b> · vro<b>lijk</b> · waar<b>heid</b>",
+        tip: "Je zegt -ug of -luk, maar je schrijft -ig en -lijk. Bij -heid schrijf je ei.",
+        items: ["gezell[ig|ug|ich]","aard[ig|ug|ich]","prett[ig|ug|ich]","gelukk[ig|ug|ich]","bez[ig|ug|ich]","pracht[ig|ug|ich]","nod[ig|ug|ich]","vro[lijk|luk|lek]","eer[lijk|luk|lek]","moei[lijk|luk|lek]","vriende[lijk|luk|lek]","gevaar[lijk|luk|lek]","gemakke[lijk|luk|lek]","duide[lijk|luk|lek]","waar[heid|hijd|hed]","gezond[heid|hijd|hed]","snel[heid|hijd|hed]","vrij[heid|hijd|hed]"] },
+      { titel: 'Lange en korte klank', groep: 'Groep 5 – 6', dictee: true,
+        regel: "Hak het woord in <b>klankgroepen</b>. Hoor je aan het eind een <b>lange klank</b> (aa, ee, oo, uu)? Schrijf dan <b>één letter</b>: ra-men. Hoor je een <b>korte klank</b> (a, e, i, o, u)? Dan schrijf je de medeklinker <b>dubbel</b>: kam-men.",
+        voorbeeld: "één raam → twee ra·men<br>één kam → twee kam·men",
+        tip: "Lange klank aan het eind van de klankgroep: één letter (bo-men). Korte klank: dubbele medeklinker (bal-len).",
+        items: ["één bal → twee …>ballen|balen|baalen","één boom → twee …>bomen|boomen|bommen","één raam → twee …>ramen|raamen|rammen","één kam → twee …>kammen|kamen|kaamen","één maan → twee …>manen|maanen|mannen","één pop → twee …>poppen|popen|poopen","één boot → twee …>boten|booten|botten","één muur → twee …>muren|muuren|murren","één bus → twee …>bussen|busen|buusen","één zeep → twee …>zepen|zeepen|zeppen","één beer → twee …>beren|beeren|berren","één pen → twee …>pennen|penen|peenen","één straat → twee …>straten|straaten|stratten","één kat → twee …>katten|katen|kaaten","één been → twee …>benen|beenen|bennen","één vuur → twee …>vuren|vuuren|vurren"] },
+      { titel: 'Verkleinwoorden', groep: 'Groep 6', dictee: true,
+        regel: "Meestal plak je er <b>-je</b> achter: huis<b>je</b>. Na een <b>m</b>: <b>-pje</b> (boom<b>pje</b>). Na een lange klank of l, n, r: <b>-tje</b> (tafel<b>tje</b>). Korte klank + l, m, n, r of ng: <b>-etje</b> (bal<b>letje</b>).",
+        voorbeeld: "huis → huisje · boom → boompje · tafel → tafeltje · bal → balletje",
+        tip: "Na een m komt -pje. Na een korte klank met l, m, n, r of ng komt -etje.",
+        items: ["boom → klein …>boompje|boomtje|boompie","huis → klein …>huisje|huistje|huissie","bal → klein …>balletje|baltje|balje","raam → klein …>raampje|raamtje|raampie","ster → klein …>sterretje|stertje|sterje","auto → klein …>autootje|autotje|autoje","oma → klein …>omaatje|omatje|omaje","pen → klein …>pennetje|pentje|penje","tafel → klein …>tafeltje|tafelje|tafelletje","kam → klein …>kammetje|kamtje|kamje","vis → klein …>visje|vistje|vissie","konijn → klein …>konijntje|konijnje|konijnetje","been → klein …>beentje|beenje|benetje","muis → klein …>muisje|muistje|muissie","duim → klein …>duimpje|duimtje|duimje","slee → klein …>sleetje|sleeje|sleepje","ring → klein …>ringetje|ringje|rinkje"] },
+      { titel: 'Leenwoorden', groep: 'Groep 6 – 7', dictee: true,
+        regel: "Leenwoorden komen uit een <b>andere taal</b>. Ze schrijf je zoals in die taal. De <b>c</b> klinkt soms als k (<b>c</b>amping) en soms als s (<b>c</b>itroen). <b>-tie</b> klinkt als tsie (vakan<b>tie</b>). <b>eau</b> klinkt als oo (cad<b>eau</b>).",
+        voorbeeld: "politie · citroen · cadeau · computer",
+        tip: "Leenwoorden moet je onthouden. Let op c, -tie en eau.",
+        items: ["🚓 Zij helpen als er iets gebeurd is>politie|polietsie|polisie","🏖️ Een paar weken vrij en lekker weg>vakantie|vakansie|fakantie","🍋 Gele, zure vrucht>citroen|sitroen|citrhoen","🎁 Iets wat je krijgt op je verjaardag>cadeau|cadoo|kadow","🏙️ Het midden van de stad>centrum|sentrum|centrem","🖥️ Apparaat om op te typen en te gamen>computer|kompjoeter|computor","🚗 Hier zet je de auto in>garage|garaasje|garasje","⛺ Plek om te kamperen>camping|kemping|campink","🍕 Italiaans gerecht met kaas>pizza|pitsa|pizzaa","🏆 Zij bepalen wie de wedstrijd wint>jury|juurie|jurie","🪑 Tafel om aan te werken>bureau|burou|buroo","ℹ️ Uitleg over iets>informatie|informasie|informatsie","📱 Hiermee kun je bellen>telefoon|telefon|tellefoon","🎤 Optreden van een band>concert|consert|koncert","🍫 Bruin en heel lekker>chocola|sjokola|chokola","🎭 Voorstelling met zingen en dansen>musical|musikal|mjoesical"] },
+      { titel: 'Werkwoorden: nu', groep: 'Groep 7', dictee: false,
+        regel: "Zoek de <b>stam</b>: het hele werkwoord zonder -en (lopen → loop). <b>Ik</b> + stam: ik loop, ik word. <b>Hij, zij, het, jij</b> + stam + <b>t</b>: hij loopt, hij wordt. Staat <b>jij achter</b> het werkwoord? Dan géén t: loop jij? word jij?",
+        voorbeeld: "ik vind · hij vindt · vind jij?",
+        tip: "Ik = stam. Hij/zij/jij = stam + t. Staat jij erachter? Dan geen t.",
+        items: ["Hij … elke dag naar school. (lopen)>loopt|loopd|lopt","Ik … morgen twaalf jaar. (worden)>word|wordt|wort","Milou … heel graag. (tekenen)>tekent|tekend|teekent","… jij ook naar het feest? (komen)>Kom|Komt|Kommt","Wat … jij van dit liedje? (vinden)>vind|vindt|vint","Zij … een brief aan oma. (schrijven)>schrijft|schrijfd|schrijvt","Het meisje … op de bank. (zitten)>zit|zitt|zitd","… hij vandaag thuis? (blijven)>Blijft|Blijfd|Blijf","Jij … heel mooi. (zingen)>zingt|zing|zingd","Ik … het antwoord niet. (weten)>weet|weett|weed","… jij later juf? (worden)>Word|Wordt|Wort","De zon … fel. (schijnen)>schijnt|schijnd|schijn","Papa … de auto. (wassen)>wast|wasd|wass","Ik … mijn fiets. (pakken)>pak|pakt|pakd","Hij … het licht uit. (doen)>doet|doed|doedt","Mijn zus … een taart. (bakken)>bakt|bakd|bak"] },
+      { titel: "Verleden tijd ('t kofschip)", groep: 'Groep 7 – 8', dictee: false,
+        regel: "Haal -en van het werkwoord af: dan heb je de <b>stam</b>. Zit de laatste letter van de stam in <b>'t kofschip</b> (t, k, f, s, ch, p)? Dan krijg je <b>-te</b>. Anders <b>-de</b>. Bij wij, jullie, zij: <b>-ten</b> of <b>-den</b>.",
+        voorbeeld: "fietsen → fiets → s zit in 't kofschip → fiets<b>te</b><br>bellen → bel → l niet → bel<b>de</b>",
+        tip: "Kijk naar de laatste letter van de stam. In 't kofschip? Dan -te. Anders -de.",
+        items: ["Gisteren … ik naar opa. (fietsen)>fietste|fietsde|fietstte","Wij … samen op het plein. (spelen)>speelden|speelten|speelde","Zij … haar oma. (bellen)>belde|belte|bellde","Hij … de hele dag. (werken)>werkte|werkde|werktte","De hond … naar de kat. (blaffen)>blafte|blafde|blaffte","Ik … de bus. (missen)>miste|misde|misste","Jullie … een taart. (bakken)>bakten|bakden|bakte","Het … de hele dag. (regenen)>regende|regente|regenden","Oma … even op de bank. (dutten)>dutte|dutde|duttte","Milou … een mooie tekening. (maken)>maakte|maakde|maakten","Wij … heel lang. (praten)>praatten|praatte|praatden","Hij … de deur open. (duwen)>duwde|duwte|duwden","Ik … me heel erg. (vervelen)>verveelde|verveelte|vervelde","Papa … het gras. (maaien)>maaide|maaite|maaiden","Zij … de hele avond. (dansen)>danste|dansde|dansten"] },
+      { titel: 'Voltooid deelwoord', groep: 'Groep 8', dictee: false,
+        regel: "Het <b>voltooid deelwoord</b> gebruik je met heb, heeft, is of zijn. Vaak begint het met <b>ge-</b>. Zit de laatste letter van de stam in <b>'t kofschip</b>? Dan eindigt het op <b>t</b>. Anders op <b>d</b>. Twijfel? Maak het langer: de gebel<b>d</b>e telefoon.",
+        voorbeeld: "ik heb gefiets<b>t</b> · ik heb gebel<b>d</b> · we zijn verhuis<b>d</b>",
+        tip: "'t Kofschip-letter: eindigt op t. Anders op d. Begint het woord met be-, ge-, ver- of her-? Dan komt er geen extra ge- voor.",
+        items: ["Ik heb heel ver … (fietsen)>gefietst|gefietsd|gefiets","Zij heeft opa … (bellen)>gebeld|gebelt|gebelld","Wij zijn naar Heemskerk … (verhuizen)>verhuisd|verhuist|geverhuisd","Hij heeft heel lang … (praten)>gepraat|gepraatt|gepraatd","Ik heb het … (beloven)>beloofd|belooft|gebeloofd","Het heeft de hele nacht … (regenen)>geregend|geregent|geregen","Wie heeft dit … ? (maken)>gemaakt|gemaakd|gemaak","Ik heb mijn tas al … (pakken)>gepakt|gepakd|gepak","Heb jij je woordjes … ? (leren)>geleerd|geleert|gelerd","Mijn fiets is … (repareren)>gerepareerd|gerepareert|gereparerd","Ik heb me … (vergissen)>vergist|vergisd|gevergist","Het is me … ! (lukken)>gelukt|gelukd|geluk","Zij heeft de hele avond … (dansen)>gedanst|gedansd|gedans","Hebben jullie goed … ? (luisteren)>geluisterd|geluistert|geluisters","Ik heb een kaartje … (sturen)>gestuurd|gestuurt|gesturd"] }
+    ]
+  },
+
+  grammatica: {
+    naam: 'Grammatica', emoji: '🧩', kleur: '#9b7fd6', kleur2: '#efe9fb',
+    niveaus: [
+      { titel: 'Zelfstandig naamwoord', groep: 'Groep 4 – 5', opdracht: 'Tik op alle zelfstandige naamwoorden.',
+        regel: "Een <b>zelfstandig naamwoord</b> is een mens, dier of ding. Test: kun je er <b>de</b>, <b>het</b> of <b>een</b> voor zetten? Dan is het een zelfstandig naamwoord.",
+        voorbeeld: "de <b>hond</b> · het <b>park</b> · een <b>appel</b>",
+        tip: "Zet er de, het of een voor. Klinkt dat goed? Dan is het een zelfstandig naamwoord.",
+        items: ["De *hond* rent door het *park*.","Het *kind* eet een *appel* in de *keuken*.","Mijn *oma* heeft een rode *fiets*.","De *juf* leest een *boek* voor.","Op het *plein* staat een grote *boom*.","Een *kat* slaapt op de *bank*.","Mijn *vader* bakt *pannenkoeken* voor het *ontbijt*.","De *vogel* zit in zijn *nest*.","In de *tas* zitten drie *pennen*.","Het *meisje* tekent een *paard*.","De *zon* schijnt op het *strand*.","Mijn *vriendin* woont in een groot *huis*."] },
+      { titel: 'Werkwoord', groep: 'Groep 5', opdracht: 'Tik op alle werkwoorden.',
+        regel: "Een <b>werkwoord</b> zegt wat iemand <b>doet</b> of wat er <b>gebeurt</b>. Test: kun je er <b>ik</b> of <b>wij</b> voor zetten? Ik loop, wij lopen. Soms staan er twee werkwoorden in een zin!",
+        voorbeeld: "De kinderen <b>spelen</b> buiten. · Ik <b>wil</b> een ijsje <b>kopen</b>.",
+        tip: "Zet er ik of wij voor. Lukt dat? Dan is het een werkwoord.",
+        items: ["De kinderen *spelen* buiten.","Ik *eet* een broodje.","Mijn broer *zwemt* in het meer.","Wij *lachen* om de grap.","De kat *springt* op de tafel.","Ze *schrijft* een kaartje.","Oma *heeft* een taart *gebakken*.","Jij *mag* morgen *kiezen*.","De vogels *fluiten* in de boom.","Hij *fietst* snel naar huis.","Ik *wil* een ijsje *kopen*.","Het *regent* de hele dag."] },
+      { titel: 'Bijvoeglijk naamwoord', groep: 'Groep 5 – 6', opdracht: 'Tik op alle bijvoeglijke naamwoorden.',
+        regel: "Een <b>bijvoeglijk naamwoord</b> zegt <b>hoe</b> iets is: groot, rood, lief, spannend. Het staat vaak vóór een zelfstandig naamwoord.",
+        voorbeeld: "een <b>rode</b> jas · de <b>kleine</b> hond",
+        tip: "Vraag: hoe is het? Een rode jas → hoe is de jas? Rood!",
+        items: ["Ik heb een *rode* jas.","De *kleine* hond blaft.","We wonen in een *oud* huis.","Wat een *mooie* tekening!","De *grote* olifant drinkt water.","Ze draagt *roze* schoenen.","Het was een *spannende* film.","Mijn *lieve* oma komt op bezoek.","De *warme* soep staat op tafel.","Een *zachte* knuffel ligt op bed.","Ik zie een *gele* vlinder.","Hij heeft *blauwe* ogen en *bruin* haar."] },
+      { titel: 'De of het', groep: 'Groep 5 – 6',
+        regel: "Een zelfstandig naamwoord krijgt <b>de</b> of <b>het</b>. Vaak moet je dat onthouden. Twee handige regels: <b>verkleinwoorden</b> zijn altijd <b>het</b> (het tafeltje) en <b>meervoud</b> is altijd <b>de</b> (de huizen).",
+        voorbeeld: "het huis · de huizen · het huisje",
+        tip: "Verkleinwoord = altijd het. Meervoud = altijd de.",
+        items: ["… huis>het|de","… tafel>de|het","… meisje>het|de","… boek>het|de","… raam>het|de","… stoel>de|het","… paard>het|de","… fiets>de|het","… water>het|de","… school>de|het","… kind>het|de","… deur>de|het","… bed>het|de","… telefoon>de|het","… feest>het|de","… boeken>de|het","… huisje>het|de","… kinderen>de|het","… stoeltje>het|de","… konijn>het|de"] },
+      { titel: 'Persoonsvorm', groep: 'Groep 6', opdracht: 'Tik op de persoonsvorm.',
+        regel: "De <b>persoonsvorm</b> is een werkwoord. Je vindt hem met de <b>vraagproef</b>: maak van de zin een vraag. Het woord dat dan vooraan komt, is de persoonsvorm. Milou <b>loopt</b> naar school → <b>Loopt</b> Milou naar school?",
+        voorbeeld: "Wij <b>gaan</b> morgen zwemmen. → <b>Gaan</b> wij morgen zwemmen?",
+        tip: "Maak er een vraag van. Het woord dat vooraan komt, is de persoonsvorm.",
+        items: ["Milou *loopt* naar school.","Wij *gaan* morgen zwemmen.","De hond *heeft* een bot gevonden.","Ik *wil* graag een ijsje.","Vandaag *speelt* mijn broer buiten.","Zij *zijn* naar de film geweest.","Morgen *komt* opa op bezoek.","De juf *leest* een verhaal voor.","Jullie *moeten* je kamer opruimen.","In de zomer *eten* we vaak buiten.","Het meisje *danst* op het podium.","Gisteren *was* het heel koud."] },
+      { titel: 'Onderwerp', groep: 'Groep 6 – 7', opdracht: 'Tik op alle woorden van het onderwerp.',
+        regel: "Het <b>onderwerp</b> is wie of wat iets doet. Zoek eerst de persoonsvorm. Vraag dan: <b>wie of wat</b> + persoonsvorm? Wie <b>loopt</b> naar school? → <b>Milou</b>. Het onderwerp kan ook uit meer woorden bestaan.",
+        voorbeeld: "<b>De kleine hond</b> blaft hard. → Wie blaft? De kleine hond.",
+        tip: "Vraag: wie of wat + persoonsvorm? Het antwoord is het onderwerp.",
+        items: ["*Milou* loopt naar school.","*De kleine hond* blaft hard.","Morgen gaat *mijn oma* naar de markt.","*Wij* spelen op het plein.","*De juf* geeft een toets.","In het park speelden *de kinderen*.","*Mijn beste vriendin* woont in Heemskerk.","Vandaag schijnt *de zon*.","*Papa en ik* bakken een taart.","Op de tafel staat *een vaas met bloemen*.","*Het konijn* eet een wortel.","Gisteren kocht *mijn moeder* nieuwe schoenen."] },
+      { titel: 'Tegenwoordige en verleden tijd', groep: 'Groep 7',
+        regel: "Kijk naar de <b>persoonsvorm</b>. <b>Tegenwoordige tijd</b> = het gebeurt nu (ik loop, ik werk). <b>Verleden tijd</b> = het is al gebeurd (ik liep, ik werkte).",
+        voorbeeld: "Ik <b>fiets</b> → nu · Ik <b>fietste</b> → vroeger",
+        tip: "Gebeurt het nu? Tegenwoordige tijd. Is het al gebeurd? Verleden tijd.",
+        items: ["Ik fiets naar school.>tegenwoordige tijd|verleden tijd","Wij speelden buiten.>verleden tijd|tegenwoordige tijd","De hond blafte hard.>verleden tijd|tegenwoordige tijd","Zij leest een boek.>tegenwoordige tijd|verleden tijd","Opa woonde in Beverwijk.>verleden tijd|tegenwoordige tijd","Het sneeuwt vandaag.>tegenwoordige tijd|verleden tijd","Ik liep naar huis.>verleden tijd|tegenwoordige tijd","Jullie zingen een lied.>tegenwoordige tijd|verleden tijd","Hij kwam te laat.>verleden tijd|tegenwoordige tijd","Mama werkt in de winkel.>tegenwoordige tijd|verleden tijd","We aten pannenkoeken.>verleden tijd|tegenwoordige tijd","De vogel vliegt weg.>tegenwoordige tijd|verleden tijd","Ik had dorst.>verleden tijd|tegenwoordige tijd","Zij heeft een kat.>tegenwoordige tijd|verleden tijd"] },
+      { titel: 'Lijdend voorwerp', groep: 'Groep 8', opdracht: 'Tik op alle woorden van het lijdend voorwerp.',
+        regel: "Het <b>lijdend voorwerp</b> vind je zo: vraag <b>wie of wat</b> + persoonsvorm + onderwerp? Milou eet een appel. → <b>Wat eet Milou?</b> → <b>een appel</b>.",
+        voorbeeld: "Papa wast <b>de auto</b>. → Wat wast papa? De auto.",
+        tip: "Vraag: wat (of wie) + persoonsvorm + onderwerp?",
+        items: ["Milou eet *een appel*.","De juf leest *een boek* voor.","Ik zie *de vogel*.","Wij bouwen *een hut*.","Papa wast *de auto*.","Zij koopt *nieuwe schoenen*.","De kat vangt *een muis*.","Ik bel *mijn oma*.","Jij tekent *een mooi paard*.","Opa leest *de krant*.","Hij schopt *de bal* in het doel.","Mama bakt *een taart* voor mijn verjaardag."] }
+    ]
+  },
+
+  lezen: {
+    naam: 'Lezen', emoji: '📖', kleur: '#4f9fe8', kleur2: '#e4f1fd',
+    niveaus: [
+      { titel: 'Wie, wat en waar?', groep: 'Groep 5',
+        regel: "Lees de tekst rustig. Het antwoord staat <b>letterlijk</b> in de tekst. Twijfel je? <b>Lees het stukje nog een keer</b>, en zoek het woord uit de vraag op.",
+        voorbeeld: "Vraag: Waar woont Snuf? → zoek het woord <i>woont</i> in de tekst.",
+        tip: "Zoek het belangrijkste woord uit de vraag op in de tekst. Het antwoord staat er vlakbij.",
+        teksten: [
+          { titel: 'Het nieuwe konijn', tekst: `Sara krijgt voor haar verjaardag een konijn. Het konijn is wit met bruine vlekken. Ze noemt hem Snuf. Snuf woont in een hok in de tuin. Elke ochtend geeft Sara hem water en verse groente. Snuf houdt het meest van wortels. Op zaterdag mag Snuf rennen op het gras. Dan springt hij hoog in de lucht. Sara moet er altijd om lachen.`,
+            vragen: [ ['Hoe heet het konijn?', 'Snuf', 'Vlekje', 'Sara'], ['Waar woont Snuf?', 'In een hok in de tuin', 'In de kamer van Sara', 'In de schuur'], ['Wat eet Snuf het liefst?', 'Wortels', 'Sla', 'Appels'], ['Wanneer mag Snuf op het gras rennen?', 'Op zaterdag', 'Elke ochtend', 'Op zondag'] ] },
+          { titel: 'Naar de markt', tekst: `Op woensdag gaat Daan met zijn opa naar de markt. Opa koopt daar altijd vis en een grote zak appels. Daan mag zelf ook iets uitzoeken. Hij twijfelt tussen een stroopwafel en een zakje kersen. Uiteindelijk kiest hij de stroopwafel. Die is nog warm! Op de terugweg fietsen ze langs de vijver. Daar zien ze twee eenden zwemmen.`,
+            vragen: [ ['Op welke dag gaan Daan en opa naar de markt?', 'Op woensdag', 'Op zaterdag', 'Op maandag'], ['Wat koopt opa altijd?', 'Vis en appels', 'Kersen en vis', 'Brood en kaas'], ['Wat kiest Daan uiteindelijk?', 'Een stroopwafel', 'Een zakje kersen', 'Een appel'], ['Wat zien ze in de vijver?', 'Twee eenden', 'Een grote vis', 'Drie zwanen'] ] },
+          { titel: 'Een smoothie maken', tekst: `Lotte maakt een smoothie. Eerst wast ze een handje aardbeien. Dan pelt ze een banaan. Ze doet het fruit in de blender, met een scheutje melk. Ze drukt op de knop. Brrr! Na een minuutje is alles mooi glad. Lotte schenkt de smoothie in een hoog glas. Ze doet er een rietje in en proeft. Mmm, zoet en lekker koud!`,
+            vragen: [ ['Wat wast Lotte als eerste?', 'Aardbeien', 'Een banaan', 'De blender'], ['Wat doet Lotte bij het fruit in de blender?', 'Een scheutje melk', 'Een beetje water', 'IJsblokjes'], ['Waarin schenkt Lotte de smoothie?', 'In een hoog glas', 'In een beker', 'In een kom'], ['Hoe smaakt de smoothie?', 'Zoet en koud', 'Zuur en warm', 'Zout'] ] }
+        ] },
+      { titel: 'Volgorde en waarom', groep: 'Groep 5 – 6',
+        regel: "Let op woorden die de <b>volgorde</b> laten zien: <b>eerst, daarna, dan, als laatste</b>. En op woorden die een <b>reden</b> geven: <b>want, omdat, doordat</b>.",
+        voorbeeld: "Ze plakt glitters, <b>omdat</b> het huis moet schitteren. → dat is de reden.",
+        tip: "Bij een waarom-vraag: zoek naar want, omdat of doordat. Bij een volgorde-vraag: zoek eerst, daarna en als laatste.",
+        teksten: [
+          { titel: 'De tekenwedstrijd', tekst: `Op school is een tekenwedstrijd. Het thema is: mijn droomhuis. Emma wil graag winnen, dus ze begint meteen. Eerst tekent ze met potlood de vorm van het huis. Daarna maakt ze een glijbaan van de bovenste verdieping naar de tuin. Dan kleurt ze alles in met stiften. Als laatste plakt ze glitters op het dak, omdat haar droomhuis moet schitteren. Een week later hoort ze de uitslag: ze is tweede geworden! Ze krijgt een nieuwe set stiften.`,
+            vragen: [ ['Wat doet Emma als eerste?', 'Ze tekent met potlood de vorm van het huis', 'Ze kleurt alles in met stiften', 'Ze plakt glitters op het dak'], ['Wat doet Emma als laatste?', 'Ze plakt glitters op het dak', 'Ze tekent een glijbaan', 'Ze kleurt het huis in'], ['Waarom plakt Emma glitters op het dak?', 'Omdat haar droomhuis moet schitteren', 'Omdat de juf dat zei', 'Omdat haar stiften op waren'], ['Wat krijgt Emma als prijs?', 'Een nieuwe set stiften', 'Een gouden beker', 'Een potje glitters'] ] },
+          { titel: 'Een gekke ochtend', tekst: `Toen Noor wakker werd, was het al half negen. Haar wekker was niet afgegaan, want de batterij was leeg. Snel trok ze haar kleren aan. Ze had geen tijd om te ontbijten, dus pakte ze een appel mee. Op de fiets merkte ze dat het regende. Haar regenjas lag nog thuis. Kletsnat kwam ze bij school aan. Maar toen zag ze dat het plein helemaal leeg was. Het was een studiedag! Noor moest keihard lachen.`,
+            vragen: [ ['Waarom ging de wekker niet af?', 'De batterij was leeg', 'Noor had hem uitgezet', 'Hij was kapot gevallen'], ['Wat at Noor onderweg?', 'Een appel', 'Een boterham', 'Niets'], ['Wat gebeurde er toen Noor op de fiets zat?', 'Ze merkte dat het regende', 'Ze viel bijna', 'Ze kwam haar juf tegen'], ['Waarom was het plein leeg?', 'Het was een studiedag', 'Iedereen was al binnen', 'Het regende te hard'] ] },
+          { titel: 'Een dansje leren', tekst: `Fien wil een dansje leren voor de playbackshow. Eerst kijkt ze een filmpje van de dans. Ze kijkt het wel drie keer, omdat de passen best snel gaan. Daarna oefent ze elk stukje apart voor de spiegel. Het lastigste is de draai aan het eind. Ze valt een paar keer bijna om. Toch geeft ze niet op. Na een week oefenen kan ze de hele dans zonder fouten. Bij de show klapt de hele klas mee.`,
+            vragen: [ ['Waarom kijkt Fien het filmpje drie keer?', 'Omdat de passen snel gaan', 'Omdat ze het zo leuk vindt', 'Omdat het filmpje kort is'], ['Wat doet Fien nadat ze het filmpje heeft gekeken?', 'Ze oefent elk stukje apart voor de spiegel', 'Ze doet meteen mee aan de show', 'Ze vraagt haar zus om hulp'], ['Wat vindt Fien het moeilijkst?', 'De draai aan het eind', 'Het begin van de dans', 'Het liedje onthouden'], ['Hoe lang oefent Fien?', 'Een week', 'Een dag', 'Een maand'] ] }
+        ] },
+      { titel: 'Verwijswoorden en signaalwoorden', groep: 'Groep 6',
+        regel: "<b>Verwijswoorden</b> zoals <b>hij, zij, die, dat, daar, ze</b> verwijzen naar iets wat al eerder in de tekst stond. <b>Signaalwoorden</b> helpen je de tekst te snappen: <b>maar, toch</b> = tegenstelling. <b>want, omdat</b> = reden. <b>daardoor, dus</b> = gevolg. <b>bijvoorbeeld</b> = voorbeeld.",
+        voorbeeld: "Bijen vliegen naar bloemen. <b>Daar</b> halen ze nectar. → daar = bij de bloemen",
+        tip: "Bij een verwijswoord: kijk in de zin ervoor. Waar gaat het over?",
+        teksten: [
+          { titel: 'Bijen', tekst: `Bijen zijn heel belangrijk voor de natuur. Ze vliegen van bloem naar bloem. Daar halen ze nectar uit. Van die nectar maken ze honing. Ondertussen nemen ze stuifmeel mee naar andere bloemen. Daardoor kunnen er nieuwe vruchten groeien, zoals appels en aardbeien. Toch gaat het niet goed met de bijen, want er zijn steeds minder bloemen. Je kunt ze helpen door bloemen in je tuin of op je balkon te zetten.`,
+            vragen: [ ['"Daar halen ze nectar uit." Waar verwijst "Daar" naar?', 'Naar de bloemen', 'Naar de honing', 'Naar de natuur'], ['"Je kunt ze helpen." Wie zijn "ze"?', 'De bijen', 'De bloemen', 'De vruchten'], ['Waarom gaat het niet goed met de bijen?', 'Er zijn steeds minder bloemen', 'Ze maken te veel honing', 'Het is te koud'], ['Het woord "Daardoor" laat zien dat er…', 'een gevolg komt', 'een tegenstelling komt', 'een voorbeeld komt'] ] },
+          { titel: 'Lisa en Mila', tekst: `Lisa en haar zus Mila delen een kamer. Lisa is heel netjes, maar Mila laat overal kleren slingeren. Dat vindt Lisa erg vervelend. Op een dag hangt ze een briefje op de deur: wie hier binnenkomt, ruimt op! Mila moet erom lachen. Toch ruimt ze die middag haar kast op. Daarna bedenken ze samen een plan. Ze verdelen de kamer in twee helften. Zo heeft ieder een eigen plekje.`,
+            vragen: [ ['Wie laat overal kleren slingeren?', 'Mila', 'Lisa', 'Allebei'], ['"Dat vindt Lisa erg vervelend." Waar verwijst "Dat" naar?', 'Dat Mila kleren laat slingeren', 'Dat Lisa netjes is', 'Het briefje op de deur'], ['Het woord "maar" in de tweede zin laat zien dat…', 'twee dingen tegenover elkaar staan', 'er iets daarna gebeurt', 'er een reden komt'], ['"Zo heeft ieder een eigen plekje." Wat betekent "Zo"?', 'Door de kamer in tweeën te verdelen', 'Door het briefje op de deur', 'Door samen te lachen'] ] },
+          { titel: 'Waarom katten spinnen', tekst: `Katten spinnen vaak als ze blij zijn. Bijvoorbeeld als je ze aait, of als ze lekker op schoot liggen. Maar wist je dat katten ook spinnen als ze pijn hebben of bang zijn? Dat lijkt gek. Toch is het slim. Wetenschappers denken namelijk dat het spinnen hen helpt om rustig te worden. Bovendien zou het trillen helpen om sneller te genezen. Een spinnende kat is dus meestal blij, maar niet altijd.`,
+            vragen: [ ['Het woord "Bijvoorbeeld" laat zien dat er…', 'een voorbeeld komt', 'een tegenstelling komt', 'een reden komt'], ['"Het spinnen helpt hen om rustig te worden." Wie zijn "hen"?', 'De katten', 'De wetenschappers', 'De mensen die aaien'], ['Welk woord betekent hier "en ook nog"?', 'Bovendien', 'Toch', 'Maar'], ['Wat klopt volgens de tekst?', 'Een spinnende kat is meestal blij, maar niet altijd', 'Katten spinnen alleen als ze blij zijn', 'Katten spinnen nooit als ze bang zijn'] ] }
+        ] },
+      { titel: 'Hoofdgedachte en soort tekst', groep: 'Groep 7',
+        regel: "De <b>hoofdgedachte</b> is het belangrijkste wat de schrijver wil zeggen, in één zin. Er zijn verschillende <b>soorten teksten</b>: een <b>verhaal</b>, een <b>informatieve tekst</b> (je leert iets), een <b>instructie</b> (hoe doe je iets) en een <b>mening</b>. Een <b>feit</b> kun je controleren. Een <b>mening</b> is wat iemand vindt.",
+        voorbeeld: "Feit: Een pompoen groeit uit een zaadje.<br>Mening: Ik vind pompoenen het mooiste.",
+        tip: "Staat er 'ik vind' of 'mooi', 'leuk', 'beste'? Dan is het vaak een mening.",
+        teksten: [
+          { titel: 'Een schooltuin voor iedereen', tekst: `Ik vind dat elke school een schooltuin moet hebben. In een schooltuin leer je hoe groente groeit. Je ziet hoe een klein zaadje een grote pompoen wordt. Ook ben je lekker buiten bezig. Dat is gezond, en je hoofd wordt er rustig van. Sommige mensen zeggen dat een tuin te veel werk is. Maar als elke klas een stukje verzorgt, valt dat best mee. Daarom moet er bij elke school een moestuin komen!`,
+            vragen: [ ['Wat voor soort tekst is dit?', 'Een tekst met een mening', 'Een verhaal', 'Een instructie'], ['Wat is de hoofdgedachte?', 'Elke school zou een schooltuin moeten hebben', 'Pompoenen groeien uit zaadjes', 'Een tuin is veel werk'], ['Welke zin is een mening?', 'Ik vind dat elke school een schooltuin moet hebben.', 'Een pompoen groeit uit een zaadje.', 'In een schooltuin groeit groente.'], ['Wat zeggen sommige mensen volgens de tekst?', 'Dat een tuin te veel werk is', 'Dat pompoenen vies zijn', 'Dat buiten zijn ongezond is'] ] },
+          { titel: 'Zo maak je fruitspiesjes', tekst: `Wat heb je nodig? Een snijplank, een mesje, satéprikkers en fruit, zoals aardbeien, druiven, banaan en meloen. Stap 1: Was je handen en het fruit. Stap 2: Snijd de banaan en de meloen in stukjes. Vraag een volwassene om te helpen bij de meloen, want die is hard. Stap 3: Prik om en om een stukje fruit aan een prikker. Stap 4: Leg de spiesjes op een bord. Tip: leg ze tien minuten in de vriezer. Dan zijn ze lekker fris!`,
+            vragen: [ ['Wat voor soort tekst is dit?', 'Een instructie', 'Een verhaal', 'Een tekst met een mening'], ['Wat moet je als eerste doen?', 'Je handen en het fruit wassen', 'Het fruit aan de prikker doen', 'De spiesjes in de vriezer leggen'], ['Waarom vraag je hulp bij de meloen?', 'Omdat die hard is', 'Omdat die duur is', 'Omdat die zuur is'], ['Wat wil de schrijver met deze tekst?', 'Uitleggen hoe je iets maakt', 'Je overtuigen van een mening', 'Een spannend verhaal vertellen'] ] },
+          { titel: 'De blauwe vinvis', tekst: `De blauwe vinvis is het grootste dier dat ooit op aarde heeft geleefd. Hij kan wel dertig meter lang worden. Dat is net zo lang als drie bussen achter elkaar! Toch eet de blauwe vinvis vooral piepkleine diertjes: krill. Daarvan eet hij er miljoenen per dag. Ik vind de blauwe vinvis het mooiste dier van de zee. Vroeger werd er veel op hem gejaagd. Nu is hij beschermd.`,
+            vragen: [ ['Waar gaat deze tekst vooral over?', 'Over de blauwe vinvis', 'Over bussen', 'Over krill'], ['Welke zin is een mening?', 'Ik vind de blauwe vinvis het mooiste dier van de zee.', 'Hij kan wel dertig meter lang worden.', 'Nu is hij beschermd.'], ['Wat eet de blauwe vinvis vooral?', 'Krill', 'Grote vissen', 'Zeewier'], ['Wat voor soort tekst is dit vooral?', 'Een informatieve tekst', 'Een instructie', 'Een gedicht'] ] }
+        ] },
+      { titel: 'Moeilijke woorden en conclusies', groep: 'Groep 7 – 8',
+        regel: "Ken je een woord niet? Kijk naar de <b>zinnen eromheen</b>: die geven vaak een hint. Soms staat iets <b>niet letterlijk</b> in de tekst, maar kun je het wel <b>afleiden</b>. Dat heet een <b>conclusie</b> trekken. Vraag jezelf: wat betekent dit dus?",
+        voorbeeld: "'Haar handen zijn klam en haar hart bonkt.' → Ze is dus zenuwachtig.",
+        tip: "Lees de zin ervoor en erna. Wat zou het woord daar kunnen betekenen?",
+        teksten: [
+          { titel: 'De verhuizing', tekst: `Jesse zit met zijn armen over elkaar op een verhuisdoos. Hij wil niet naar Zwolle. Al zijn vrienden wonen hier. Zijn moeder gaat naast hem zitten. "Ik snap dat je het moeilijk vindt," zegt ze. "Maar weet je nog dat je altijd zo jaloers was op de skatebaan van je neef? Er ligt er één vlak bij ons nieuwe huis." Jesse kijkt op. Zijn mondhoeken krullen een beetje omhoog. "Echt?" vraagt hij. "Mag ik dan een nieuw skateboard?"`,
+            vragen: [ ['Hoe voelt Jesse zich aan het begin?', 'Boos en verdrietig', 'Blij', 'Moe'], ['"Zijn mondhoeken krullen omhoog." Wat betekent dat?', 'Hij begint te glimlachen', 'Hij gaat huilen', 'Hij wordt boos'], ['Wat betekent "jaloers" hier?', 'Je wilt graag hebben wat een ander heeft', 'Je bent bang voor iets', 'Je bent heel moe'], ['Welke conclusie kun je trekken?', 'Jesse krijgt een beetje zin in het nieuwe huis', 'Jesse gaat toch niet verhuizen', 'Jesse heeft geen vrienden'] ] },
+          { titel: 'Plastic in de zee', tekst: `In de oceaan drijft enorm veel plastic. Het komt van flessen, tasjes en ander afval dat niet goed wordt weggegooid. Door de zon en de golven valt het plastic uiteen in piepkleine stukjes. Wetenschappers noemen dat microplastics. Vissen en vogels denken dat die stukjes eten zijn. Zo komt het plastic in hun maag terecht. Gelukkig zijn er ook oplossingen. In Nederland krijg je bijvoorbeeld statiegeld terug op flesjes en blikjes. Daardoor worden ze minder vaak weggegooid.`,
+            vragen: [ ['Wat betekent "uiteenvallen"?', 'In stukjes breken', 'Groter worden', 'Naar de bodem zinken'], ['Wat zijn microplastics?', 'Piepkleine stukjes plastic', 'Grote plastic flessen', 'Een soort vis'], ['Waarom eten vissen plastic?', 'Ze denken dat het eten is', 'Ze vinden het lekker', 'Ze hebben niets anders'], ['Welke conclusie past bij de tekst?', 'Minder plastic weggooien helpt de dieren in zee', 'Vissen houden van plastic', 'Statiegeld is slecht voor de zee'] ] },
+          { titel: 'De auditie', tekst: `Yara staat achter het gordijn. Haar handen zijn klam en haar hart bonkt in haar keel. Straks moet ze zingen voor de jury van de schoolmusical. Ze heeft weken geoefend, elke avond onder de douche. Dan hoort ze haar naam. Ze haalt diep adem en loopt het podium op. De eerste noot trilt een beetje. Maar dan vergeet ze de jury, en zingt ze alsof ze helemaal alleen is. Als ze klaar is, blijft het even stil. Dan staat de juf op en begint te klappen.`,
+            vragen: [ ['Wat betekent "klam"?', 'Een beetje nat van het zweet', 'Heel koud', 'Vies'], ['Hoe voelt Yara zich achter het gordijn?', 'Zenuwachtig', 'Verveeld', 'Boos'], ['Waarom trilt de eerste noot?', 'Omdat ze zenuwachtig is', 'Omdat ze verkouden is', 'Omdat de microfoon kapot is'], ['Wat kun je afleiden uit het einde?', 'De juf vond het mooi', 'Yara zong heel vals', 'De jury was boos'] ] }
+        ] }
+    ]
+  }
+};
+const DOEL = 0.8;            // 80% goed = niveau gehaald
+const VRAGEN_PER_RONDE = 10;
+
+// ════════════════════════════════════════════════════════════
+//  HULPFUNCTIES
+// ════════════════════════════════════════════════════════════
+function $(id) { return document.getElementById(id); }
+function schud(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+function toonScherm(id) { document.querySelectorAll('.scherm').forEach(s => s.classList.remove('actief')); $('scherm-' + id).classList.add('actief'); window.scrollTo(0, 0); stopSpreken(); }
+function zetKleur(vak) { const d = DATA[vak]; document.body.style.setProperty('--kleur', d.kleur); document.body.style.setProperty('--kleur2', d.kleur2); }
+
+function sterren() { return MB.sterren(); }
+function updateSterren() { $('sterren').textContent = sterren(); }
+function voegSterToe(n) {
+  try { localStorage.setItem('milou_leer_sterren', sterren() + n); } catch (e) {}
+  updateSterren();
+  for (let i = 0; i < n; i++) setTimeout(() => {
+    const s = document.createElement('div'); s.className = 'ster-pop'; s.textContent = '⭐';
+    s.style.left = (window.innerWidth / 2 + Math.random() * 60 - 30) + 'px'; s.style.top = (window.innerHeight / 2) + 'px';
+    document.body.appendChild(s); setTimeout(() => s.remove(), 1000);
+  }, i * 140);
+  // Beloningen worden pas aan het eind van een ronde gecontroleerd, zodat een bon haar niet midden in een vraag stoort
+}
+function geluid(type) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator(), g = ctx.createGain(); o.connect(g); g.connect(ctx.destination);
+    const t = ctx.currentTime;
+    if (type === 'goed') { o.frequency.setValueAtTime(523, t); o.frequency.setValueAtTime(659, t + .1); o.frequency.setValueAtTime(784, t + .2); g.gain.setValueAtTime(.25, t); g.gain.exponentialRampToValueAtTime(.001, t + .5); o.start(); o.stop(t + .5); }
+    else { o.frequency.setValueAtTime(330, t); o.frequency.setValueAtTime(260, t + .15); g.gain.setValueAtTime(.15, t); g.gain.exponentialRampToValueAtTime(.001, t + .3); o.start(); o.stop(t + .3); }
+  } catch (e) {}
+}
+function confetti() {
+  const kl = ['#ff6eb4', '#ffe066', '#64b5f6', '#4caf50', '#b39ddb', '#ffb347'];
+  for (let i = 0; i < 40; i++) {
+    const c = document.createElement('div'); c.className = 'confetti-stuk';
+    c.style.left = Math.random() * 100 + 'vw'; c.style.background = kl[i % kl.length];
+    c.style.animationDuration = (1.3 + Math.random()) + 's'; c.style.animationDelay = Math.random() * .6 + 's';
+    document.body.appendChild(c); setTimeout(() => c.remove(), 3000);
+  }
+}
+
+// ── Voorlezen (Nederlandse stem van de iPad) ──
+let nlStem = null;
+function zoekStem() {
+  if (!('speechSynthesis' in window)) return;
+  const stemmen = speechSynthesis.getVoices();
+  nlStem = stemmen.find(v => v.lang === 'nl-NL') || stemmen.find(v => (v.lang || '').indexOf('nl') === 0) || null;
+}
+if ('speechSynthesis' in window) { zoekStem(); speechSynthesis.onvoiceschanged = zoekStem; }
+function kanSpreken() { return 'speechSynthesis' in window; }
+function spreek(tekst, tempo) {
+  if (!kanSpreken()) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(tekst);
+  u.lang = 'nl-NL'; if (nlStem) u.voice = nlStem; u.rate = tempo || 0.9;
+  speechSynthesis.speak(u);
+}
+function stopSpreken() { if (kanSpreken()) speechSynthesis.cancel(); }
+function zonderHtml(h) { const d = document.createElement('div'); d.innerHTML = h.replace(/<br>/g, '. '); return d.textContent; }
+
+// ════════════════════════════════════════════════════════════
+//  MENU
+// ════════════════════════════════════════════════════════════
+function naarMenu() { toonScherm('menu'); renderMenu(); }
+function renderMenu() {
+  updateSterren();
+  const v = MB.voortgang();
+  const lijst = $('vak-lijst'); lijst.innerHTML = '';
+  Object.keys(DATA).forEach(vak => {
+    const d = DATA[vak], n = d.niveaus.length, hoog = MB.hoogsteNiveau(vak);
+    const b = document.createElement('button');
+    b.className = 'vak-kaart';
+    b.style.setProperty('--kleur', d.kleur); b.style.setProperty('--kleur2', d.kleur2);
+    const sub = hoog ? 'Niveau ' + hoog + ' van ' + n + ' gehaald' : (v[vak].start > 1 ? 'Je begint bij niveau ' + v[vak].start : n + ' niveaus om te ontdekken');
+    b.innerHTML = `<div class="vak-emoji">${d.emoji}</div><div class="vak-info"><div class="vak-naam">${d.naam}</div><div class="vak-sub">${sub}</div><div class="balk"><div style="width:${Math.round(hoog / n * 100)}%"></div></div></div>`;
+    b.addEventListener('click', function () { openVak(vak); });
+    lijst.appendChild(b);
+  });
+  renderStrook();
+}
+function renderStrook() {
+  const el = $('beloning-strook'), nv = MB.volgende(), nb = MB.bonnen().filter(b => !b.ingewisseld).length;
+  const knop = `<button class="bs-bonnen" onclick="openBonnen()">🎟️<br>Mijn bonnen${nb ? ' (' + nb + ')' : ''}</button>`;
+  if (!nv) { el.innerHTML = `<div class="bs-trofee">🏆</div><div class="bs-midden"><div class="bs-label">Beloningen</div><div class="bs-naam">Alles verdiend! Papa bedenkt vast iets nieuws.</div></div>${knop}`; return; }
+  const eenh = nv.b.type === 'sterren' ? '⭐' : nv.b.type === 'oefendagen' ? 'dagen' : '';
+  const standTxt = nv.b.type === 'niveau' ? MB.ONDERDELEN[nv.b.onderdeel] + ': niveau ' + nv.stand + ' van ' + nv.b.drempel : nv.stand + ' van ' + nv.b.drempel + ' ' + eenh;
+  el.innerHTML = `<div class="bs-trofee">🎁</div><div class="bs-midden"><div class="bs-label">Hier werk je naartoe</div><div class="bs-naam"></div><div class="balk"><div style="width:${nv.pct}%"></div></div><div class="bs-stand">${esc(standTxt)}</div></div>${knop}`;
+  el.querySelector('.bs-naam').textContent = nv.b.beloning;
+}
+
+// ════════════════════════════════════════════════════════════
+//  NIVEAUS
+// ════════════════════════════════════════════════════════════
+let huidigVak = 'spelling', huidigNiv = 0;
+function openVak(vak) { huidigVak = vak; zetKleur(vak); toonScherm('niveaus'); renderNiveaus(); }
+function naarNiveaus() { toonScherm('niveaus'); renderNiveaus(); }
+function isOpen(vak, nr) { const v = MB.voortgang()[vak]; return nr <= v.start || v.behaald.indexOf(nr - 1) >= 0 || v.behaald.indexOf(nr) >= 0; }
+function renderNiveaus() {
+  const d = DATA[huidigVak], v = MB.voortgang()[huidigVak];
+  $('niveaus-kop').textContent = d.emoji + ' ' + d.naam;
+  const ip = $('instap-plek');
+  ip.innerHTML = '';
+  if (huidigVak !== 'lezen' && !v.instap) {
+    ip.innerHTML = `<div class="instap-kaart"><p>🧭 Doe eerst de <b>instaptoets</b>. Dan weet de app waar jij het beste kunt beginnen.</p><button class="knop" onclick="startInstap()">Start</button></div>`;
+  }
+  const lijst = $('niveau-lijst'); lijst.innerHTML = '';
+  d.niveaus.forEach((n, i) => {
+    const nr = i + 1, klaar = v.behaald.indexOf(nr) >= 0, open = isOpen(huidigVak, nr);
+    const b = document.createElement('button');
+    b.className = 'niveau-rij' + (klaar ? ' klaar' : '') + (open ? '' : ' op-slot');
+    b.innerHTML = `<div class="nv-nr">${nr}</div><div class="nv-info"><div class="nv-titel">${esc(n.titel)}</div><div class="nv-groep">${esc(n.groep)}</div></div><div class="nv-status">${klaar ? '✅' : open ? '▶️' : '🔒'}</div>`;
+    if (open) b.addEventListener('click', function () { openUitleg(i); });
+    else b.setAttribute('aria-disabled', 'true');
+    lijst.appendChild(b);
+  });
+}
+function openUitleg(i) {
+  huidigNiv = i;
+  const n = DATA[huidigVak].niveaus[i];
+  $('uitleg-titel').textContent = 'Niveau ' + (i + 1) + ': ' + n.titel;
+  $('uitleg-groep').textContent = n.groep;
+  $('uitleg-regel').innerHTML = n.regel;
+  $('uitleg-voorbeeld').innerHTML = n.voorbeeld;
+  $('uitleg-spreek').style.display = kanSpreken() ? '' : 'none';
+  toonScherm('uitleg');
+}
+function spreekUitleg() { const n = DATA[huidigVak].niveaus[huidigNiv]; spreek(zonderHtml(n.regel)); }
+
+// ════════════════════════════════════════════════════════════
+//  VRAGEN MAKEN
+// ════════════════════════════════════════════════════════════
+function maakVraag(vak, ni, item, dictee) {
+  const niv = DATA[vak].niveaus[ni];
+  if (typeof item === 'object') return item; // leesvraag
+  if (item.indexOf('>') >= 0) {
+    const p = item.indexOf('>'), opties = item.slice(p + 1).split('|');
+    const vr = { type: 'kies', vraag: item.slice(0, p), goed: opties[0], opties: schud(opties), woord: opties[0], label: item.slice(0, p) };
+    if (dictee) { vr.type = 'dictee'; }
+    return vr;
+  }
+  const m = item.match(/^(.*)\[([^\]]+)\](.*)$/);
+  if (m) {
+    const binnen = m[2].split('|');
+    const goed = binnen[0], opties = binnen.length > 1 ? binnen : niv.opties;
+    const woord = m[1] + goed + m[3];
+    return { type: dictee ? 'dictee' : 'gat', voor: m[1], na: m[3], goed: goed, opties: binnen.length > 1 ? schud(opties) : opties.slice(), woord: woord, label: woord };
+  }
+  if (item.indexOf('*') >= 0) {
+    const tokens = [], doel = [];
+    let binnen = false;
+    item.split(' ').forEach((t, i) => {
+      let tekst = t;
+      if (tekst.indexOf('*') === 0) { binnen = true; tekst = tekst.slice(1); }
+      let eind = false;
+      if (tekst.indexOf('*') >= 0) { eind = true; tekst = tekst.replace('*', ''); }
+      tokens.push(tekst);
+      if (binnen) doel.push(i);
+      if (eind) binnen = false;
+    });
+    return { type: 'tik', tokens: tokens, doel: doel, opdracht: niv.opdracht, label: item.replace(/\*/g, '') };
+  }
+  return null;
+}
+
+function maakRonde(vak, ni) {
+  const niv = DATA[vak].niveaus[ni];
+  if (vak === 'lezen') {
+    const r = [];
+    schud(niv.teksten).forEach(t => {
+      t.vragen.forEach(q => r.push({ type: 'lees', tekst: t, vraag: q[0], goed: q[1], opties: schud(q.slice(1)), label: t.titel + ': ' + q[0] }));
+    });
+    return r;
+  }
+  const items = schud(niv.items).slice(0, VRAGEN_PER_RONDE);
+  return items.map((it, i) => maakVraag(vak, ni, it, niv.dictee && kanSpreken() && i % 3 === 2));
+}
+
+// ════════════════════════════════════════════════════════════
+//  OEFENEN
+// ════════════════════════════════════════════════════════════
+let ronde = null;
+function startOefenen() {
+  ronde = { vak: huidigVak, ni: huidigNiv, vragen: maakRonde(huidigVak, huidigNiv), i: 0, score: 0, telt: 0, uitslag: [], verdiend: 0, instap: null };
+  ronde.telt = ronde.vragen.length;
+  $('oefen-titel').textContent = 'Niveau ' + (huidigNiv + 1) + ': ' + DATA[huidigVak].niveaus[huidigNiv].titel;
+  toonScherm('oefen');
+  toonVraag();
+}
+function startInstap() {
+  const d = DATA[huidigVak];
+  ronde = { vak: huidigVak, ni: 0, vragen: [], i: 0, score: 0, telt: 0, uitslag: [], verdiend: 0, instap: { blok: 0, goed: 0, inBlok: 0 } };
+  ronde.vragen = instapBlok(0);
+  $('oefen-titel').textContent = '🧭 Instaptoets ' + d.naam;
+  toonScherm('oefen');
+  toonVraag();
+}
+function instapBlok(ni) { return schud(DATA[huidigVak].niveaus[ni].items).slice(0, 3).map(it => maakVraag(huidigVak, ni, it, false)); }
+
+function renderStippen() {
+  const st = $('stippen'); st.innerHTML = '';
+  const aantal = ronde.instap ? ronde.vragen.length : ronde.telt;
+  for (let i = 0; i < aantal; i++) {
+    const s = document.createElement('div');
+    s.className = 'stip' + (ronde.uitslag[i] === true ? ' goed' : ronde.uitslag[i] === false ? ' fout' : (i === ronde.i ? ' nu' : ''));
+    st.appendChild(s);
+  }
+}
+
+let beantwoord = false;
+function toonVraag() {
+  beantwoord = false;
+  const q = ronde.vragen[ronde.i];
+  renderStippen();
+  $('volgende-rij').innerHTML = '';
+  const lp = $('lees-plek'); lp.innerHTML = '';
+  const k = $('vraag-kaart');
+  const herh = q.herhaling ? '<div class="vraag-label">🔁 Nog een keer, je kunt het!</div>' : '';
+
+  if (q.type === 'lees') {
+    lp.innerHTML = `<div class="lees-tekst"><h3><span>${esc(q.tekst.titel)}</span>${kanSpreken() ? '<button class="spreek-knop" id="lees-voor">🔊 Lees voor</button>' : ''}</h3><p>${esc(q.tekst.tekst)}</p></div>`;
+    const lv = $('lees-voor'); if (lv) lv.addEventListener('click', function () { spreek(q.tekst.titel + '. ' + q.tekst.tekst, 0.85); });
+    k.innerHTML = herh + `<div class="vraag-tekst">${esc(q.vraag)}</div><div class="opties" id="opties"></div><div class="feedback" id="fb"></div>`;
+    renderOpties(q, false);
+  } else if (q.type === 'gat') {
+    k.innerHTML = herh + `<div class="vraag-label">Welke letters horen op de streep?</div><div class="gat-woord">${esc(q.voor)}<span class="gat">&nbsp;</span>${esc(q.na)}</div><div class="opties ${q.opties.length === 2 ? 'twee' : ''}" id="opties"></div><div class="feedback" id="fb"></div>`;
+    renderOpties(q, true);
+  } else if (q.type === 'kies') {
+    k.innerHTML = herh + `<div class="vraag-label">${ronde.vak === 'grammatica' && q.goed.indexOf('tijd') >= 0 ? 'In welke tijd staat deze zin?' : 'Kies het goede antwoord.'}</div><div class="vraag-tekst">${esc(q.vraag)}</div><div class="opties ${q.opties.length === 2 ? 'twee' : ''}" id="opties"></div><div class="feedback" id="fb"></div>`;
+    renderOpties(q, q.goed.length <= 4);
+  } else if (q.type === 'dictee') {
+    k.innerHTML = herh + `<div class="vraag-label">🎧 Luister en schrijf het woord op.${q.vraag ? ' Hint: ' + esc(q.vraag.replace(/…/g, '').trim()) : ''}</div><button class="luister-knop" id="luister" aria-label="Luister naar het woord">🔊</button><input class="dictee-veld" id="dictee" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="typ hier"><div class="feedback" id="fb"></div>`;
+    $('luister').addEventListener('click', function () { spreek(q.woord, 0.8); });
+    $('dictee').addEventListener('keydown', function (e) { if (e.key === 'Enter') controleerDictee(); });
+    $('volgende-rij').innerHTML = '<button class="knop" id="check-knop">Controleer</button>';
+    $('check-knop').addEventListener('click', controleerDictee);
+    setTimeout(function () { spreek(q.woord, 0.8); }, 350);
+  } else if (q.type === 'tik') {
+    k.innerHTML = herh + `<div class="vraag-tekst">${esc(q.opdracht)}</div><div class="zin-woorden" id="woorden"></div><div class="feedback" id="fb"></div>`;
+    const w = $('woorden');
+    q.gekozen = [];
+    q.tokens.forEach((t, i) => {
+      const b = document.createElement('button'); b.className = 'woord'; b.textContent = t;
+      b.addEventListener('click', function () {
+        if (beantwoord) return;
+        const p = q.gekozen.indexOf(i);
+        if (p >= 0) { q.gekozen.splice(p, 1); this.classList.remove('gekozen'); } else { q.gekozen.push(i); this.classList.add('gekozen'); }
+        $('check-knop').disabled = q.gekozen.length === 0;
+      });
+      w.appendChild(b);
+    });
+    $('volgende-rij').innerHTML = '<button class="knop" id="check-knop" disabled>Controleer</button>';
+    $('check-knop').addEventListener('click', controleerTik);
+  }
+}
+function renderOpties(q, groot) {
+  const o = $('opties');
+  q.opties.forEach(opt => {
+    const b = document.createElement('button');
+    b.className = 'optie' + (groot ? ' groot' : ''); b.textContent = opt;
+    b.addEventListener('click', function () { kiesOptie(this, opt); });
+    o.appendChild(b);
+  });
+}
+function kiesOptie(knop, opt) {
+  if (beantwoord) return;
+  const q = ronde.vragen[ronde.i], juist = opt === q.goed;
+  document.querySelectorAll('#opties .optie').forEach(b => { b.disabled = true; if (b.textContent === q.goed) b.classList.add('goed'); });
+  if (!juist) knop.classList.add('fout');
+  if (q.type === 'gat' && juist) document.querySelector('.gat').textContent = q.goed;
+  verwerk(juist, q.goed);
+}
+function normaal(s) { return String(s).trim().toLowerCase().replace(/\s+/g, ' '); }
+function controleerDictee() {
+  if (beantwoord) return;
+  const q = ronde.vragen[ronde.i], veld = $('dictee');
+  if (!veld.value.trim()) { veld.focus(); return; }
+  const juist = normaal(veld.value) === normaal(q.woord);
+  veld.classList.add(juist ? 'goed' : 'fout'); veld.disabled = true;
+  verwerk(juist, q.woord);
+}
+function controleerTik() {
+  if (beantwoord) return;
+  const q = ronde.vragen[ronde.i];
+  const juist = q.gekozen.length === q.doel.length && q.doel.every(i => q.gekozen.indexOf(i) >= 0);
+  document.querySelectorAll('#woorden .woord').forEach((b, i) => {
+    b.classList.remove('gekozen');
+    const isDoel = q.doel.indexOf(i) >= 0, gek = q.gekozen.indexOf(i) >= 0;
+    if (isDoel && gek) b.classList.add('goed'); else if (gek) b.classList.add('fout'); else if (isDoel) b.classList.add('gemist');
+  });
+  verwerk(juist, q.doel.map(i => q.tokens[i].replace(/[.,!?]/g, '')).join(' '));
+}
+
+function verwerk(juist, goedAntwoord) {
+  beantwoord = true;
+  const q = ronde.vragen[ronde.i], niv = DATA[ronde.vak].niveaus[q.herkomst != null ? q.herkomst : ronde.ni];
+  const fb = $('fb');
+  geluid(juist ? 'goed' : 'fout');
+  const eerste = !q.herhaling;
+  if (eerste) {
+    ronde.uitslag[ronde.i] = juist;
+    const v = MB.voortgang();
+    v[ronde.vak].totaal++; if (juist) v[ronde.vak].goed++;
+    if (!juist) { v[ronde.vak].fouten.unshift({ w: q.label, d: new Date().toISOString().slice(0, 10) }); v[ronde.vak].fouten = v[ronde.vak].fouten.slice(0, 30); }
+    v[ronde.vak].laatst = new Date().toISOString();
+    MB.bewaarVoortgang(v);
+  }
+  if (juist) {
+    const s = !eerste ? 0 : (q.type === 'dictee' ? 2 : 1);
+    if (eerste) ronde.score++;
+    if (ronde.instap) ronde.instap.goed++;
+    fb.className = 'feedback goed';
+    fb.innerHTML = ['Goed zo! 🎉', 'Top! ⭐', 'Helemaal goed!', 'Knap gedaan! 💪', 'Yes! 🌸'][Math.floor(Math.random() * 5)] + (s === 2 ? ' Dictee goed: dubbele sterren!' : '');
+    if (s) { ronde.verdiend += s; voegSterToe(s); }
+  } else {
+    fb.className = 'feedback fout';
+    fb.innerHTML = `Bijna! Het goede antwoord is: <b>${esc(goedAntwoord)}</b><br>💡 ${esc(niv.tip)}`;
+    if (eerste && !ronde.instap) { const kopie = Object.assign({}, q, { herhaling: true }); if (kopie.opties) kopie.opties = schud(kopie.opties); ronde.vragen.push(kopie); }
+  }
+  if (ronde.instap) ronde.instap.inBlok++;
+  renderStippen();
+  const laatste = ronde.i >= ronde.vragen.length - 1;
+  $('volgende-rij').innerHTML = `<button class="knop" id="volgende-knop">${laatste && !ronde.instap ? 'Bekijk je score' : 'Volgende'}</button>`;
+  $('volgende-knop').addEventListener('click', volgendeVraag);
+}
+
+function volgendeVraag() {
+  stopSpreken();
+  if (ronde.instap) return volgendeInstap();
+  ronde.i++;
+  if (ronde.i < ronde.vragen.length) { toonVraag(); return; }
+  eindeRonde();
+}
+function volgendeInstap() {
+  ronde.i++;
+  if (ronde.i < ronde.vragen.length) { toonVraag(); return; }
+  const ins = ronde.instap, d = DATA[ronde.vak];
+  if (ins.goed >= 2 && ins.blok < d.niveaus.length - 1) {
+    ins.blok++; ins.goed = 0; ins.inBlok = 0;
+    ronde.vragen = instapBlok(ins.blok).map(q => Object.assign(q, { herkomst: ins.blok }));
+    ronde.i = 0; ronde.uitslag = [];
+    toonVraag(); return;
+  }
+  const start = ins.blok + 1; // het eerste niveau dat nog niet helemaal lukte (of het laatste)
+  const v = MB.voortgang(); v[ronde.vak].start = Math.max(v[ronde.vak].start, start); v[ronde.vak].instap = true; MB.bewaarVoortgang(v);
+  MB.logOefening(ronde.vak, ronde.score, 0);
+  MB.check();
+  zetKleur(ronde.vak);
+  $('res-emoji').textContent = '🧭';
+  $('res-score').textContent = 'Niveau ' + start;
+  $('res-tekst').textContent = 'Klaar! Jij begint bij niveau ' + start + ': ' + d.niveaus[start - 1].titel + '. Haal dat niveau en het volgende gaat open.';
+  $('res-sterren').textContent = ronde.verdiend ? '+' + ronde.verdiend + ' ⭐ verdiend' : '';
+  $('res-knoppen').innerHTML = '';
+  const k = document.createElement('button'); k.className = 'knop'; k.textContent = 'Naar de niveaus';
+  k.addEventListener('click', naarNiveaus); $('res-knoppen').appendChild(k);
+  toonScherm('resultaat');
+}
+
+function eindeRonde() {
+  const d = DATA[ronde.vak], niv = d.niveaus[ronde.ni], nr = ronde.ni + 1;
+  const pct = ronde.score / ronde.telt, gehaald = pct >= DOEL;
+  const v = MB.voortgang(), alGehaald = v[ronde.vak].behaald.indexOf(nr) >= 0;
+  MB.logOefening(ronde.vak, ronde.score, ronde.telt);
+  if (gehaald && !alGehaald) {
+    v[ronde.vak].behaald.push(nr); MB.bewaarVoortgang(v);
+    ronde.verdiend += 5; voegSterToe(5);
+    confetti();
+    MB.niveauGehaald(ronde.vak, nr, niv.titel, ronde.score + ' van de ' + ronde.telt);
+  } else { MB.check(); }
+  $('res-emoji').textContent = gehaald ? '🏅' : pct >= 0.5 ? '💪' : '🌱';
+  $('res-score').textContent = ronde.score + ' / ' + ronde.telt;
+  $('res-tekst').textContent = gehaald
+    ? (alGehaald ? 'Weer gehaald! Dit niveau ken je echt goed.' : 'Niveau ' + nr + ' gehaald! ' + (nr < d.niveaus.length ? 'Niveau ' + (nr + 1) + ' is nu open.' : 'Je hebt alle niveaus gehaald, wauw!'))
+    : 'Goed geoefend! Je hebt ' + Math.ceil(ronde.telt * DOEL) + ' goed nodig om het niveau te halen. Probeer het nog een keer.';
+  $('res-sterren').textContent = ronde.verdiend ? '+' + ronde.verdiend + ' ⭐ verdiend' + (gehaald && !alGehaald ? ' (met 5 bonussterren)' : '') : '';
+  const kn = $('res-knoppen'); kn.innerHTML = '';
+  function knop(tekst, licht, fn) { const b = document.createElement('button'); b.className = 'knop' + (licht ? ' licht' : ''); b.textContent = tekst; b.addEventListener('click', fn); kn.appendChild(b); }
+  knop('Nog een keer', !gehaald ? false : true, function () { openUitleg(ronde.ni); startOefenen(); });
+  if (gehaald && nr < d.niveaus.length) knop('Volgend niveau', false, function () { openUitleg(nr); });
+  knop('Niveaus', true, naarNiveaus);
+  toonScherm('resultaat');
+}
+function stopOefenen() {
+  if (ronde && !ronde.instap && ronde.uitslag.length) MB.logOefening(ronde.vak, ronde.score, ronde.uitslag.length);
+  MB.check();
+  naarNiveaus();
+}
+
+// ════════════════════════════════════════════════════════════
+//  BONNEN
+// ════════════════════════════════════════════════════════════
+function openBonnen() {
+  zetKleur('spelling');
+  const lijst = $('bon-lijst'), bn = MB.bonnen();
+  lijst.innerHTML = bn.length ? '' : '<div class="leeg">🎟️ Hier komen je beloningsbonnen.<br>Oefen in je taalboek en leerboek om ze te verdienen!</div>';
+  bn.forEach(b => {
+    const r = document.createElement('button'); r.className = 'bon-rij' + (b.ingewisseld ? ' ingewisseld' : '');
+    r.innerHTML = `<div class="em">${b.ingewisseld ? '✅' : '🎟️'}</div><div class="tk"><b></b><small>${esc(MB.datumNL(b.datum))}${b.ingewisseld ? ' · ingewisseld' : ''}</small></div>`;
+    r.querySelector('b').textContent = b.beloning;
+    r.addEventListener('click', function () { MB.toonBon(b, true); });
+    lijst.appendChild(r);
+  });
+  const open = MB.ladder().filter(b => !b.bereikt), bl = $('beloning-lijst');
+  bl.innerHTML = open.length ? '<h3>🎁 Nog te verdienen</h3>' : '';
+  open.forEach(b => {
+    const st = Math.min(MB.stand(b), b.drempel), pct = Math.round(st / b.drempel * 100);
+    const r = document.createElement('div'); r.className = 'bl-rij';
+    r.innerHTML = `<div class="bl-boven"><span></span><small>${esc(MB.omschrijf(b))}</small></div><div class="balk"><div style="width:${pct}%"></div></div>`;
+    r.querySelector('span').textContent = b.beloning;
+    bl.appendChild(r);
+  });
+  toonScherm('bonnen');
+}
+
+renderMenu();
+</script>
+</body>
+</html>

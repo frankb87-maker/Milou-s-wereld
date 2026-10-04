@@ -632,6 +632,12 @@
       <div class="tile-sub">Rekenen, klokkijken & meer</div>
       <span style="position:absolute;top:8px;right:8px;background:linear-gradient(135deg,#ff6eb4,#ffb347);color:white;font-size:0.6rem;font-weight:900;padding:2px 6px;border-radius:10px">NIEUW</span>
     </a>
+    <a href="taal.html" class="home-tile" style="text-decoration:none;position:relative">
+      <div class="tile-emoji">📝</div>
+      <div class="tile-label">Taalboek</div>
+      <div class="tile-sub">Spelling, lezen & grammatica</div>
+      <span style="position:absolute;top:8px;right:8px;background:linear-gradient(135deg,#9b7fd6,#4f9fe8);color:white;font-size:0.6rem;font-weight:900;padding:2px 6px;border-radius:10px">NIEUW</span>
+    </a>
     <a href="teken.html" class="home-tile" style="text-decoration:none;position:relative">
       <div class="tile-emoji">🎨</div>
       <div class="tile-label">Tekenstudio</div>
@@ -1459,6 +1465,58 @@
         </button>
       </div>
       <div id="geheim-bevestiging" style="font-size:0.8rem;color:var(--mint);margin-top:8px;min-height:18px;font-weight:700"></div>
+    </div>
+
+    <!-- 📚 Leervoortgang -->
+    <div class="card accent-sky">
+      <h2>📚 Leervoortgang</h2>
+      <div id="ld-overzicht" style="font-size:0.86rem;line-height:1.6"></div>
+      <div style="font-weight:800;font-size:0.82rem;margin:14px 0 6px">📅 Oefendagen (laatste 14 dagen)</div>
+      <div id="ld-dagen" style="display:flex;gap:4px;flex-wrap:wrap"></div>
+      <details style="margin-top:14px">
+        <summary style="font-weight:800;font-size:0.85rem;cursor:pointer">✏️ Waar ze laatst fouten maakte</summary>
+        <div id="ld-fouten" style="font-size:0.82rem;color:var(--muted);line-height:1.7;margin-top:8px"></div>
+      </details>
+      <details style="margin-top:10px">
+        <summary style="font-weight:800;font-size:0.85rem;cursor:pointer">⚙️ Startniveau aanpassen</summary>
+        <p style="font-size:0.78rem;color:var(--muted);margin:8px 0">Weet de juf op welk niveau ze zit? Zet hier vanaf welk niveau alles open staat.</p>
+        <div id="ld-start" style="display:grid;gap:8px"></div>
+      </details>
+    </div>
+
+    <!-- 🏆 Beloningsladder -->
+    <div class="card accent-yellow">
+      <h2>🏆 Beloningsladder</h2>
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:12px">Zet hier wat Milou verdient. Haalt ze een mijlpaal, dan krijgt ze een bon in de app en krijg jij een mailtje.</p>
+      <div id="bl-lijst" style="display:grid;gap:8px;margin-bottom:14px"></div>
+      <div style="background:var(--bg);border-radius:14px;padding:12px;display:grid;gap:8px">
+        <div style="font-weight:800;font-size:0.85rem">➕ Nieuwe beloning</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <select id="bl-type" onchange="blTypeWissel()" style="flex:1;min-width:140px;border:2px solid var(--pink2);border-radius:12px;padding:8px;font-family:'Nunito',sans-serif;font-size:0.85rem;background:var(--card);color:var(--text)">
+            <option value="sterren">⭐ Aantal sterren erbij</option>
+            <option value="oefendagen">📅 Aantal oefendagen</option>
+            <option value="niveau">🎯 Niveau halen</option>
+          </select>
+          <select id="bl-onderdeel" style="display:none;flex:1;min-width:120px;border:2px solid var(--pink2);border-radius:12px;padding:8px;font-family:'Nunito',sans-serif;font-size:0.85rem;background:var(--card);color:var(--text)">
+            <option value="spelling">Spelling</option><option value="lezen">Lezen</option><option value="grammatica">Grammatica</option>
+          </select>
+          <input id="bl-drempel" type="number" min="1" inputmode="numeric" placeholder="Aantal" style="width:90px;border:2px solid var(--pink2);border-radius:12px;padding:8px;font-family:'Nunito',sans-serif;font-size:0.85rem;background:var(--card);color:var(--text)">
+        </div>
+        <input id="bl-beloning" type="text" placeholder="Beloning, bijv. Samen naar de bios 🍿" style="border:2px solid var(--pink2);border-radius:12px;padding:9px 12px;font-family:'Nunito',sans-serif;font-size:0.88rem;background:var(--card);color:var(--text)">
+        <div id="bl-hint" style="font-size:0.75rem;color:var(--muted)"></div>
+        <button onclick="blToevoegen()" style="background:var(--yellow);border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:10px;border-radius:12px;color:#7a5a00;font-size:0.88rem">Beloning toevoegen</button>
+      </div>
+    </div>
+
+    <!-- 🎟️ Verdiende bonnen -->
+    <div class="card accent-pink">
+      <h2>🎟️ Verdiende bonnen</h2>
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:10px">Heeft ze haar beloning gekregen? Zet de bon dan op ingewisseld.</p>
+      <div id="bon-beheer" style="display:grid;gap:8px"></div>
+      <div style="border-top:1px solid var(--pink2);margin-top:14px;padding-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <button onclick="blTestMail()" style="background:var(--card);border:2px solid var(--pink2);cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:8px 14px;border-radius:50px;color:var(--text);font-size:0.8rem">📧 Stuur testmail</button>
+        <span id="mail-status" style="font-size:0.78rem;color:var(--muted);font-weight:700"></span>
+      </div>
     </div>
 
     <!-- Dagboek inzien (optioneel) -->
@@ -2559,6 +2617,120 @@ function uitloggenOuder() {
 function laadOuderDashboard() {
   tekenStemmingGrafiek();
   laadDagboekStats();
+  laadLeerDashboard();
+}
+
+// ════════════════════════════════════════════════════
+//  📚 LEERVOORTGANG & 🏆 BELONINGEN (ouderdashboard)
+// ════════════════════════════════════════════════════
+const AANTAL_NIVEAUS = { spelling: 10, lezen: 5, grammatica: 8 };
+function htmlVeilig(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+function laadLeerDashboard() {
+  if (typeof MB === 'undefined') return;
+  const v = MB.voortgang(), log = MB.oefenlog();
+  // Overzicht per onderdeel
+  let h = '<div style="display:grid;gap:8px">';
+  h += '<div style="font-weight:800">⭐ ' + MB.sterren() + ' sterren · 📅 ' + MB.oefendagen() + ' oefendagen</div>';
+  Object.keys(MB.ONDERDELEN).forEach(o => {
+    const x = v[o], hoog = MB.hoogsteNiveau(o), pct = x.totaal ? Math.round(x.goed / x.totaal * 100) : 0, n = AANTAL_NIVEAUS[o];
+    const laatst = x.laatst ? new Date(x.laatst).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) : 'nog niet';
+    h += '<div style="background:var(--bg);border-radius:12px;padding:10px 12px">'
+      + '<div style="display:flex;justify-content:space-between;font-weight:800"><span>' + MB.ONDERDELEN[o] + '</span><span>niveau ' + (hoog || '–') + ' / ' + n + '</span></div>'
+      + '<div style="height:8px;background:var(--pink2);border-radius:8px;overflow:hidden;margin:6px 0"><div style="height:100%;width:' + Math.round(hoog / n * 100) + '%;background:linear-gradient(90deg,#ff6eb4,#ffb347)"></div></div>'
+      + '<div style="font-size:0.78rem;color:var(--muted)">' + pct + '% goed bij de eerste poging · ' + x.totaal + ' vragen · laatst: ' + laatst + (x.start > 1 ? ' · start bij niveau ' + x.start : '') + '</div></div>';
+  });
+  h += '</div>';
+  document.getElementById('ld-overzicht').innerHTML = h;
+  // Oefendagen
+  const dg = document.getElementById('ld-dagen'); dg.innerHTML = '';
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    const e = log[key], s = document.createElement('div');
+    s.title = d.toLocaleDateString('nl-NL') + (e ? ': ' + e.vragen + ' vragen' : '');
+    s.style.cssText = 'width:30px;height:38px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:0.62rem;font-weight:800;' + (e ? 'background:#a8e6cf;color:#1f5a3f' : 'background:var(--bg);color:var(--muted)');
+    s.innerHTML = '<span>' + ['zo','ma','di','wo','do','vr','za'][d.getDay()] + '</span><span>' + (e ? (e.vragen || '✓') : '·') + '</span>';
+    dg.appendChild(s);
+  }
+  // Fouten
+  let f = '';
+  Object.keys(MB.ONDERDELEN).forEach(o => {
+    const lijst = v[o].fouten.slice(0, 8);
+    if (lijst.length) f += '<b style="color:var(--text)">' + MB.ONDERDELEN[o] + '</b><br>' + lijst.map(x => '• ' + htmlVeilig(x.w)).join('<br>') + '<br>';
+  });
+  document.getElementById('ld-fouten').innerHTML = f || 'Nog geen fouten, of nog niet geoefend.';
+  // Startniveau
+  const st = document.getElementById('ld-start'); st.innerHTML = '';
+  Object.keys(MB.ONDERDELEN).forEach(o => {
+    const rij = document.createElement('label');
+    rij.style.cssText = 'display:flex;justify-content:space-between;align-items:center;font-size:0.85rem;font-weight:700';
+    let opts = '';
+    for (let i = 1; i <= AANTAL_NIVEAUS[o]; i++) opts += '<option value="' + i + '"' + (i === v[o].start ? ' selected' : '') + '>Niveau ' + i + '</option>';
+    rij.innerHTML = '<span>' + MB.ONDERDELEN[o] + '</span><select style="border:2px solid var(--pink2);border-radius:10px;padding:6px;font-family:Nunito,sans-serif;background:var(--card);color:var(--text)">' + opts + '</select>';
+    rij.querySelector('select').addEventListener('change', function () {
+      const vv = MB.voortgang(); vv[o].start = parseInt(this.value, 10); vv[o].instap = true; MB.bewaarVoortgang(vv); laadLeerDashboard();
+    });
+    st.appendChild(rij);
+  });
+  laadBeloningBeheer();
+}
+function laadBeloningBeheer() {
+  const l = MB.ladder(), el = document.getElementById('bl-lijst');
+  el.innerHTML = l.length ? '' : '<div style="font-size:0.85rem;color:var(--muted)">Nog geen beloningen. Voeg er hieronder een toe.</div>';
+  l.forEach((b, i) => {
+    const st = Math.min(MB.stand(b), b.drempel), pct = Math.round(st / b.drempel * 100);
+    const r = document.createElement('div');
+    r.style.cssText = 'background:var(--bg);border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center';
+    r.innerHTML = '<div style="flex:1;min-width:0"><div class="bl-naam" style="font-weight:800;font-size:0.9rem"></div>'
+      + '<div style="font-size:0.75rem;color:var(--muted)">' + htmlVeilig(MB.omschrijf(b)) + (b.bereikt ? ' · ✅ behaald op ' + new Date(b.datum).toLocaleDateString('nl-NL') : ' · ' + (b.type === 'niveau' ? 'nu niveau ' + st : st + ' van ' + b.drempel)) + '</div>'
+      + (b.bereikt ? '' : '<div style="height:6px;background:var(--pink2);border-radius:6px;overflow:hidden;margin-top:6px"><div style="height:100%;width:' + pct + '%;background:#ffb347"></div></div>')
+      + '</div><button aria-label="Verwijder" style="background:none;border:none;cursor:pointer;font-size:1.1rem">🗑️</button>';
+    r.querySelector('.bl-naam').textContent = b.beloning;
+    r.querySelector('button').addEventListener('click', function () {
+      if (!confirm('Beloning "' + b.beloning + '" verwijderen?')) return;
+      const ll = MB.ladder(); ll.splice(i, 1); MB.bewaarLadder(ll); laadBeloningBeheer();
+    });
+    el.appendChild(r);
+  });
+  blTypeWissel();
+  // Bonnen
+  const bn = MB.bonnen(), be = document.getElementById('bon-beheer');
+  be.innerHTML = bn.length ? '' : '<div style="font-size:0.85rem;color:var(--muted)">Nog geen bonnen verdiend.</div>';
+  bn.forEach((b, i) => {
+    const r = document.createElement('label');
+    r.style.cssText = 'display:flex;gap:10px;align-items:center;background:var(--bg);border-radius:12px;padding:10px 12px;cursor:pointer' + (b.ingewisseld ? ';opacity:.6' : '');
+    r.innerHTML = '<input type="checkbox"' + (b.ingewisseld ? ' checked' : '') + ' style="width:20px;height:20px;accent-color:#ff6eb4">'
+      + '<div style="flex:1"><div style="font-weight:800;font-size:0.88rem"></div><div style="font-size:0.75rem;color:var(--muted)">' + htmlVeilig(b.mijlpaal) + ' · ' + new Date(b.datum).toLocaleDateString('nl-NL') + ' · ' + b.code + '</div></div>';
+    r.querySelector('div div').textContent = b.beloning;
+    r.querySelector('input').addEventListener('change', function () { const x = MB.bonnen(); x[i].ingewisseld = this.checked; MB.bewaarBonnen(x); laadBeloningBeheer(); });
+    be.appendChild(r);
+  });
+  const q = MB.wachtrij().length;
+  document.getElementById('mail-status').textContent = q ? '⏳ ' + q + ' mail(s) wachten op verzending' : '';
+}
+function blTypeWissel() {
+  const t = document.getElementById('bl-type').value;
+  document.getElementById('bl-onderdeel').style.display = t === 'niveau' ? '' : 'none';
+  document.getElementById('bl-hint').textContent = t === 'sterren' ? 'Telt vanaf nu. Ze heeft er nu ' + MB.sterren() + ', die tellen niet mee.'
+    : t === 'oefendagen' ? 'Telt alle dagen waarop ze in het leer- of taalboek oefent (nu ' + MB.oefendagen() + ').'
+    : 'Spelling heeft 10 niveaus, grammatica 8 en lezen 5.';
+}
+function blToevoegen() {
+  const t = document.getElementById('bl-type').value, d = parseInt(document.getElementById('bl-drempel').value, 10);
+  const bel = document.getElementById('bl-beloning').value.trim(), o = document.getElementById('bl-onderdeel').value;
+  if (!d || d < 1) { alert('Vul een aantal in.'); return; }
+  if (!bel) { alert('Vul in wat de beloning is.'); return; }
+  if (t === 'niveau' && d > AANTAL_NIVEAUS[o]) { alert(MB.ONDERDELEN[o] + ' heeft ' + AANTAL_NIVEAUS[o] + ' niveaus.'); return; }
+  const b = { id: 'b' + Date.now(), type: t, drempel: d, beloning: bel, bereikt: false };
+  if (t === 'niveau') b.onderdeel = o;
+  if (t === 'sterren') b.basis = MB.sterren();
+  const l = MB.ladder(); l.push(b); MB.bewaarLadder(l);
+  document.getElementById('bl-drempel').value = ''; document.getElementById('bl-beloning').value = '';
+  laadBeloningBeheer();
+}
+function blTestMail() {
+  const s = document.getElementById('mail-status'); s.textContent = '⏳ Bezig met versturen…';
+  MB.testMail(function (ok, err) { s.textContent = ok ? '✅ Testmail verstuurd! Kijk in je inbox.' : '❌ Niet gelukt: ' + ((err && (err.text || err.status)) || 'controleer de EmailJS-template'); });
 }
 function tekenStemmingGrafiek() {
   const canvas = document.getElementById('stemmingGrafiek');
@@ -2792,6 +2964,7 @@ nieuwBericht();
 </script>
 
 <!-- 📦 Data bestand — pas data.js aan voor updates, niet dit bestand! -->
+<script src="beloningen.js"></script>
 <script src="data.js"></script>
 <script>
   // Dagquote — gebruikt AI quotes als beschikbaar, anders DAGQUOTES uit data.js

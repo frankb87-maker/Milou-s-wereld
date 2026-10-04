@@ -431,6 +431,11 @@ canvas.overtrek-canvas {
         <div class="mk-naam">Overtrekken</div>
         <div class="mk-sub">Cijfers & letters</div>
       </div>
+      <a class="module-kaart" href="taal.html" style="text-decoration:none;color:inherit">
+        <div class="mk-emoji">📝</div>
+        <div class="mk-naam">Taalboek</div>
+        <div class="mk-sub">Spelling, lezen & grammatica</div>
+      </a>
       <div class="module-kaart" onclick="startKlok()">
         <div class="mk-emoji">🕐</div>
         <div class="mk-naam">Klokkijken</div>
@@ -558,6 +563,7 @@ canvas.overtrek-canvas {
 
 </div>
 
+<script src="beloningen.js"></script>
 <script>
 // ══════════════════════════════════════════════════
 //  STATE & HELPERS
@@ -577,9 +583,16 @@ function slaaSterrenOp() {
   localStorage.setItem('milou_leer_sterren', totaalSterren);
   document.getElementById('totaal-sterren').textContent = totaalSterren;
 }
+let beloningTimer = null;
 function voegSterToe(aantal, x, y) {
   totaalSterren += aantal;
   slaaSterrenOp();
+  // Telt mee voor oefendagen en de beloningsladder (zie beloningen.js)
+  if (typeof MB !== 'undefined') {
+    MB.logOefening(null, 1, 1);
+    clearTimeout(beloningTimer);
+    beloningTimer = setTimeout(function () { MB.check(); }, 1500);
+  }
   for (let i = 0; i < aantal; i++) {
     setTimeout(() => {
       const s = document.createElement('div');
