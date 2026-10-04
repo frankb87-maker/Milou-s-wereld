@@ -66,7 +66,7 @@ h1.titel { font-family: 'Pacifico', cursive; font-weight: 400; color: var(--roze
 
 /* Niveaus */
 .terug-rij { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-.terug-knop { background: var(--wit); border: none; box-shadow: var(--shadow); border-radius: 50px; padding: 8px 14px; font-weight: 800; font-size: 0.85rem; cursor: pointer; }
+.terug-knop { white-space: nowrap; background: var(--wit); border: none; box-shadow: var(--shadow); border-radius: 50px; padding: 8px 14px; font-weight: 800; font-size: 0.85rem; cursor: pointer; }
 .scherm-kop { font-weight: 900; font-size: 1.3rem; }
 .instap-kaart { background: var(--kleur2); border-radius: 20px; padding: 16px; margin-bottom: 16px; display: flex; gap: 12px; align-items: center; }
 .instap-kaart p { font-size: 0.88rem; font-weight: 700; line-height: 1.4; flex: 1; }
@@ -101,6 +101,25 @@ h1.titel { font-family: 'Pacifico', cursive; font-weight: 400; color: var(--roze
 .lees-tekst { background: var(--wit); border-radius: 20px; padding: 18px 18px 14px; box-shadow: var(--shadow); margin-bottom: 14px; }
 .lees-tekst h3 { font-size: 1.1rem; font-weight: 900; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .lees-tekst p { font-size: 1.05rem; line-height: 1.75; max-width: 62ch; }
+.kort-regel { font-size: 1.25rem; font-weight: 900; line-height: 1.4; margin: 6px 0 4px; }
+.meer { margin-top: 14px; }
+.meer summary { font-weight: 900; font-size: 0.9rem; color: var(--kleur); cursor: pointer; }
+.meer[open] summary { margin-bottom: 8px; }
+.spiek { background: #f7f3ff; border: 2px dashed var(--kleur2); border-radius: 14px; padding: 10px 12px; margin-bottom: 14px; font-size: 0.9rem; line-height: 1.5; }
+.sp-rij { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+.sp-rij span { background: var(--wit); border-radius: 999px; padding: 4px 10px; font-weight: 800; font-size: 0.88rem; }
+.sp-test { font-weight: 700; }
+.spiek b { color: var(--kleur); }
+.wu { margin-top: 8px; background: rgba(255,255,255,0.7); border-radius: 10px; padding: 8px 10px; line-height: 1.7; font-weight: 700; }
+.stappen-blok { margin-top: 14px; background: #f7f3ff; border-radius: 14px; padding: 12px 14px; }
+.st-kop, .vb-kop { font-weight: 900; font-size: 0.85rem; margin-bottom: 6px; color: var(--tekst); }
+.stappen-blok ol { padding-left: 22px; line-height: 1.6; font-size: 0.98rem; }
+.stappen-blok li { margin: 4px 0; }
+.stappen-blok b { color: var(--kleur); }
+.letop { margin-top: 12px; background: #fff8d6; color: #6b4e00; border-radius: 14px; padding: 10px 14px; font-size: 0.93rem; line-height: 1.5; }
+.hulp-knop { margin-right: auto; margin-left: 8px; font-size: 0.8rem; }
+.hulp-paneel { background: var(--wit); border-radius: 20px; padding: 16px; box-shadow: var(--shadow); margin-bottom: 14px; border: 2px solid var(--kleur2); }
+.hulp-paneel[hidden] { display: none; }
 .stem-info { margin-top: 22px; text-align: center; font-size: 0.78rem; font-weight: 700; color: var(--muted); line-height: 1.5; }
 .stem-info button { border: 2px solid #f0e3ec; background: var(--wit); border-radius: 999px; padding: 5px 12px; font-weight: 900; font-size: 0.78rem; cursor: pointer; margin-left: 6px; }
 .lees-hulp { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 10px; }
@@ -211,8 +230,12 @@ h1.titel { font-family: 'Pacifico', cursive; font-weight: 400; color: var(--roze
     <div class="uitleg-kaart">
       <h2 id="uitleg-titel"></h2>
       <div class="nv-groep" id="uitleg-groep"></div>
+      <div class="kort-regel" id="uitleg-kort"></div>
       <div class="regel" id="uitleg-regel"></div>
+      <div class="stappen-blok" id="uitleg-stappen"></div>
       <div class="voorbeeld" id="uitleg-voorbeeld"></div>
+      <div class="letop" id="uitleg-letop"></div>
+      <details class="meer" id="uitleg-meer"><summary>📖 Meer uitleg</summary><div id="uitleg-meer-inhoud"></div></details>
       <div class="knop-rij">
         <button class="knop licht" id="uitleg-spreek" onclick="spreekUitleg()">🔊 Lees voor</button>
         <button class="knop" onclick="startOefenen()">Start oefenen</button>
@@ -224,9 +247,11 @@ h1.titel { font-family: 'Pacifico', cursive; font-weight: 400; color: var(--roze
   <div class="scherm" id="scherm-oefen">
     <div class="oefen-kop">
       <button class="terug-knop" onclick="stopOefenen()">✕ Stop</button>
+      <button class="terug-knop hulp-knop" id="hulp-knop" onclick="toonHulp()">💡 Hulp</button>
       <div class="stippen" id="stippen"></div>
     </div>
     <div class="oefen-titel" id="oefen-titel" style="margin-bottom:10px"></div>
+    <div class="hulp-paneel" id="hulp-paneel" hidden></div>
     <div id="lees-plek"></div>
     <div class="vraag-kaart" id="vraag-kaart"></div>
     <div class="volgende-rij" id="volgende-rij"></div>
@@ -325,44 +350,84 @@ const DATA = {
   grammatica: {
     naam: 'Grammatica', emoji: '🧩', kleur: '#9b7fd6', kleur2: '#efe9fb',
     niveaus: [
-      { titel: 'Zelfstandig naamwoord', groep: 'Groep 4 – 5', opdracht: 'Tik op alle zelfstandige naamwoorden.',
-        regel: "Een <b>zelfstandig naamwoord</b> is een mens, dier of ding. Test: kun je er <b>de</b>, <b>het</b> of <b>een</b> voor zetten? Dan is het een zelfstandig naamwoord.",
-        voorbeeld: "de <b>hond</b> · het <b>park</b> · een <b>appel</b>",
+      { titel: 'Zelfstandig naamwoord', groep: 'Groep 4 – 5', opdracht: "Tik de zelfstandige naamwoorden aan.",
+        spiek: "<div class='sp-rij'><span>👩 mens</span><span>🐶 dier</span><span>📦 ding</span><span>🌳 plek</span></div><div class='sp-test'>Past <b>de</b>, <b>het</b> of <b>een</b> ervoor? ✓</div>",
+        kort: "Een woord voor een mens, dier, ding of plek.",
+        kortVoorbeeld: "👩 juf · 🐶 hond · 📦 fiets · 🌳 park",
+        regel: "Een zelfstandig naamwoord is een woord voor een <b>mens</b>, een <b>dier</b>, een <b>ding</b> of een <b>plek</b>. Ook woorden voor dingen die je niet kunt vastpakken horen erbij, zoals <b>het ontbijt</b> of <b>het feest</b>.",
+        voorbeeld: "👩 mens: de juf, mijn oma<br>🐶 dier: de hond, een kat<br>🚲 ding: de fiets, het boek<br>🌳 plek: het park, de keuken",
+        stappen: ["Lees de zin rustig.", "Zet voor elk woord <b>de</b>, <b>het</b> of <b>een</b>.", "Klinkt dat goed? Dan is het een zelfstandig naamwoord: <i>het park</i> ✓", "Klinkt het raar? Dan is het er geen: <i>de rent</i> ✗"],
+        letop: "In één zin staan vaak twee of drie zelfstandige naamwoorden. Tik ze allemaal aan! Woordjes als <b>de, het, een, mijn, op</b> en <b>in</b> zijn zelf nooit een zelfstandig naamwoord.",
         tip: "Zet er de, het of een voor. Klinkt dat goed? Dan is het een zelfstandig naamwoord.",
         items: ["De *hond* rent door het *park*.","Het *kind* eet een *appel* in de *keuken*.","Mijn *oma* heeft een rode *fiets*.","De *juf* leest een *boek* voor.","Op het *plein* staat een grote *boom*.","Een *kat* slaapt op de *bank*.","Mijn *vader* bakt *pannenkoeken* voor het *ontbijt*.","De *vogel* zit in zijn *nest*.","In de *tas* zitten drie *pennen*.","Het *meisje* tekent een *paard*.","De *zon* schijnt op het *strand*.","Mijn *vriendin* woont in een groot *huis*."] },
-      { titel: 'Werkwoord', groep: 'Groep 5', opdracht: 'Tik op alle werkwoorden.',
-        regel: "Een <b>werkwoord</b> zegt wat iemand <b>doet</b> of wat er <b>gebeurt</b>. Test: kun je er <b>ik</b> of <b>wij</b> voor zetten? Ik loop, wij lopen. Soms staan er twee werkwoorden in een zin!",
-        voorbeeld: "De kinderen <b>spelen</b> buiten. · Ik <b>wil</b> een ijsje <b>kopen</b>.",
+      { titel: 'Werkwoord', groep: 'Groep 5', opdracht: "Tik de werkwoorden aan.",
+        spiek: "<div class='sp-rij'><span>🏃 doen</span><span>🌧️ gebeuren</span></div><div class='sp-test'>Past <b>ik</b> of <b>wij</b> ervoor? ✓</div>",
+        kort: "Een woord voor wat je doet.",
+        kortVoorbeeld: "🏃 lopen · 🍽️ eten · 😂 lachen · 🌧️ regenen",
+        regel: "Een werkwoord zegt wat iemand <b>doet</b> (lopen, eten, lachen) of wat er <b>gebeurt</b> (regenen). Ook <b>hebben</b>, <b>zijn</b>, <b>willen</b>, <b>mogen</b> en <b>kunnen</b> zijn werkwoorden.",
+        voorbeeld: "De kinderen <b>spelen</b> buiten.<br>Oma <b>heeft</b> een taart <b>gebakken</b>.",
+        stappen: ["Zoek in de zin wat er gedaan wordt of wat er gebeurt.", "Test: kun je er <b>ik</b> of <b>wij</b> voor zetten? <i>wij spelen</i> ✓, <i>ik eet</i> ✓", "Kijk ook naar het <b>einde</b> van de zin. Daar staat vaak nog een werkwoord: Ik <b>wil</b> een ijsje <b>kopen</b>."],
+        letop: "Een zin kan twee werkwoorden hebben. Tik ze dan allebei aan!",
         tip: "Zet er ik of wij voor. Lukt dat? Dan is het een werkwoord.",
         items: ["De kinderen *spelen* buiten.","Ik *eet* een broodje.","Mijn broer *zwemt* in het meer.","Wij *lachen* om de grap.","De kat *springt* op de tafel.","Ze *schrijft* een kaartje.","Oma *heeft* een taart *gebakken*.","Jij *mag* morgen *kiezen*.","De vogels *fluiten* in de boom.","Hij *fietst* snel naar huis.","Ik *wil* een ijsje *kopen*.","Het *regent* de hele dag."] },
-      { titel: 'Bijvoeglijk naamwoord', groep: 'Groep 5 – 6', opdracht: 'Tik op alle bijvoeglijke naamwoorden.',
-        regel: "Een <b>bijvoeglijk naamwoord</b> zegt <b>hoe</b> iets is: groot, rood, lief, spannend. Het staat vaak vóór een zelfstandig naamwoord.",
-        voorbeeld: "een <b>rode</b> jas · de <b>kleine</b> hond",
+      { titel: 'Bijvoeglijk naamwoord', groep: 'Groep 5 – 6', opdracht: "Tik de bijvoeglijke naamwoorden aan.",
+        spiek: "<div class='sp-rij'><span>🎨 kleur</span><span>📏 groot of klein</span><span>😊 gevoel</span></div><div class='sp-test'><b>Hoe</b> is het?</div>",
+        kort: "Een woord dat zegt hoe iets is.",
+        kortVoorbeeld: "een <b>rode</b> jas · de <b>kleine</b> hond",
+        regel: "Een bijvoeglijk naamwoord vertelt <b>hoe iets is</b>: de kleur, de grootte, hoe het voelt of hoe het eruitziet. Het staat meestal vlak <b>vóór</b> een zelfstandig naamwoord.",
+        voorbeeld: "🎨 kleur: een <b>rode</b> jas<br>📏 grootte: de <b>kleine</b> hond<br>😊 gevoel: een <b>spannende</b> film",
+        stappen: ["Zoek eerst het zelfstandig naamwoord, bijvoorbeeld <i>jas</i>.", "Kijk naar het woord dat ervóór staat.", "Vraag: <b>hoe is</b> de jas? Rood! Dan is <b>rode</b> het bijvoeglijk naamwoord."],
+        letop: "<b>De, het</b> en <b>een</b> zijn geen bijvoeglijke naamwoorden. In <i>een rode jas</i> tik je alleen op <b>rode</b>.",
         tip: "Vraag: hoe is het? Een rode jas → hoe is de jas? Rood!",
         items: ["Ik heb een *rode* jas.","De *kleine* hond blaft.","We wonen in een *oud* huis.","Wat een *mooie* tekening!","De *grote* olifant drinkt water.","Ze draagt *roze* schoenen.","Het was een *spannende* film.","Mijn *lieve* oma komt op bezoek.","De *warme* soep staat op tafel.","Een *zachte* knuffel ligt op bed.","Ik zie een *gele* vlinder.","Hij heeft *blauwe* ogen en *bruin* haar."] },
       { titel: 'De of het', groep: 'Groep 5 – 6',
-        regel: "Een zelfstandig naamwoord krijgt <b>de</b> of <b>het</b>. Vaak moet je dat onthouden. Twee handige regels: <b>verkleinwoorden</b> zijn altijd <b>het</b> (het tafeltje) en <b>meervoud</b> is altijd <b>de</b> (de huizen).",
-        voorbeeld: "het huis · de huizen · het huisje",
+        spiek: "<div class='sp-test'>👥 Meer dan één → <b>de</b> · 🤏 Met -je → <b>het</b></div>",
+        kort: "Welk woordje hoort ervoor: de of het?",
+        kortVoorbeeld: "het huis · de huizen · het huisje",
+        regel: "Voor een zelfstandig naamwoord staat <b>de</b> of <b>het</b>. Vaak moet je dat onthouden. Zeg het hardop en luister wat goed klinkt. Er zijn ook twee handige regels!",
+        voorbeeld: "het huis → de huizen → het huisje",
+        stappen: ["Is het <b>meer dan één</b> (meervoud)? Dan is het altijd <b>de</b>: de huizen, de kinderen.", "Is het een <b>verkleinwoord</b> met -je? Dan is het altijd <b>het</b>: het huisje, het stoeltje.", "Geen van beide? Zeg ze allebei hardop: <i>de huis</i> of <i>het huis</i>? Welke klinkt goed?"],
+        letop: "Mensen zijn bijna altijd <b>de</b>: de juf, de man. Maar let op: het is <b>het meisje</b> en <b>het kind</b>!",
         tip: "Verkleinwoord = altijd het. Meervoud = altijd de.",
         items: ["… huis>het|de","… tafel>de|het","… meisje>het|de","… boek>het|de","… raam>het|de","… stoel>de|het","… paard>het|de","… fiets>de|het","… water>het|de","… school>de|het","… kind>het|de","… deur>de|het","… bed>het|de","… telefoon>de|het","… feest>het|de","… boeken>de|het","… huisje>het|de","… kinderen>de|het","… stoeltje>het|de","… konijn>het|de"] },
-      { titel: 'Persoonsvorm', groep: 'Groep 6', opdracht: 'Tik op de persoonsvorm.',
-        regel: "De <b>persoonsvorm</b> is een werkwoord. Je vindt hem met de <b>vraagproef</b>: maak van de zin een vraag. Het woord dat dan vooraan komt, is de persoonsvorm. Milou <b>loopt</b> naar school → <b>Loopt</b> Milou naar school?",
-        voorbeeld: "Wij <b>gaan</b> morgen zwemmen. → <b>Gaan</b> wij morgen zwemmen?",
+      { titel: 'Persoonsvorm', groep: 'Groep 6', opdracht: "Tik de persoonsvorm aan.",
+        spiek: "<div class='sp-test'>Maak er een <b>vraag</b> van. Wat staat <b>vooraan</b>?</div>",
+        kort: "Maak er een vraag van. Het werkwoord dat vooraan komt, is de persoonsvorm.",
+        kortVoorbeeld: "Wij <b>gaan</b> zwemmen. → <b>Gaan</b> wij zwemmen?",
+        regel: "De persoonsvorm is het belangrijkste werkwoord van de zin. Elke zin heeft er precies <b>één</b>. Je vindt hem met de <b>vraagproef</b>.",
+        voorbeeld: "Wij gaan morgen zwemmen. → <b>Gaan</b> wij morgen zwemmen? → <b>gaan</b>",
+        stappen: ["Maak van de zin een vraag die je met <b>ja</b> of <b>nee</b> kunt beantwoorden.", "Het werkwoord dat dan <b>vooraan</b> staat, is de persoonsvorm.", "Milou loopt naar school. → <b>Loopt</b> Milou naar school? Dus de persoonsvorm is <b>loopt</b>.", "Twijfel je? Zet de zin in een andere tijd (vandaag → gisteren). Het werkwoord dat verandert, is de persoonsvorm."],
+        letop: "Staan er twee werkwoorden in de zin? Maar één ervan is de persoonsvorm. Bij <i>gaan zwemmen</i> is het <b>gaan</b>.",
         tip: "Maak er een vraag van. Het woord dat vooraan komt, is de persoonsvorm.",
         items: ["Milou *loopt* naar school.","Wij *gaan* morgen zwemmen.","De hond *heeft* een bot gevonden.","Ik *wil* graag een ijsje.","Vandaag *speelt* mijn broer buiten.","Zij *zijn* naar de film geweest.","Morgen *komt* opa op bezoek.","De juf *leest* een verhaal voor.","Jullie *moeten* je kamer opruimen.","In de zomer *eten* we vaak buiten.","Het meisje *danst* op het podium.","Gisteren *was* het heel koud."] },
-      { titel: 'Onderwerp', groep: 'Groep 6 – 7', opdracht: 'Tik op alle woorden van het onderwerp.',
-        regel: "Het <b>onderwerp</b> is wie of wat iets doet. Zoek eerst de persoonsvorm. Vraag dan: <b>wie of wat</b> + persoonsvorm? Wie <b>loopt</b> naar school? → <b>Milou</b>. Het onderwerp kan ook uit meer woorden bestaan.",
-        voorbeeld: "<b>De kleine hond</b> blaft hard. → Wie blaft? De kleine hond.",
+      { titel: 'Onderwerp', groep: 'Groep 6 – 7', opdracht: "Tik het onderwerp aan.",
+        spiek: "<div class='sp-test'><b>Wie of wat</b> + werkwoord?</div>",
+        kort: "Wie of wat doet het?",
+        kortVoorbeeld: "<b>De hond</b> blaft. → Wie blaft? <b>De hond</b>.",
+        regel: "Het onderwerp is <b>wie of wat</b> iets doet in de zin. Dat kan één woord zijn (Milou, wij) of een groepje woorden (de kleine hond).",
+        voorbeeld: "Morgen gaat <b>mijn oma</b> naar de markt.<br>→ Wie gaat? <b>Mijn oma</b>.",
+        stappen: ["Zoek eerst de persoonsvorm met de vraagproef.", "Vraag: <b>wie of wat</b> + persoonsvorm? Bijvoorbeeld: wie <b>blaft</b>?", "Het antwoord is het onderwerp: <b>de kleine hond</b>. Tik <b>alle</b> woorden van het antwoord aan."],
+        letop: "Het onderwerp staat niet altijd vooraan! In <i>Vandaag schijnt de zon</i> is <b>de zon</b> het onderwerp.",
         tip: "Vraag: wie of wat + persoonsvorm? Het antwoord is het onderwerp.",
         items: ["*Milou* loopt naar school.","*De kleine hond* blaft hard.","Morgen gaat *mijn oma* naar de markt.","*Wij* spelen op het plein.","*De juf* geeft een toets.","In het park speelden *de kinderen*.","*Mijn beste vriendin* woont in Heemskerk.","Vandaag schijnt *de zon*.","*Papa en ik* bakken een taart.","Op de tafel staat *een vaas met bloemen*.","*Het konijn* eet een wortel.","Gisteren kocht *mijn moeder* nieuwe schoenen."] },
       { titel: 'Tegenwoordige en verleden tijd', groep: 'Groep 7',
-        regel: "Kijk naar de <b>persoonsvorm</b>. <b>Tegenwoordige tijd</b> = het gebeurt nu (ik loop, ik werk). <b>Verleden tijd</b> = het is al gebeurd (ik liep, ik werkte).",
-        voorbeeld: "Ik <b>fiets</b> → nu · Ik <b>fietste</b> → vroeger",
+        spiek: "<div class='sp-test'>⏰ <b>nu</b> of 📅 <b>gisteren</b>?</div>",
+        kort: "Gebeurt het nu, of was het gisteren?",
+        kortVoorbeeld: "Ik <b>fiets</b> ⏰ nu · Ik <b>fietste</b> 📅 gisteren",
+        regel: "Een zin staat in de <b>tegenwoordige tijd</b> (het gebeurt nu) of in de <b>verleden tijd</b> (het is al gebeurd). Je ziet het aan de persoonsvorm.",
+        voorbeeld: "Ik <b>loop</b> → nu · Ik <b>liep</b> → gisteren<br>Ik <b>werk</b> → nu · Ik <b>werkte</b> → gisteren",
+        stappen: ["Zoek de persoonsvorm.", "Past het woord <b>nu</b> of <b>vandaag</b> in de zin? Dan is het de tegenwoordige tijd: <i>Ik fiets nu.</i>", "Past het woord <b>gisteren</b> in de zin? Dan is het de verleden tijd: <i>Ik fietste gisteren.</i>"],
+        letop: "In de verleden tijd eindigt het werkwoord vaak op <b>-te</b> of <b>-de</b> (werkte, speelde). Maar soms verandert het hele woord: lopen → <b>liep</b>, komen → <b>kwam</b>, hebben → <b>had</b>.",
         tip: "Gebeurt het nu? Tegenwoordige tijd. Is het al gebeurd? Verleden tijd.",
         items: ["Ik fiets naar school.>tegenwoordige tijd|verleden tijd","Wij speelden buiten.>verleden tijd|tegenwoordige tijd","De hond blafte hard.>verleden tijd|tegenwoordige tijd","Zij leest een boek.>tegenwoordige tijd|verleden tijd","Opa woonde in Beverwijk.>verleden tijd|tegenwoordige tijd","Het sneeuwt vandaag.>tegenwoordige tijd|verleden tijd","Ik liep naar huis.>verleden tijd|tegenwoordige tijd","Jullie zingen een lied.>tegenwoordige tijd|verleden tijd","Hij kwam te laat.>verleden tijd|tegenwoordige tijd","Mama werkt in de winkel.>tegenwoordige tijd|verleden tijd","We aten pannenkoeken.>verleden tijd|tegenwoordige tijd","De vogel vliegt weg.>tegenwoordige tijd|verleden tijd","Ik had dorst.>verleden tijd|tegenwoordige tijd","Zij heeft een kat.>tegenwoordige tijd|verleden tijd"] },
-      { titel: 'Lijdend voorwerp', groep: 'Groep 8', opdracht: 'Tik op alle woorden van het lijdend voorwerp.',
-        regel: "Het <b>lijdend voorwerp</b> vind je zo: vraag <b>wie of wat</b> + persoonsvorm + onderwerp? Milou eet een appel. → <b>Wat eet Milou?</b> → <b>een appel</b>.",
-        voorbeeld: "Papa wast <b>de auto</b>. → Wat wast papa? De auto.",
+      { titel: 'Lijdend voorwerp', groep: 'Groep 8', opdracht: "Tik het lijdend voorwerp aan.",
+        spiek: "<div class='sp-test'><b>Wat</b> + werkwoord + wie?</div>",
+        kort: "Waar doet iemand iets mee?",
+        kortVoorbeeld: "Papa wast <b>de auto</b>. → Wat wast papa? <b>De auto</b>.",
+        regel: "Het lijdend voorwerp is <b>wie of wat</b> er iets mee gebeurt. Het onderwerp doet iets, en het lijdend voorwerp is waar het mee gedaan wordt.",
+        voorbeeld: "Papa wast de auto. → Wat wast papa? <b>De auto</b>.",
+        stappen: ["Zoek de persoonsvorm en het onderwerp.", "Vraag: <b>wie of wat</b> + persoonsvorm + onderwerp? Bijvoorbeeld: wat <b>eet Milou</b>?", "Het antwoord is het lijdend voorwerp: <b>een appel</b>. Tik alle woorden ervan aan."],
+        letop: "Woordgroepen als <i>in het doel</i> of <i>voor mijn verjaardag</i> horen er niet bij. Die vertellen waar of waarom, en zijn een ander zinsdeel.",
         tip: "Vraag: wat (of wie) + persoonsvorm + onderwerp?",
         items: ["Milou eet *een appel*.","De juf leest *een boek* voor.","Ik zie *de vogel*.","Wij bouwen *een hut*.","Papa wast *de auto*.","Zij koopt *nieuwe schoenen*.","De kat vangt *een muis*.","Ik bel *mijn oma*.","Jij tekent *een mooi paard*.","Opa leest *de krant*.","Hij schopt *de bal* in het doel.","Mama bakt *een taart* voor mijn verjaardag."] }
     ]
@@ -604,12 +669,29 @@ function openUitleg(i) {
   $('uitleg-titel').textContent = 'Niveau ' + (i + 1) + ': ' + n.titel;
   $('uitleg-groep').textContent = n.groep;
   $('uitleg-regel').innerHTML = n.regel;
-  $('uitleg-voorbeeld').innerHTML = n.voorbeeld;
+  $('uitleg-voorbeeld').innerHTML = '<div class="vb-kop">Voorbeelden</div>' + n.voorbeeld;
+  const kort = !!n.kort;
+  $('uitleg-kort').innerHTML = kort ? n.kort : ''; $('uitleg-kort').style.display = kort ? '' : 'none';
+  $('uitleg-meer').style.display = kort ? '' : 'none'; $('uitleg-meer').open = false;
+  if (kort) {
+    $('uitleg-voorbeeld').innerHTML = n.kortVoorbeeld;
+    $('uitleg-meer-inhoud').innerHTML = '<div class="regel">' + n.regel + '</div>' + (n.stappen ? '<div class="stappen-blok">' + stappenHTML(n.stappen) + '</div>' : '') + '<div class="voorbeeld">' + n.voorbeeld + '</div>' + (n.letop ? '<div class="letop">⚠️ <b>Let op!</b> ' + n.letop + '</div>' : '');
+  }
+  $('uitleg-regel').style.display = kort ? 'none' : '';
+  $('uitleg-stappen').innerHTML = n.stappen ? stappenHTML(n.stappen) : '';
+  $('uitleg-stappen').style.display = n.stappen && !kort ? '' : 'none';
+  $('uitleg-letop').innerHTML = n.letop ? '⚠️ <b>Let op!</b> ' + n.letop : '';
+  $('uitleg-letop').style.display = n.letop && !kort ? '' : 'none';
   $('uitleg-spreek').style.display = kanSpreken() ? '' : 'none';
   toonScherm('uitleg');
 }
+function stappenHTML(st) {
+  return '<div class="st-kop">🪜 Zo doe je het</div><ol>' + st.map(x => '<li>' + x + '</li>').join('') + '</ol>';
+}
 function spreekUitleg() {
-  const n = DATA[huidigVak].niveaus[huidigNiv], t = zonderHtml(n.regel);
+  const n = DATA[huidigVak].niveaus[huidigNiv];
+  if (n.kort) { spreekReeks([zonderHtml(n.kort), zonderHtml(n.kortVoorbeeld).replace(/[·→]/g, ',')]); return; }
+  const t = zonderHtml(n.regel) + (n.stappen ? ' Zo doe je het. ' + n.stappen.map((x, i) => 'Stap ' + (i + 1) + '. ' + zonderHtml(x).replace(/[✓✗]/g, '') + '.').join(' ') : '') + (n.letop ? ' Let op! ' + zonderHtml(n.letop) : '');
   spreekReeks((t.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [t]).map(z => z.trim()).filter(Boolean));
 }
 
@@ -683,6 +765,16 @@ function startInstap() {
 }
 function instapBlok(ni) { return schud(DATA[huidigVak].niveaus[ni].items).slice(0, 3).map(it => maakVraag(huidigVak, ni, it, false)); }
 
+function toonHulp() {
+  const p = $('hulp-paneel');
+  if (!p.hidden) { p.hidden = true; return; }
+  const q = ronde.vragen[ronde.i], niv = DATA[ronde.vak].niveaus[q && q.herkomst != null ? q.herkomst : ronde.ni];
+  p.innerHTML = '<div class="regel">' + niv.regel + '</div>' + (niv.stappen ? '<div class="stappen-blok">' + stappenHTML(niv.stappen) + '</div>' : '<div class="voorbeeld">' + niv.voorbeeld + '</div>')
+    + (niv.letop ? '<div class="letop">⚠️ <b>Let op!</b> ' + niv.letop + '</div>' : '')
+    + '<div class="knop-rij" style="margin-top:10px"><button class="knop licht" id="hulp-dicht">Snap ik, verder! 👍</button></div>';
+  p.hidden = false;
+  $('hulp-dicht').addEventListener('click', () => { p.hidden = true; });
+}
 function renderStippen() {
   const st = $('stippen'); st.innerHTML = '';
   const aantal = ronde.instap ? ronde.vragen.length : ronde.telt;
@@ -696,6 +788,7 @@ function renderStippen() {
 let beantwoord = false;
 function toonVraag() {
   beantwoord = false;
+  if ($('hulp-paneel')) $('hulp-paneel').hidden = true;
   const q = ronde.vragen[ronde.i];
   renderStippen();
   $('volgende-rij').innerHTML = '';
@@ -712,7 +805,8 @@ function toonVraag() {
     k.innerHTML = herh + `<div class="vraag-label">Welke letters horen op de streep?</div><div class="gat-woord">${esc(q.voor)}<span class="gat">&nbsp;</span>${esc(q.na)}</div><div class="opties ${q.opties.length === 2 ? 'twee' : ''}" id="opties"></div><div class="feedback" id="fb"></div>`;
     renderOpties(q, true);
   } else if (q.type === 'kies') {
-    k.innerHTML = herh + `<div class="vraag-label">${ronde.vak === 'grammatica' && q.goed.indexOf('tijd') >= 0 ? 'In welke tijd staat deze zin?' : 'Kies het goede antwoord.'}</div><div class="vraag-tekst">${esc(q.vraag)}</div><div class="opties ${q.opties.length === 2 ? 'twee' : ''}" id="opties"></div><div class="feedback" id="fb"></div>`;
+    const nivK = DATA[ronde.vak].niveaus[q.herkomst != null ? q.herkomst : ronde.ni];
+    k.innerHTML = herh + (ronde.vak === 'grammatica' && nivK.spiek ? `<div class="spiek">${nivK.spiek}</div>` : '') + `<div class="vraag-label">${ronde.vak === 'grammatica' && q.goed.indexOf('tijd') >= 0 ? 'In welke tijd staat deze zin?' : 'Kies het goede antwoord.'}</div><div class="vraag-tekst">${esc(q.vraag)}</div><div class="opties ${q.opties.length === 2 ? 'twee' : ''}" id="opties"></div><div class="feedback" id="fb"></div>`;
     renderOpties(q, q.goed.length <= 4);
   } else if (q.type === 'dictee') {
     k.innerHTML = herh + `<div class="vraag-label">🎧 Luister en schrijf het woord op.${q.vraag ? ' Hint: ' + esc(q.vraag.replace(/…/g, '').trim()) : ''}</div><button class="luister-knop" id="luister" aria-label="Luister naar het woord">🔊</button><input class="dictee-veld" id="dictee" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="typ hier"><div class="feedback" id="fb"></div>`;
@@ -722,7 +816,8 @@ function toonVraag() {
     $('check-knop').addEventListener('click', controleerDictee);
     setTimeout(function () { spreekWoord(q.woord, true); }, 350);
   } else if (q.type === 'tik') {
-    k.innerHTML = herh + `<div class="vraag-tekst">${esc(q.opdracht)}</div><div class="zin-woorden" id="woorden"></div><div class="feedback" id="fb"></div>`;
+    const nivT = DATA[ronde.vak].niveaus[q.herkomst != null ? q.herkomst : ronde.ni];
+    k.innerHTML = herh + (nivT.spiek ? `<div class="spiek">${nivT.spiek}</div>` : '') + `<div class="vraag-tekst">${esc(q.opdracht)}</div><div class="zin-woorden" id="woorden"></div><div class="feedback" id="fb"></div>`;
     const w = $('woorden');
     q.gekozen = [];
     q.tokens.forEach((t, i) => {
@@ -781,6 +876,25 @@ function toonLeestekst(plek, t) {
     spreekWoord(woord);
   }));
 }
+
+// ── Uitleg per woord na het antwoord (grammatica niveau 1 en 2) ──
+const ZN_SOORT = {
+  hond: ['🐶 dier', 'de'], park: ['🌳 plek', 'het'], kind: ['👩 mens', 'het'], appel: ['📦 ding', 'de'], keuken: ['🌳 plek', 'de'],
+  oma: ['👩 mens', 'de'], fiets: ['📦 ding', 'de'], juf: ['👩 mens', 'de'], boek: ['📦 ding', 'het'], plein: ['🌳 plek', 'het'],
+  boom: ['🌳 plant', 'de'], kat: ['🐶 dier', 'de'], bank: ['📦 ding', 'de'], vader: ['👩 mens', 'de'], pannenkoeken: ['📦 ding', 'de'],
+  ontbijt: ['🍳 iets wat je eet', 'het'], vogel: ['🐶 dier', 'de'], nest: ['📦 ding', 'het'], tas: ['📦 ding', 'de'], pennen: ['📦 ding', 'de'],
+  meisje: ['👩 mens', 'het'], paard: ['🐶 dier', 'het'], zon: ['☀️ ding in de lucht', 'de'], strand: ['🌳 plek', 'het'], vriendin: ['👩 mens', 'de'], huis: ['🌳 plek', 'het']
+};
+const WW_HEEL = {
+  spelen: 'spelen', eet: 'eten', zwemt: 'zwemmen', lachen: 'lachen', springt: 'springen', schrijft: 'schrijven', heeft: 'hebben',
+  gebakken: 'bakken', mag: 'mogen', kiezen: 'kiezen', fluiten: 'fluiten', fietst: 'fietsen', wil: 'willen', kopen: 'kopen', regent: 'regenen'
+};
+function woordUitleg(niv, woorden) {
+  const schoon = w => w.toLowerCase().replace(/[.,!?]/g, '');
+  if (niv.titel === 'Zelfstandig naamwoord') return woorden.map(w => { const k = schoon(w), d = ZN_SOORT[k]; return (d ? d[0].split(' ')[0] + ' ' : '') + '<b>' + esc(k) + '</b>'; }).join(' · ');
+  if (niv.titel === 'Werkwoord') return woorden.map(w => { const k = schoon(w), h = WW_HEEL[k]; return '🏃 <b>' + esc(k) + '</b>' + (h && h !== k ? ' (' + h + ')' : ''); }).join(' · ');
+  return '';
+}
 function renderOpties(q, groot) {
   const o = $('opties');
   q.opties.forEach(opt => {
@@ -816,7 +930,9 @@ function controleerTik() {
     const isDoel = q.doel.indexOf(i) >= 0, gek = q.gekozen.indexOf(i) >= 0;
     if (isDoel && gek) b.classList.add('goed'); else if (gek) b.classList.add('fout'); else if (isDoel) b.classList.add('gemist');
   });
+  ronde.woordUitleg = woordUitleg(DATA[ronde.vak].niveaus[q.herkomst != null ? q.herkomst : ronde.ni], q.doel.map(i => q.tokens[i]));
   verwerk(juist, q.doel.map(i => q.tokens[i].replace(/[.,!?]/g, '')).join(' '));
+  ronde.woordUitleg = '';
 }
 
 function verwerk(juist, goedAntwoord) {
@@ -839,10 +955,11 @@ function verwerk(juist, goedAntwoord) {
     if (ronde.instap) ronde.instap.goed++;
     fb.className = 'feedback goed';
     fb.innerHTML = ['Goed zo! 🎉', 'Top! ⭐', 'Helemaal goed!', 'Knap gedaan! 💪', 'Yes! 🌸'][Math.floor(Math.random() * 5)] + (s === 2 ? ' Dictee goed: dubbele sterren!' : '');
+    if (ronde.woordUitleg) fb.innerHTML += '<div class="wu">' + ronde.woordUitleg + '</div>';
     if (s) { ronde.verdiend += s; voegSterToe(s); }
   } else {
     fb.className = 'feedback fout';
-    fb.innerHTML = `Bijna! Het goede antwoord is: <b>${esc(goedAntwoord)}</b><br>💡 ${esc(niv.tip)}`;
+    fb.innerHTML = ronde.woordUitleg ? 'Bijna! Goed is:<div class="wu">' + ronde.woordUitleg + '</div>' : `Bijna! Het goede antwoord is: <b>${esc(goedAntwoord)}</b><br>💡 ${esc(niv.tip)}`;
     if (eerste && !ronde.instap) { const kopie = Object.assign({}, q, { herhaling: true }); if (kopie.opties) kopie.opties = schud(kopie.opties); ronde.vragen.push(kopie); }
   }
   if (ronde.instap) ronde.instap.inBlok++;
