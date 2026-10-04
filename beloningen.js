@@ -205,6 +205,20 @@
     const pct = rij.length ? Math.round(rij.reduce((s, x) => s + x.gedaan / x.nodig, 0) / rij.length * 100) : 0;
     return { taken: rij, klaar: b.vooraf || rij.every(x => x.klaar), pct: b.bereikt ? 100 : pct, nogTaken: rij.filter(x => !x.klaar).length };
   }
+  // Alles wat ze in totaal nog moet doen tot deze beloning (inclusief pakketten die eerst komen)
+  function nogTeDoen(b, l) {
+    l = l || ladder();
+    if (b.type !== 'pakket' || b.bereikt) return [];
+    const t = taken(), ba = basis(), lijst = pakketten(l).filter(x => !x.vooraf);
+    const idx = lijst.findIndex(x => x.id === b.id), tot = {};
+    VOLGORDE.forEach(k => { tot[k] = 0; });
+    for (let i = 0; i <= idx; i++) VOLGORDE.forEach(k => { tot[k] += (lijst[i].pakket[k] || 0); });
+    return VOLGORDE.map(k => ({ soort: k, nog: Math.max(0, tot[k] - (t[k] - ba[k])) })).filter(x => x.nog > 0);
+  }
+  function nogTekst(rest) {
+    const delen = rest.map(x => x.nog + ' ' + (x.nog === 1 ? TAKEN[x.soort].een : TAKEN[x.soort].meer));
+    return delen.length > 1 ? delen.slice(0, -1).join(', ') + ' en ' + delen[delen.length - 1] : (delen[0] || '');
+  }
   function stand(b) {
     if (b.type === 'pakket') return pakketStand(b).pct;
     if (b.type === 'dagen') return oefendagen();
@@ -269,6 +283,46 @@
         'Boncode: ' + b.code + '\n\n' + samenvatting());
     });
     return nieuw;
+  }
+
+  // ── "Ik wil een nagellakje, wat moet ik doen?" — zoek de beloning bij een vraag ──
+  const BELONING_WOORDEN = [
+    [/nagellak/, ['nagellak', 'nagellakje', 'nagels', 'kruidvat']],
+    [/ijsje|scoops/, ['ijs', 'ijsje', 'ijsjes', 'scoops', 'mcdonalds', 'mac', 'mcflurry']],
+    [/komkommersushi/, ['komkommersushi', 'dekamarkt', 'deka']],
+    [/robux/, ['robux', 'roblox']],
+    [/action/, ['action']],
+    [/clickeez/, ['clickeez', 'clickies', 'klickies', 'clickie']],
+    [/intertoys/, ['intertoys', 'cadeautje', 'cadeau', 'speelgoed']],
+    [/normal/, ['normal', 'shoppen', 'winkelen', 'makeup', 'make up']],
+    [/bestellen/, ['bestellen', 'bestel', 'butter', 'chicken', 'afhalen', 'point']],
+    [/supermarkt/, ['supermarkt', 'avondeten', 'eten kiezen', 'kiezen wat we eten']],
+    [/schetsboek/, ['schetsboek', 'tekenboek', 'schetsboekje']]
+  ];
+  const STOP = ['een', 'het', 'de', 'bij', 'wat', 'jij', 'kiest', 'we', 'max', 'halen', 'uitzoeken', 'samen', 'voor', 'nieuw', 'nieuwe', 'naar', 'met', 'van'];
+  function norm(t) { return String(t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim(); }
+  function afstand(a, b) {
+    if (Math.abs(a.length - b.length) > 2) return 9;
+    const d = []; for (let i = 0; i <= a.length; i++) d[i] = [i];
+    for (let j = 1; j <= b.length; j++) d[0][j] = j;
+    for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    return d[a.length][b.length];
+  }
+  function zoekBeloning(vraag) {
+    const tekst = ' ' + norm(vraag) + ' ', woorden = tekst.trim().split(' ');
+    let beste = null, top = 0;
+    ladder().forEach(b => {
+      const bt = norm(b.beloning);
+      let sleutels = bt.split(' ').filter(w => w.length >= 4 && STOP.indexOf(w) < 0);
+      BELONING_WOORDEN.forEach(g => { if (g[0].test(bt)) sleutels = sleutels.concat(g[1]); });
+      let score = 0;
+      sleutels.forEach(k => {
+        if (tekst.indexOf(' ' + k + ' ') >= 0 || (k.length >= 6 && tekst.indexOf(k) >= 0)) score += k.length * 2;
+        else if (k.length >= 5) woorden.forEach(w => { if (w.length >= 4 && afstand(w, k) <= (k.length >= 8 ? 2 : 1)) score += k.length; });
+      });
+      if (score > top) { top = score; beste = b; }
+    });
+    return beste;
   }
 
   // Klein meldingetje onderin beeld (stoort niet tijdens het oefenen)
@@ -532,7 +586,7 @@
   window.MB = {
     ONDERDELEN, NAMEN, AANTAL, TAKEN, VOLGORDE, MATEN, sterren, voortgang, bewaarVoortgang, hoogsteNiveau, logOefening, logSterren, oefendagen,
     dagdoel, zetDagdoel, taken, telTaak, pakketStand, pakketTekst, gehaald, volgendeDagen, vandaagStatus, statusTekst, widget, toonPakket, takenHTML, toast, isBonus, nogNodig,
-    ladder, bewaarLadder, laadPapaLadder: () => laadPapaLadder(lees(K.ladder, [])), bonnen, bewaarBonnen: b => schrijf(K.bonnen, b), stand, omschrijf, volgende,
+    zoekBeloning, nogTeDoen, nogTekst, ladder, bewaarLadder, laadPapaLadder: () => laadPapaLadder(lees(K.ladder, [])), bonnen, bewaarBonnen: b => schrijf(K.bonnen, b), stand, omschrijf, volgende,
     check, niveauGehaald, mail, testMail, verwerkWachtrij, toonBon, samenvatting, datumNL,
     oefenlog: () => lees(K.log, {}), wachtrij: () => lees(K.wachtrij, [])
   };
