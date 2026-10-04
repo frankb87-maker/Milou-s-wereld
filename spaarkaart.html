@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>🌸 Milou's Spaarkaart</title>
+<title>🎁 Wat wil ik halen?</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
 <style>
-:root { --roze: #ff6eb4; --roze2: #ffd6ec; --roze3: #fff4fa; --goud: #f5b700; --bg: #fff9fc; --wit: #fff; --tekst: #3a2a3a; --muted: #8a7a8a; --shadow: 0 4px 20px rgba(200,100,160,0.12); }
+:root { --roze: #ff6eb4; --roze2: #ffd6ec; --roze3: #fff4fa; --bg: #fff9fc; --wit: #fff; --tekst: #3a2a3a; --muted: #8a7a8a; --shadow: 0 4px 20px rgba(200,100,160,0.12); }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html { -webkit-text-size-adjust: 100%; }
 body { font-family: 'Nunito', system-ui, sans-serif; background: var(--bg); color: var(--tekst); min-height: 100vh; padding-bottom: env(safe-area-inset-bottom, 0px); }
@@ -15,301 +15,123 @@ button { font-family: inherit; color: inherit; }
 header { position: sticky; top: 0; z-index: 20; background: linear-gradient(135deg, #ff6eb4, #ffb347); padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; box-shadow: 0 4px 16px rgba(255,110,180,0.3); }
 .logo { font-family: 'Pacifico', cursive; font-size: 1.1rem; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.18); }
 .kop-knop { background: rgba(255,255,255,0.3); border: none; border-radius: 50px; padding: 7px 14px; color: #fff; font-weight: 800; font-size: 0.82rem; text-decoration: none; }
-.teller { background: rgba(255,255,255,0.3); border-radius: 50px; padding: 6px 12px; color: #fff; font-weight: 900; font-size: 0.9rem; }
-.container { max-width: 640px; margin: 0 auto; padding: 18px 16px 40px; }
-h1 { font-family: 'Pacifico', cursive; font-weight: 400; color: var(--roze); font-size: 1.7rem; text-align: center; }
-.sub { text-align: center; color: var(--muted); font-size: 0.9rem; font-weight: 700; margin: 2px 0 16px; }
-h2 { font-size: 1.1rem; font-weight: 900; margin: 26px 0 10px; }
-.kaart { background: var(--wit); border-radius: 22px; padding: 16px; box-shadow: var(--shadow); }
-
-/* Zo werkt het */
-.stappen { display: grid; gap: 10px; }
-.stap { display: flex; gap: 12px; align-items: center; }
-.stap-nr { width: 44px; height: 44px; border-radius: 14px; background: var(--roze3); display: grid; place-items: center; font-size: 1.4rem; flex-shrink: 0; }
-.stap p { font-size: 0.92rem; font-weight: 700; line-height: 1.4; }
-.stap b { color: var(--roze); }
-.bonus-uitleg { margin-top: 12px; background: #fff8d6; border-radius: 14px; padding: 10px 12px; font-size: 0.86rem; font-weight: 800; color: #7a5a00; line-height: 1.4; }
-
-.oefen-knoppen { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
-.oefen-knop { display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--roze); color: #fff; text-decoration: none; font-weight: 900; border-radius: 16px; padding: 13px; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(255,110,180,0.3); }
-.oefen-knop.blauw { background: #4f9fe8; box-shadow: 0 4px 12px rgba(79,159,232,0.3); }
-
-/* De spaarkaart */
-.raster { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
-.vak { aspect-ratio: 1; border-radius: 50%; border: 3px dashed #f0d3e3; display: grid; place-items: center; position: relative; font-size: 1.5rem; background: #fffafd; }
-.vak .nr { font-size: 0.72rem; font-weight: 900; color: #d8c0cf; }
-.vak.vol { border: 3px solid var(--roze); background: #ffe3f1; }
-.vak.bonus { border: 3px solid var(--goud); background: #fff4c2; }
-.vak.doel { border-style: solid; border-color: #ffb347; background: #fff1de; cursor: pointer; }
-.vak.doel.vol { border-color: var(--roze); background: #ffe3f1; }
-.vak .vink { position: absolute; right: -4px; bottom: -4px; font-size: 0.9rem; background: #fff; border-radius: 50%; width: 22px; height: 22px; display: grid; place-items: center; box-shadow: 0 2px 6px rgba(0,0,0,.12); }
-.vak.volgende { animation: pulse 1.6s ease-in-out infinite; }
-@keyframes pulse { 50% { transform: scale(1.08); box-shadow: 0 0 0 6px rgba(255,179,71,.25); } }
-.week-label { grid-column: 1 / -1; font-size: 0.72rem; font-weight: 800; color: var(--muted); margin-top: 2px; }
-.legenda { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; font-size: 0.76rem; font-weight: 800; color: var(--muted); }
-.vak-info { margin-top: 12px; background: var(--roze3); border-radius: 14px; padding: 10px 12px; font-weight: 800; font-size: 0.88rem; display: none; line-height: 1.4; }
-
-/* Lijsten */
-.lijst { display: grid; gap: 8px; }
-.rij { display: flex; align-items: center; gap: 12px; background: var(--wit); border-radius: 16px; padding: 12px 14px; box-shadow: var(--shadow); }
-.rij.klaar { opacity: .55; }
-.rij.eerst { border: 3px solid var(--roze); }
-.badge { min-width: 48px; height: 48px; border-radius: 14px; background: var(--roze3); display: grid; place-items: center; font-weight: 900; font-size: 0.8rem; text-align: center; line-height: 1.1; flex-shrink: 0; }
-.badge.goud { background: #fff4c2; }
-.rij-tekst { flex: 1; min-width: 0; }
-.rij-naam { font-weight: 900; font-size: 0.95rem; line-height: 1.3; }
-.rij-sub { font-size: 0.78rem; font-weight: 800; color: var(--muted); margin-top: 2px; }
-.bon-rij { cursor: pointer; border: 2px dashed var(--roze2); box-shadow: none; text-align: left; width: 100%; font: inherit; }
-.leeg { text-align: center; color: var(--muted); font-weight: 700; padding: 18px 10px; line-height: 1.6; }
-@media (prefers-reduced-motion: reduce) { .vak.volgende { animation: none; } }
-
-.huidig { background: var(--wit); border-radius: 22px; padding: 18px; box-shadow: var(--shadow); border: 3px solid var(--roze); }
-.huidig .lbl { font-size: 0.78rem; font-weight: 800; color: var(--muted); }
-.huidig .ttl { font-size: 1.25rem; font-weight: 900; line-height: 1.3; margin: 2px 0 10px; }
-.groot-balk { height: 12px; background: #ffe3f1; border-radius: 12px; overflow: hidden; margin-bottom: 14px; }
-.groot-balk > div { height: 100%; background: linear-gradient(90deg, #ff6eb4, #ffb347); border-radius: 12px; }
-.rij { cursor: pointer; border: none; width: 100%; text-align: left; font: inherit; color: inherit; }
-.rij .pijl { font-weight: 900; color: var(--roze); font-size: 1.1rem; }
-.mini { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px; }
-.mini span { font-size: 0.72rem; font-weight: 800; background: var(--roze3); border-radius: 999px; padding: 2px 7px; }
-.mini span.klaar { background: #effaf0; color: #23632a; }
-.soort { display: flex; gap: 10px; align-items: flex-start; }
-.soort + .soort { margin-top: 10px; }
-.soort .stap-nr { width: 40px; height: 40px; font-size: 1.25rem; }
-.vraag-kaart { margin-bottom: 4px; border: 2px solid var(--roze2); }
-.vz { display: flex; gap: 8px; }
-.vz input { flex: 1; min-width: 0; border: 2px solid var(--roze2); border-radius: 14px; padding: 12px 14px; font-family: inherit; font-size: 16px; font-weight: 700; color: var(--tekst); }
-.vz input:focus { outline: none; border-color: var(--roze); }
-.wil-lijst { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.wil { min-width: 0; overflow-wrap: anywhere; -webkit-hyphens: auto; hyphens: auto; display: flex; align-items: center; gap: 8px; text-align: left; border: 2px solid var(--roze2); background: #fff; border-radius: 16px; padding: 10px; font: inherit; font-weight: 800; font-size: 0.85rem; line-height: 1.25; cursor: pointer; color: var(--tekst); }
-.wil .em { font-size: 1.6rem; flex-shrink: 0; }
-.wil .tk { min-width: 0; }
-.wil.gekozen { border-color: var(--roze); background: #fff4fa; }
-.zelf-typen { margin-top: 10px; }
-.zelf-typen summary { font-size: 0.82rem; font-weight: 800; color: var(--muted); cursor: pointer; margin-bottom: 8px; }
-.vz .mic { background: #fff; border: 2px solid var(--roze2); color: var(--tekst); }
-.vz .mic.luistert { background: #ffe3f1; border-color: var(--roze); animation: mic 1s ease-in-out infinite; }
-@keyframes mic { 50% { transform: scale(1.08); } }
-.nog { margin-top: 10px; background: #fff; border-radius: 14px; padding: 10px 12px; }
-.nog-titel { font-weight: 900; margin-bottom: 6px; }
-.nog-rij { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-top: 1px dashed #f3e4ec; }
-.nog-rij:first-of-type { border-top: none; }
-.nog-rij .em { font-size: 1.4rem; width: 30px; text-align: center; }
-.nog-rij .tk { flex: 1; font-weight: 800; }
-.nog-rij a { background: var(--roze); color: #fff; text-decoration: none; font-weight: 900; font-size: 0.8rem; border-radius: 999px; padding: 7px 12px; white-space: nowrap; }
-.vz button { border: none; background: var(--roze); color: #fff; font-size: 1.2rem; border-radius: 14px; padding: 0 16px; cursor: pointer; }
-.bubbel { margin-top: 12px; border-radius: 16px; padding: 12px 14px; font-size: 0.9rem; line-height: 1.5; font-weight: 700; }
-.bubbel.v { background: var(--roze2); margin-left: 15%; text-align: right; font-weight: 800; }
-.bubbel.a { background: var(--roze3); }
-.bubbel .mbp-lijst { margin-top: 10px; }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.chips button { border: 2px solid var(--roze2); background: #fff; border-radius: 999px; padding: 5px 10px; font: inherit; font-size: 0.8rem; font-weight: 800; cursor: pointer; }
+.container { max-width: 520px; margin: 0 auto; padding: 26px 16px 40px; }
+h1 { font-family: 'Pacifico', cursive; font-weight: 400; color: var(--roze); font-size: 1.7rem; text-align: center; margin-bottom: 18px; }
+.zoek { display: flex; gap: 8px; }
+.zoek input { flex: 1; min-width: 0; border: 3px solid var(--roze2); border-radius: 16px; padding: 15px 16px; font-family: inherit; font-size: 17px; font-weight: 700; color: var(--tekst); background: var(--wit); }
+.zoek input:focus { outline: none; border-color: var(--roze); }
+.zoek button { border: none; background: var(--roze); color: #fff; font-size: 1.3rem; border-radius: 16px; padding: 0 18px; cursor: pointer; }
+.stap { background: var(--wit); border-radius: 22px; box-shadow: var(--shadow); padding: 20px; margin-top: 18px; text-align: center; }
+.stap .em { font-size: 3rem; line-height: 1; }
+.stap h2 { font-size: 1.2rem; font-weight: 900; line-height: 1.35; margin: 8px 0 4px; }
+.stap p { font-size: 0.92rem; font-weight: 700; color: var(--muted); line-height: 1.5; }
+.knoppen { display: grid; gap: 10px; margin-top: 16px; }
+.knop { display: block; border: none; border-radius: 999px; padding: 15px; font-weight: 900; font-size: 1rem; cursor: pointer; background: var(--roze); color: #fff; text-decoration: none; }
+.knop.licht { background: var(--roze3); color: var(--tekst); }
+.taken { display: grid; gap: 10px; margin-top: 16px; text-align: left; }
+.taak { display: flex; align-items: center; gap: 12px; border: 3px solid #f3e4ec; border-radius: 18px; padding: 12px 14px; }
+.taak .em2 { font-size: 2rem; width: 38px; text-align: center; }
+.taak .tk { flex: 1; min-width: 0; font-weight: 900; font-size: 1rem; line-height: 1.3; }
+.taak a { background: var(--roze); color: #fff; text-decoration: none; font-weight: 900; font-size: 0.85rem; border-radius: 999px; padding: 10px 14px; white-space: nowrap; }
+.tips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 12px; }
+.tips button { border: 2px solid var(--roze2); background: var(--wit); border-radius: 999px; padding: 8px 14px; font-weight: 800; font-size: 0.88rem; cursor: pointer; max-width: 100%; overflow-wrap: anywhere; }
+.tips-kop { font-size: 0.85rem; font-weight: 800; color: var(--muted); margin-top: 22px; text-align: center; }
+.voet { text-align: center; margin-top: 24px; }
+.voet a { color: var(--roze); font-weight: 900; font-size: 0.88rem; text-decoration: none; }
 </style>
 </head>
 <body>
 <header>
   <a href="index.html" class="kop-knop">← Terug</a>
-  <span class="logo">🎁 Beloningen</span>
-  <div class="teller">📅 <span id="teller">0</span></div>
+  <span class="logo">🎁 Wat wil ik halen?</span>
+  <a href="prijzenkast.html" class="kop-knop">🏆</a>
 </header>
 
 <div class="container">
-  <h1>Mijn beloningen</h1>
-  <p class="sub">Tik op een beloning om te zien wat je ervoor moet doen!</p>
-
-  <div class="kaart vraag-kaart">
-    <div style="font-weight:900;font-size:1rem;margin-bottom:8px">🎁 Wat wil je hebben? Tik erop!</div>
-    <div class="wil-lijst" id="wil-lijst"></div>
-    <details class="zelf-typen">
-      <summary>✍️ Of typ het zelf</summary>
-      <div class="vz">
-        <input id="vraag" type="text" enterkeyhint="search" autocomplete="off" placeholder="Bijv. ik wil een nagellakje kopen">
-        <button onclick="beantwoord()" aria-label="Vraag">🔎</button>
-      </div>
-    </details>
-    <div id="vraag-antwoord"></div>
-  </div>
-
-  <div id="huidig" style="margin-top:16px"></div>
-
-  <h2>✨ Zo werkt het</h2>
-  <div class="kaart">
-    <div class="soort"><div class="stap-nr">🎁</div><p style="font-size:0.9rem;font-weight:700;line-height:1.45"><b style="color:var(--roze)">Pakketten:</b> elke beloning heeft een pakket met taken: spelling, lezen, grammatica, rekenen en klokkijken. Is alles af? Dan is de beloning van jou! Doe je meer dan nodig, dan telt dat al mee voor het volgende pakket.</p></div>
-    <div class="soort"><div class="stap-nr">📅</div><p style="font-size:0.9rem;font-weight:700;line-height:1.45"><b style="color:var(--roze)">Volhouden:</b> verdien je op een dag <b id="uitleg-doel">10</b> ⭐, dan is het een oefendag. Na een aantal oefendagen krijg je een extra beloning.</p></div>
-    <div class="soort"><div class="stap-nr">🏅</div><p style="font-size:0.9rem;font-weight:700;line-height:1.45"><b style="color:var(--roze)">Niveaus:</b> haal je een niveau, dan verdien je soms ook iets extra's.</p></div>
-  </div>
-
-  <h2>🎁 Pakketten</h2>
-  <div class="lijst" id="pakket-lijst"></div>
-
-  <h2 id="dagen-kop">📅 Extra voor volhouden</h2>
-  <div class="lijst" id="dagen-lijst"></div>
-
-  <h2 id="niveau-kop">🏅 Extra voor niveaus</h2>
-  <div class="lijst" id="niveau-lijst"></div>
-
-  <h2>🎟️ Mijn bonnen <a href="prijzenkast.html" style="font-size:0.85rem;color:var(--roze);text-decoration:none;margin-left:6px">🏆 naar mijn prijzenkast ›</a></h2>
-  <div class="lijst" id="bon-lijst"></div>
+  <h1>Wat wil je halen?</h1>
+  <form class="zoek" onsubmit="event.preventDefault(); zoek();">
+    <input id="vraag" type="text" enterkeyhint="search" autocomplete="off" placeholder="Typ het hier…">
+    <button type="submit" aria-label="Zoeken">🔎</button>
+  </form>
+  <div id="stap"></div>
+  <div id="tips"></div>
+  <div class="voet"><a href="prijzenkast.html">🏆 Mijn prijzenkast ›</a></div>
 </div>
 
 <script src="beloningen.js"></script>
 <script>
-function rijKnop(lijst, b, badge, sub, extra, eerst) {
-  const r = document.createElement('button');
-  r.className = 'rij' + (b.bereikt ? ' klaar' : '') + (eerst ? ' eerst' : '');
-  r.innerHTML = `<div class="badge${b.type === 'pakket' ? '' : ' goud'}">${badge}</div><div class="rij-tekst"><div class="rij-naam"></div><div class="rij-sub"></div>${extra || ''}</div><div class="pijl">›</div>`;
-  r.querySelector('.rij-naam').textContent = b.beloning;
-  r.querySelector('.rij-sub').textContent = sub;
-  r.addEventListener('click', function () { MB.toonPakket(b); });
-  lijst.appendChild(r);
-}
-function render() {
-  MB.check();
-  const l = MB.ladder(), nv = MB.volgende();
-  document.getElementById('teller').textContent = MB.oefendagen();
-  document.getElementById('uitleg-doel').textContent = MB.dagdoel();
-
-  // Het pakket waar ze nu aan werkt, met knoppen naar de oefeningen
-  const h = document.getElementById('huidig');
-  if (nv) {
-    h.innerHTML = `<div class="huidig"><div class="lbl">👉 Hier werk je nu aan</div><div class="ttl"></div>
-      <div class="groot-balk"><div style="width:${nv.pct}%"></div></div>
-      <div class="mbp-lijst">${MB.takenHTML(nv.stand, true)}</div></div>`;
-    h.querySelector('.ttl').textContent = nv.b.beloning;
-  } else h.innerHTML = '<div class="kaart leeg">🎉 Alle pakketten zijn af! Wat ben jij een harde werker.</div>';
-
-  // Pakketten
-  const pl = document.getElementById('pakket-lijst'); pl.innerHTML = '';
-  MB.ladder().filter(b => b.type === 'pakket').forEach((b, i) => {
-    const ps = MB.pakketStand(b, l);
-    const mini = '<div class="mini">' + ps.taken.map(x => `<span class="${x.klaar ? 'klaar' : ''}">${MB.TAKEN[x.soort].emoji} ${x.gedaan}/${x.nodig}</span>`).join('') + '</div>';
-    const eerst = nv && nv.b.id === b.id;
-    rijKnop(pl, b, (i + 1) + '<br>🎁', b.bereikt ? '✅ verdiend!' : (eerst ? '👉 ' : '') + MB.nogNodig(b), b.bereikt ? '' : mini, eerst);
-  });
-
-  // Extra beloningen
-  const dagen = l.filter(b => b.type === 'dagen').sort((a, b) => a.drempel - b.drempel), dl = document.getElementById('dagen-lijst'); dl.innerHTML = '';
-  document.getElementById('dagen-kop').style.display = dagen.length ? '' : 'none';
-  dagen.forEach(b => rijKnop(dl, b, b.drempel + '<br>📅', b.bereikt ? '✅ verdiend!' : MB.nogNodig(b) + ' · nu ' + MB.oefendagen()));
-  const niv = l.filter(b => b.type === 'niveau'), nl = document.getElementById('niveau-lijst'); nl.innerHTML = '';
-  document.getElementById('niveau-kop').style.display = niv.length ? '' : 'none';
-  niv.forEach(b => rijKnop(nl, b, (MB.NAMEN[b.onderdeel] || '').slice(0, 5) + '<br>' + b.drempel, b.bereikt ? '✅ verdiend!' : MB.nogNodig(b)));
-
-  // Bonnen
-  const bn = MB.bonnen(), bo = document.getElementById('bon-lijst'); bo.innerHTML = '';
-  if (!bn.length) bo.innerHTML = '<div class="leeg">🎟️ Hier komen je beloningsbonnen.</div>';
-  bn.forEach(b => {
-    const r = document.createElement('button');
-    r.className = 'rij bon-rij' + (b.ingewisseld ? ' klaar' : '');
-    r.innerHTML = `<div class="badge">${b.ingewisseld ? '✅' : '🎟️'}</div><div class="rij-tekst"><div class="rij-naam"></div><div class="rij-sub">${MB.datumNL(b.datum)}${b.ingewisseld ? ' · ingewisseld' : ' · tik om je bon te zien'}</div></div>`;
-    r.querySelector('.rij-naam').textContent = b.beloning;
-    r.addEventListener('click', function () { MB.toonBon(b, true); });
-    bo.appendChild(r);
-  });
-}
-function beantwoord(vraag) {
-  const veld = document.getElementById('vraag');
-  vraag = (vraag || veld.value || '').trim();
-  if (!vraag) { veld.focus(); return; }
-  veld.value = '';
-  const plek = document.getElementById('vraag-antwoord'); plek.innerHTML = '';
-  const v = document.createElement('div'); v.className = 'bubbel v'; v.textContent = vraag; plek.appendChild(v);
-  const a = document.createElement('div'); a.className = 'bubbel a'; plek.appendChild(a);
-  toonAntwoord(MB.zoekBeloning(vraag), vraag);
-}
-function toonAntwoord(b, vraag) {
-  const plek = document.getElementById('vraag-antwoord');
-  if (!vraag) plek.innerHTML = '';
-  let a = plek.querySelector('.bubbel.a');
-  if (!a) { a = document.createElement('div'); a.className = 'bubbel a'; plek.appendChild(a); }
-  const l = MB.ladder(), nv = MB.volgende();
-  if (!b) {
-    a.innerHTML = 'Die beloning staat nog niet in je lijst 🤔. Vraag het eens aan papa! Dit kun je wel verdienen:<div class="chips"></div>';
-    l.filter(x => !x.bereikt).slice(0, 6).forEach(x => {
-      const c = document.createElement('button'); c.textContent = x.beloning;
-      c.addEventListener('click', () => toonAntwoord(x, null));
-      a.querySelector('.chips').appendChild(c);
-    });
-    return;
-  }
-  const naam = document.createElement('b'); naam.textContent = b.beloning;
-  if (b.bereikt) {
-    a.innerHTML = '🎉 Die heb je al verdiend: <span></span>! Kijk bij je bonnen onderaan deze pagina.';
-    a.querySelector('span').appendChild(naam);
-  } else if (b.type === 'pakket') {
-    const rest = MB.nogTeDoen(b, l), later = nv && nv.b.id !== b.id;
-    a.innerHTML = 'Voor <span></span> moet je nog doen:'
-      + '<div class="nog">' + rest.map(x => `<div class="nog-rij"><div class="em">${MB.TAKEN[x.soort].emoji}</div><div class="tk">nog ${x.nog} ${x.nog === 1 ? MB.TAKEN[x.soort].een : MB.TAKEN[x.soort].meer}</div><a href="${MB.TAKEN[x.soort].link}">Doe nu ›</a></div>`).join('') + '</div>'
-      + (later ? '<p style="margin-top:10px;font-size:0.85rem">👉 Hierin zit ook het pakket voor <i class="eerst"></i>, dat je eerst afmaakt. Daarna is dit pakket aan de beurt!</p>' : '<p style="margin-top:10px;font-size:0.85rem">👉 Hier werk je nu al aan. Zet hem op! 💪</p>');
-    a.querySelector('span').appendChild(naam);
-    if (later) a.querySelector('.eerst').textContent = nv.b.beloning;
-    spreekAntwoord('Voor ' + b.beloning.replace(/\p{Extended_Pictographic}/gu, '') + ' moet je nog doen: ' + MB.nogTekst(rest) + '.');
-  } else if (b.type === 'dagen') {
-    const r = Math.max(0, b.drempel - MB.oefendagen());
-    a.innerHTML = '<span></span> is een extra beloning voor volhouden 📅. Verdien op ' + b.drempel + ' dagen minstens ' + MB.dagdoel() + ' ⭐. Je hebt er nu ' + MB.oefendagen() + ', dus nog ' + r + (r === 1 ? ' dag' : ' dagen') + ' te gaan!';
-    a.querySelector('span').appendChild(naam);
-  } else {
-    a.innerHTML = '<span></span> is een extra beloning 🏅. Haal daarvoor ' + MB.NAMEN[b.onderdeel] + ' niveau ' + b.drempel + '. Nu zit je op niveau ' + (MB.hoogsteNiveau(b.onderdeel) || 0) + '.';
-    a.querySelector('span').appendChild(naam);
-  }
-}
-document.getElementById('vraag').addEventListener('keydown', e => { if (e.key === 'Enter') beantwoord(); });
-
-// 🎤 Zeggen in plaats van typen (als de iPad dat ondersteunt)
-let gesproken = false;
-function spreekAntwoord(t) {
-  if (!gesproken || !('speechSynthesis' in window)) return;
-  gesproken = false;
-  speechSynthesis.cancel();
-  setTimeout(() => {
-    const u = new SpeechSynthesisUtterance(t), st = speechSynthesis.getVoices();
-    u.lang = 'nl-NL'; u.rate = 0.9;
-    const v = st.find(x => /claire|ellen|fleur|google nederlands|colette|fenna/i.test(x.name) && /^nl/i.test(x.lang)) || st.find(x => /^nl/i.test(x.lang));
-    if (v) u.voice = v;
-    speechSynthesis.speak(u);
-  }, 150);
-}
-(function () {
-  return; // inspreken is uitgezet: Milou kiest liever door te tikken
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition, mic = document.getElementById('mic');
-  if (!SR) return;
-  mic.hidden = false;
-  mic.addEventListener('click', function () {
-    const r = new SR();
-    r.lang = 'nl-NL'; r.interimResults = true; r.maxAlternatives = 1;
-    const veld = document.getElementById('vraag');
-    veld.placeholder = '🎤 Ik luister… zeg het maar!';
-    mic.classList.add('luistert');
-    r.onresult = e => { veld.value = Array.from(e.results).map(x => x[0].transcript).join(' '); if (e.results[e.results.length - 1].isFinal) { gesproken = true; beantwoord(); } };
-    r.onend = () => { mic.classList.remove('luistert'); veld.placeholder = 'Bijv. ik wil een nagellakje kopen'; };
-    r.onerror = () => { mic.classList.remove('luistert'); veld.placeholder = 'Dat lukte niet. Typ het maar, of gebruik het 🎤 op je toetsenbord.'; };
-    try { r.start(); } catch (e) { r.onerror(); }
-  });
-})();
 function emojiVan(t) { try { const m = t.match(/\p{Extended_Pictographic}/gu); return m ? m[m.length - 1] : '🎁'; } catch (e) { return '🎁'; } }
 function kortNaam(t) { return t.replace(/\p{Extended_Pictographic}|\uFE0F/gu, '').replace(/\(.*?\)/g, '').replace(/\s+/g, ' ').trim(); }
-function renderWil() {
-  const lijst = document.getElementById('wil-lijst'); lijst.innerHTML = '';
-  const open = MB.ladder().filter(b => !b.bereikt);
-  if (!open.length) { lijst.innerHTML = '<div class="leeg" style="grid-column:1/-1">🎉 Je hebt alles al verdiend!</div>'; return; }
+function el(id) { return document.getElementById(id); }
+
+function toonTips() {
+  const open = MB.ladder().filter(b => !b.bereikt).slice(0, 4);
+  if (!open.length) { el('tips').innerHTML = ''; return; }
+  el('tips').innerHTML = '<div class="tips-kop">Of tik op wat je wilt:</div><div class="tips"></div>';
+  const rij = el('tips').querySelector('.tips');
   open.forEach(b => {
     const k = document.createElement('button');
-    k.className = 'wil';
-    k.innerHTML = '<span class="em"></span><span class="tk"></span>';
-    k.querySelector('.em').textContent = emojiVan(b.beloning);
-    k.querySelector('.tk').textContent = kortNaam(b.beloning);
-    k.addEventListener('click', function () {
-      lijst.querySelectorAll('.wil').forEach(x => x.classList.toggle('gekozen', x === k));
-      toonAntwoord(b, null);
-    });
-    lijst.appendChild(k);
+    k.textContent = emojiVan(b.beloning) + ' ' + kortNaam(b.beloning);
+    k.addEventListener('click', function () { vraagZeker(b); });
+    rij.appendChild(k);
   });
 }
-render();
-renderWil();
-(function () { const q = new URLSearchParams(location.search).get('vraag'); const id = new URLSearchParams(location.search).get('id');
-  if (id) { const b = MB.ladder().find(x => x.id === id); if (b) { toonAntwoord(b, null); return; } }
-  if (q) beantwoord(q); })();
+
+function zoek() {
+  const veld = el('vraag'), v = veld.value.trim();
+  if (!v) { veld.focus(); return; }
+  veld.blur();
+  const b = MB.zoekBeloning(v);
+  if (!b) {
+    el('stap').innerHTML = '<div class="stap"><div class="em">🤔</div><h2>Die staat nog niet in je lijst</h2><p>Vraag papa of hij hem erbij zet! Of kies hieronder iets anders.</p></div>';
+    toonTips(); return;
+  }
+  vraagZeker(b);
+}
+
+// Stap 1: weet je het zeker?
+function vraagZeker(b) {
+  el('tips').innerHTML = '';
+  el('vraag').value = '';
+  if (b.bereikt) {
+    el('stap').innerHTML = '<div class="stap"><div class="em">🎉</div><h2></h2><p>Die heb je al gewonnen! Hij staat in je prijzenkast.</p>'
+      + '<div class="knoppen"><a class="knop" href="prijzenkast.html">🏆 Naar mijn prijzenkast</a><button class="knop licht" onclick="opnieuw()">Iets anders kiezen</button></div></div>';
+    el('stap').querySelector('h2').textContent = kortNaam(b.beloning);
+    return;
+  }
+  el('stap').innerHTML = '<div class="stap"><div class="em">' + emojiVan(b.beloning) + '</div><h2></h2><p>Weet je dit zeker?</p>'
+    + '<div class="knoppen"><button class="knop" id="ja">✅ Ja, dit wil ik!</button><button class="knop licht" onclick="opnieuw()">↩️ Nee, iets anders</button></div></div>';
+  el('stap').querySelector('h2').textContent = kortNaam(b.beloning);
+  el('ja').addEventListener('click', function () { toonTaken(b); });
+}
+
+// Stap 2: dit moet je doen
+function toonTaken(b) {
+  var inhoud = '';
+  if (b.type === 'pakket') {
+    const rest = MB.nogTeDoen(b);
+    inhoud = rest.length
+      ? '<div class="taken">' + rest.map(function (x) { return '<div class="taak"><div class="em2">' + MB.TAKEN[x.soort].emoji + '</div><div class="tk">' + x.nog + ' ' + (x.nog === 1 ? MB.TAKEN[x.soort].een : MB.TAKEN[x.soort].meer) + '</div><a href="' + MB.TAKEN[x.soort].link + '">Doe nu ›</a></div>'; }).join('') + '</div>'
+      : '<p>Je bent al klaar! 🎉</p>';
+  } else if (b.type === 'dagen') {
+    const r = Math.max(0, b.drempel - MB.oefendagen());
+    inhoud = '<div class="taken"><div class="taak"><div class="em2">📅</div><div class="tk">Nog ' + r + (r === 1 ? ' dag' : ' dagen') + ' oefenen</div><a href="leren.html">Doe nu ›</a></div></div>';
+  } else {
+    inhoud = '<div class="taken"><div class="taak"><div class="em2">🏅</div><div class="tk">Haal ' + MB.NAMEN[b.onderdeel] + ' niveau ' + b.drempel + '</div><a href="' + (b.onderdeel === 'klokkijken' ? 'leren.html?open=klok' : 'taal.html?open=' + b.onderdeel) + '">Doe nu ›</a></div></div>';
+  }
+  el('stap').innerHTML = '<div class="stap"><div class="em">' + emojiVan(b.beloning) + '</div><h2>Dit moet je nog doen:</h2>' + inhoud
+    + '<div class="knoppen"><button class="knop licht" onclick="opnieuw()">↩️ Iets anders kiezen</button></div></div>';
+}
+
+function opnieuw() { el('stap').innerHTML = ''; el('vraag').value = ''; toonTips(); }
+
+MB.check();
+toonTips();
+(function () {
+  const q = new URLSearchParams(location.search).get('vraag'), id = new URLSearchParams(location.search).get('id');
+  if (id) { const b = MB.ladder().find(function (x) { return x.id === id; }); if (b) return vraagZeker(b); }
+  if (q) { el('vraag').value = q; zoek(); }
+})();
 </script>
 </body>
 </html>

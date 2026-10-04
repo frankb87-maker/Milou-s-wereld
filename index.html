@@ -496,6 +496,8 @@
   }
   .hw-btn:hover { transform: scale(1.2); background: rgba(255,255,255,0.35); }
   .hw-btn.gekozen { background: rgba(255,255,255,0.5); transform: scale(1.15); }
+  .home-wil-knop { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 12px 0 4px; background: linear-gradient(135deg, #ff6eb4, #ffb347); color: white; text-decoration: none; font-weight: 900; font-size: 1rem; padding: 15px; border-radius: 18px; box-shadow: 0 4px 14px rgba(255,110,180,0.3); }
+  .home-wil-knop span { font-weight: 800; font-size: 0.85rem; opacity: 0.9; }
   .home-wil { margin: 12px 0 4px; }
   .home-wil-titel { font-size: 0.85rem; font-weight: 800; color: var(--text); margin-bottom: 8px; }
   .home-wil-rij { display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 4px; }
@@ -654,10 +656,7 @@
   </div>
   <!-- 🌸 Dagdoel & spaarkaart (vult zich via beloningen.js) -->
   <div id="home-dagdoel" style="margin:18px 0 4px"></div>
-  <div class="home-wil" id="home-wil" hidden>
-    <div class="home-wil-titel">🎁 Wat wil je hebben? Tik erop en zie wat je nog moet doen:</div>
-    <div class="home-wil-rij" id="home-wil-rij"></div>
-  </div>
+  <a class="home-wil-knop" href="spaarkaart.html">🎁 Wat wil je halen? <span>Typ het in ›</span></a>
   <div class="home-grid">
     <a href="prijzenkast.html" class="home-tile" style="text-decoration:none">
       <div class="tile-emoji">🏆</div>
@@ -3059,97 +3058,6 @@ function blToevoegen() {
 function laadHomeBeloning() {
   if (typeof MB === 'undefined') return;
   MB.widget(document.getElementById('home-dagdoel'), { link: 'spaarkaart.html' });
-  // Beloningen om op te tikken (Milou's idee: niet typen of praten, gewoon kiezen)
-  const rij = document.getElementById('home-wil-rij'), open = MB.ladder().filter(b => !b.bereikt);
-  document.getElementById('home-wil').hidden = !open.length;
-  rij.innerHTML = '';
-  open.forEach(b => {
-    const m = b.beloning.match(/\p{Extended_Pictographic}/gu), em = m ? m[m.length - 1] : '🎁';
-    const kort = b.beloning.replace(/\p{Extended_Pictographic}|\uFE0F/gu, '').replace(/\(.*?\)/g, '').replace(/\s+/g, ' ').trim();
-    const a = document.createElement('a');
-    a.href = 'spaarkaart.html?id=' + encodeURIComponent(b.id);
-    a.innerHTML = '<span></span>';
-    a.querySelector('span').textContent = em;
-    a.appendChild(document.createTextNode(kort));
-    rij.appendChild(a);
-  });
-  MB.check(); // nog niet getoonde bonnen alsnog laten zien
-}
-window.addEventListener('load', laadHomeBeloning);
-function blPapaLadder() {
-  if (!confirm('De beloningsladder wordt vervangen door de beloningen van papa (7 pakketten + extra beloningen). Al verdiende beloningen en bonnen blijven bewaard, en het tellen van taken begint opnieuw. Doorgaan?')) return;
-  MB.laadPapaLadder();
-  laadBeloningBeheer();
-}
-function blTestMail() {
-  const s = document.getElementById('mail-status'); s.textContent = '⏳ Bezig met versturen…';
-  MB.testMail(function (ok, err) { s.textContent = ok ? '✅ Testmail verstuurd! Kijk in je inbox.' : '❌ Niet gelukt: ' + ((err && (err.text || err.status)) || 'controleer de EmailJS-template'); });
-}
-function tekenStemmingGrafiek() {
-  const canvas = document.getElementById('stemmingGrafiek');
-  if (!canvas) return;
-  canvas.width = canvas.offsetWidth;
-  const ctx = canvas.getContext('2d');
-  let weekData = {}; try { weekData = JSON.parse(localStorage.getItem('milou_stemmingen') || '{}'); } catch(e) {}
-  const nu = new Date();
-  const SCORE = { '😊':5,'🥰':5,'🤩':5,'😌':4,'😐':3,'💬':3,'😴':2,'😟':2,'😢':1,'😠':1 };
-  const DN = ['Zo','Ma','Di','Wo','Do','Vr','Za'];
-  const labels=[], scores=[], kleuren=[];
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(nu); d.setDate(d.getDate()-i);
-    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    labels.push(DN[d.getDay()]);
-    if (weekData[key]?.length > 0) {
-      const gem = weekData[key].reduce((s,e) => s+(SCORE[e.emoji]||3), 0) / weekData[key].length;
-      scores.push(gem); kleuren.push(gem>=4?'#a8e6cf':gem>=3?'#ffe49a':'#f9c9d8');
-    } else { scores.push(0); kleuren.push('#e0e0e0'); }
-  }
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  const bW = (canvas.width-40)/7-8, mH = canvas.height-40;
-  scores.forEach((s,i) => {
-    const x = 20 + i*((canvas.width-40)/7);
-    const h = s > 0 ? (s/5)*mH : 4;
-    ctx.fillStyle = kleuren[i];
-    ctx.beginPath();
-    // iOS-compatible afgeronde rechthoek (roundRect werkt niet op oudere Safari)
-    const rx = 6, bx = x, by = canvas.height-30-h, bh = h;
-    ctx.moveTo(bx+rx, by); ctx.lineTo(bx+bW-rx, by);
-    ctx.arcTo(bx+bW, by, bx+bW, by+rx, rx);
-    ctx.lineTo(bx+bW, by+bh-rx);
-    ctx.arcTo(bx+bW, by+bh, bx+bW-rx, by+bh, rx);
-    ctx.lineTo(bx+rx, by+bh);
-    ctx.arcTo(bx, by+bh, bx, by+bh-rx, rx);
-    ctx.lineTo(bx, by+rx);
-    ctx.arcTo(bx, by, bx+rx, by, rx);
-    ctx.closePath(); ctx.fill();
-    ctx.fillStyle='#3a2a3a'; ctx.font='bold 11px Nunito,sans-serif'; ctx.textAlign='center';
-    ctx.fillText(labels[i], x+bW/2, canvas.height-10);
-    if (s>0) { ctx.font='14px serif'; ctx.fillText(s>=4.5?'🥰':s>=3.5?'😊':s>=2.5?'😐':s>=1.5?'😴':'😢', x+bW/2, canvas.height-35-h); }
-  });
-  const sv = document.getElementById('stemming-samenvatting');
-  if (sv) {
-    const t = scores.filter(s=>s>0).length;
-    const g = t>0 ? scores.reduce((a,b)=>a+b,0)/t : 0;
-    sv.innerHTML = `📅 <strong>${t} van 7 dagen</strong> ingevuld<br>😊 Gemiddeld: <strong>${g.toFixed(1)}/5</strong><br>${g>=4?'💚 Milou heeft een goede week!':g>=3?'🌿 Gemiddelde week':'💛 Milou heeft wat extra aandacht nodig'}`;
-  }
-}
-function laadDagboekStats() {
-  const el = document.getElementById('dagboek-stats');
-  if (!el) return;
-  let e=[]; try{e=JSON.parse(localStorage.getItem('milou_dagboek')||'[]');}catch(ex){}
-  const gedeeld = e.filter(i => !isPrive(i));
-  el.innerHTML = !e.length ? 'Milou heeft nog niets in haar dagboek geschreven.' :
-    `📝 <strong>${e.length}</strong> pagina's geschreven · 📅 laatste: <strong>${e[0]?.datum}</strong>`;
-  const lijst = document.getElementById('dagboek-ouder'); if (!lijst) return;
-  lijst.innerHTML = e.length && !gedeeld.length ? '<div style="font-size:0.85rem;color:var(--muted)">Nog geen gedeelde pagina\'s.</div>' : '';
-  gedeeld.slice(0, 15).forEach(i => {
-    const d = document.createElement('div');
-    d.style.cssText = 'background:var(--bg);border-radius:12px;padding:10px 12px;border-left:4px solid var(--lavender)';
-    d.innerHTML = '<div style="font-size:0.75rem;font-weight:800;color:var(--muted)"></div><div style="font-size:0.88rem;line-height:1.6;white-space:pre-wrap;margin-top:2px"></div>';
-    d.children[0].textContent = '📅 ' + i.datum;
-    d.children[1].textContent = i.tekst;
-    lijst.appendChild(d);
-  });
 }
 
 // ════════════════════════════════════════════════════
