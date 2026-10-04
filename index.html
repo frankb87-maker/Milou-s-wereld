@@ -495,6 +495,12 @@
   }
   .hw-btn:hover { transform: scale(1.2); background: rgba(255,255,255,0.35); }
   .hw-btn.gekozen { background: rgba(255,255,255,0.5); transform: scale(1.15); }
+  .gevoel-woorden { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .gw { border: none; cursor: pointer; background: rgba(255,255,255,0.25); color: white; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.82rem; padding: 6px 10px; border-radius: 999px; }
+  .gw.gekozen { background: white; color: #c2407e; }
+  .gevoel-tekst { width: 100%; margin-top: 10px; border: none; border-radius: 12px; padding: 10px 12px; font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 700; color: #3a2a3a; background: rgba(255,255,255,0.9); resize: none; }
+  .gevoel-klaar { margin-top: 8px; border: none; cursor: pointer; background: white; color: #c2407e; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.9rem; padding: 9px 18px; border-radius: 999px; }
+  .gevoel-noot { font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.85); margin-top: 8px; line-height: 1.4; }
 
   /* ─── DONKERE MODUS ─── */
   body.donker {
@@ -572,13 +578,19 @@
       <!-- Dagelijkse stemming -->
       <div class="hero-widget" id="stemming-widget">
         <div class="hw-label">Hoe voel jij je vandaag?</div>
-        <div class="hw-stemmingen">
-          <button onclick="kiesStemming(event,'😊','Super!')" class="hw-btn">😊</button>
-          <button onclick="kiesStemming(event,'🥰','Liefdevol!')" class="hw-btn">🥰</button>
-          <button onclick="kiesStemming(event,'😐','Gewoon')" class="hw-btn">😐</button>
-          <button onclick="kiesStemming(event,'😴','Moe')" class="hw-btn">😴</button>
-          <button onclick="kiesStemming(event,'😢','Niet zo fijn')" class="hw-btn">😢</button>
+        <div class="gevoel-woorden" id="gevoel-woorden">
+          <button class="gw" data-emoji="😊" data-label="Blij">😊 Blij</button>
+          <button class="gw" data-emoji="😌" data-label="Rustig">😌 Rustig</button>
+          <button class="gw" data-emoji="🤩" data-label="Trots">🤩 Trots</button>
+          <button class="gw" data-emoji="😐" data-label="Gewoon">😐 Gewoon</button>
+          <button class="gw" data-emoji="😴" data-label="Moe">😴 Moe</button>
+          <button class="gw" data-emoji="😟" data-label="Zenuwachtig">😟 Zenuwachtig</button>
+          <button class="gw" data-emoji="😢" data-label="Verdrietig">😢 Verdrietig</button>
+          <button class="gw" data-emoji="😠" data-label="Boos">😠 Boos</button>
         </div>
+        <textarea id="gevoel-tekst" class="gevoel-tekst" rows="2" maxlength="300" placeholder="Of schrijf zelf hoe je je voelt… ✍️"></textarea>
+        <button class="gevoel-klaar" onclick="slaGevoelOp()">Klaar 💚</button>
+        <div class="gevoel-noot">Papa en mama kunnen lezen wat je hier schrijft. Iets geheims? Dat kan in je dagboek 📓</div>
         <div id="stemming-reactie" style="min-height:20px;font-size:0.85rem;font-weight:700;color:rgba(255,255,255,0.9);margin-top:6px"></div>
       </div>
       <!-- Dagelijkse quote -->
@@ -588,7 +600,14 @@
       </div>
     </div>
   </div>
+  <!-- 🌸 Dagdoel & spaarkaart (vult zich via beloningen.js) -->
+  <div id="home-dagdoel" style="margin:18px 0 4px"></div>
   <div class="home-grid">
+    <a href="spaarkaart.html" class="home-tile" style="text-decoration:none">
+      <div class="tile-emoji">🎁</div>
+      <div class="tile-label">Beloningen</div>
+      <div class="tile-sub">Pakketten & bonnen</div>
+    </a>
     <button class="home-tile" onclick="toon('schema', navBtn('schema'))">
       <div class="tile-emoji">🗓️</div>
       <div class="tile-label">Mijn Schema</div>
@@ -658,19 +677,11 @@
 
   <!-- Sterren beloningsbalk -->
   <div class="card accent-yellow" style="margin-top:18px">
-    <h2>⭐ Jouw sterren deze week</h2>
+    <h2>💚 Je gevoel gedeeld deze week</h2>
     <div id="sterren-balk" style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0"></div>
-    <p style="font-size:0.78rem;color:var(--muted)">Je verdient een ster voor elke dag dat je de app gebruikt en je stemming invult! 🌟</p>
+    <p style="font-size:0.78rem;color:var(--muted)">Je krijgt een hartje voor elke dag dat je laat weten hoe je je voelt 💚</p>
   </div>
 
-  <!-- 🎁 Beloningen (vult zich via beloningen.js) -->
-  <a href="taal.html#beloningen" id="home-beloning" class="card accent-pink" style="display:none;text-decoration:none;color:inherit">
-    <h2>🎁 Hier werk je naartoe</h2>
-    <div id="hb-naam" style="font-weight:800;font-size:1rem;margin:6px 0 8px"></div>
-    <div style="height:10px;background:var(--pink2);border-radius:10px;overflow:hidden"><div id="hb-balk" style="height:100%;width:0;background:linear-gradient(90deg,#ff6eb4,#ffb347);border-radius:10px"></div></div>
-    <div id="hb-stand" style="font-size:0.78rem;color:var(--muted);font-weight:700;margin-top:6px"></div>
-    <div style="font-size:0.82rem;font-weight:800;margin-top:10px;color:#ff6eb4">Bekijk alle beloningen ›</div>
-  </a>
 
   <!-- Geheim berichtje van papa/mama -->
   <div id="geheim-berichtje-card" style="display:none" class="card accent-pink">
@@ -1455,6 +1466,7 @@
       <h2>📈 Stemmingen deze week</h2>
       <canvas id="stemmingGrafiek" height="200" style="width:100%;margin-top:8px"></canvas>
       <div id="stemming-samenvatting" style="margin-top:12px;font-size:0.85rem;color:var(--muted);line-height:1.8"></div>
+      <div id="gevoel-teksten" style="margin-top:10px"></div>
     </div>
 
     <!-- Geheim berichtje sturen -->
@@ -1480,7 +1492,7 @@
     <div class="card accent-sky">
       <h2>📚 Leervoortgang</h2>
       <div id="ld-overzicht" style="font-size:0.86rem;line-height:1.6"></div>
-      <div style="font-weight:800;font-size:0.82rem;margin:14px 0 6px">📅 Oefendagen (laatste 14 dagen)</div>
+      <div style="font-weight:800;font-size:0.82rem;margin:14px 0 6px">⭐ Sterren per dag (laatste 14 dagen) · roze = oefendag</div>
       <div id="ld-dagen" style="display:flex;gap:4px;flex-wrap:wrap"></div>
       <details style="margin-top:14px">
         <summary style="font-weight:800;font-size:0.85rem;cursor:pointer">✏️ Waar ze laatst fouten maakte</summary>
@@ -1496,17 +1508,18 @@
     <!-- 🏆 Beloningsladder -->
     <div class="card accent-yellow">
       <h2>🏆 Beloningsladder</h2>
-      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:12px">Zet hier wat Milou verdient. Haalt ze een mijlpaal, dan krijgt ze een bon in de app en krijg jij een mailtje.</p>
+      <p style="font-size:0.8rem;color:var(--muted);margin-bottom:12px"><b>🎁 Pakketten</b> verdient Milou met werk: elk pakket is een mix van spelling, grammatica, lezen, rekenen en klokkijken. De pakketten gaan op volgorde, en extra werk telt mee voor het volgende pakket. <b>📅 Volhouden</b> en <b>🏅 Niveaus</b> geven extra beloningen. Haalt ze een beloning, dan krijgt ze een bon in de app en krijg jij een mailtje.</p>
       <button onclick="blPapaLadder()" style="width:100%;background:linear-gradient(135deg,#ff6eb4,#ffb347);border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:11px;border-radius:12px;color:white;font-size:0.88rem;margin-bottom:12px">🎁 Laad de beloningen van papa</button>
       <div id="bl-lijst" style="display:grid;gap:8px;margin-bottom:14px"></div>
       <div style="background:var(--bg);border-radius:14px;padding:12px;display:grid;gap:8px">
         <div style="font-weight:800;font-size:0.85rem">➕ Nieuwe beloning</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <select id="bl-type" onchange="blTypeWissel()" style="flex:1;min-width:140px;border:2px solid var(--pink2);border-radius:12px;padding:8px;font-family:'Nunito',sans-serif;font-size:0.85rem;background:var(--card);color:var(--text)">
-            <option value="sterren">⭐ Aantal sterren erbij</option>
-            <option value="oefendagen">📅 Aantal oefendagen</option>
-            <option value="niveau">🎯 Niveau halen</option>
+            <option value="pakket">🎁 Pakket (werk)</option>
+            <option value="dagen">📅 Extra: aantal oefendagen</option>
+            <option value="niveau">🏅 Extra: niveau halen</option>
           </select>
+          <select id="bl-maat" onchange="blTypeWissel()" style="flex:1;min-width:120px;border:2px solid var(--pink2);border-radius:12px;padding:8px;font-family:'Nunito',sans-serif;font-size:0.85rem;background:var(--card);color:var(--text)"></select>
           <select id="bl-onderdeel" style="display:none;flex:1;min-width:120px;border:2px solid var(--pink2);border-radius:12px;padding:8px;font-family:'Nunito',sans-serif;font-size:0.85rem;background:var(--card);color:var(--text)">
             <option value="spelling">Spelling</option><option value="lezen">Lezen</option><option value="grammatica">Grammatica</option><option value="klokkijken">Klokkijken</option>
           </select>
@@ -1572,7 +1585,7 @@ if (dagTekstEl) dagTekstEl.textContent = `${groet}, het is ${dagNu} 🌸`;
 // ════════════════════════════════════════════════════════
 
 // ── Stemming opslaan in localStorage ──
-function slaStemmingOp(emoji, label) {
+function slaStemmingOp(emoji, label, tekst) {
   const nu      = new Date();
   const datumKey = `${nu.getFullYear()}-${String(nu.getMonth()+1).padStart(2,'0')}-${String(nu.getDate()).padStart(2,'0')}`;
   const dagNaamNu = ['Zondag','Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag'][nu.getDay()];
@@ -1584,7 +1597,9 @@ function slaStemmingOp(emoji, label) {
 
   // Voeg toe (meerdere stemmingen op één dag zijn OK)
   if (!weekData[datumKey]) weekData[datumKey] = [];
-  weekData[datumKey].push({ emoji, label, dag: dagNaamNu, tijd: tijdStr, timestamp: nu.toISOString() });
+  const regel = { emoji, label, dag: dagNaamNu, tijd: tijdStr, timestamp: nu.toISOString() };
+  if (tekst) regel.tekst = tekst;
+  weekData[datumKey].push(regel);
 
   localStorage.setItem('milou_stemmingen', JSON.stringify(weekData));
   return weekData;
@@ -1598,7 +1613,7 @@ function bouwWeekOverzicht(weekData) {
   // Laatste 7 dagen
   let overzicht = '';
   let totaalStemmingen = 0;
-  let stemmingTelling = { '😊':0, '🥰':0, '😐':0, '😴':0, '😢':0 };
+  let stemmingTelling = { '😊':0, '🥰':0, '🤩':0, '😌':0, '😐':0, '💬':0, '😴':0, '😟':0, '😢':0, '😠':0 };
 
   for (let i = 6; i >= 0; i--) {
     const d = new Date(nu);
@@ -1611,7 +1626,7 @@ function bouwWeekOverzicht(weekData) {
       const items = weekData[key];
       totaalStemmingen += items.length;
       items.forEach(s => { if (stemmingTelling[s.emoji] !== undefined) stemmingTelling[s.emoji]++; });
-      const stemmingRegel = items.map(s => `${s.emoji} ${s.label} (${s.tijd})`).join(', ');
+      const stemmingRegel = items.map(s => `${s.emoji} ${s.label}${s.tekst ? ' ("' + s.tekst + '")' : ''} (${s.tijd})`).join(', ');
       overzicht += `${dagNaam} ${datumStr}: ${stemmingRegel}\n`;
     } else {
       overzicht += `${dagNaam} ${datumStr}: geen stemming ingevuld\n`;
@@ -1639,9 +1654,9 @@ function verstuurWeekmail(weekData) {
     week_periode: weekStr,
     samenvatting: samenvatting,
     overzicht:    overzicht,
-    blij:         stemmingTelling['😊'] + stemmingTelling['🥰'],
-    gewoon:       stemmingTelling['😐'],
-    moe_verdrietig: stemmingTelling['😴'] + stemmingTelling['😢'],
+    blij:         stemmingTelling['😊'] + stemmingTelling['🥰'] + stemmingTelling['🤩'] + stemmingTelling['😌'],
+    gewoon:       stemmingTelling['😐'] + stemmingTelling['💬'],
+    moe_verdrietig: stemmingTelling['😴'] + stemmingTelling['😢'] + stemmingTelling['😟'] + stemmingTelling['😠'],
     totaal:       totaalStemmingen,
   };
 
@@ -1695,8 +1710,44 @@ const STEMMING_REACTIES = {
   '😐': ['Dat is ook goed. Niet elke dag hoeft bijzonder te zijn 🌿', 'Gewoon is prima! Rust maar even 💚'],
   '😴': ['Doe het rustig aan vandaag. Jij mag ook uitrusten 😴', 'Moe zijn mag. Zorg goed voor jezelf 🌙'],
   '😢': ['Dat is oké. Slechte dagen horen erbij. Je bent niet alleen 💕', 'Ik hoor je. Misschien helpt een knuffel of muziek? 🎵'],
+  '😌': ['Lekker rustig, wat fijn 🌿', 'Geniet van die rust 💚'],
+  '🤩': ['Wauw, trots mag je zijn! 🌟', 'Super dat je trots bent op jezelf! 💪'],
+  '😟': ['Spannend hè? Praat er gerust over met papa of mama 💕', 'Even diep ademhalen helpt soms. Je kunt het! 🌸'],
+  '😠': ['Boos zijn mag. Misschien helpt even bewegen of muziek? 🎵', 'Dat is balen. Vertel het gerust aan papa of mama 💕'],
 };
 
+// ── Gevoel: woorden kiezen en/of zelf schrijven ──
+document.querySelectorAll('#gevoel-woorden .gw').forEach(function (b) {
+  b.addEventListener('click', function () {
+    const al = this.classList.contains('gekozen');
+    document.querySelectorAll('#gevoel-woorden .gw').forEach(x => x.classList.remove('gekozen'));
+    if (!al) this.classList.add('gekozen');
+  });
+});
+const GEVOEL_WOORDEN = [
+  [/blij|vrolijk|fijn|leuk|happy|goed|super|gezellig/, '😊', 'Blij'],
+  [/rustig|relax|kalm|chill/, '😌', 'Rustig'],
+  [/trots/, '🤩', 'Trots'],
+  [/moe|slaperig|uitgeput/, '😴', 'Moe'],
+  [/zenuw|bang|spannend|stress|onrustig|eng/, '😟', 'Zenuwachtig'],
+  [/verdrietig|huil|sad|alleen|mis /, '😢', 'Verdrietig'],
+  [/boos|kwaad|irritant|geïrriteerd|chagrijnig/, '😠', 'Boos']
+];
+function slaGevoelOp() {
+  const gekozen = document.querySelector('#gevoel-woorden .gw.gekozen');
+  const veld = document.getElementById('gevoel-tekst'), tekst = veld.value.trim();
+  const reactie = document.getElementById('stemming-reactie');
+  if (!gekozen && !tekst) { reactie.textContent = 'Kies een woord of schrijf iets op 💚'; return; }
+  let emoji = '💬', label = 'Zelf geschreven';
+  if (gekozen) { emoji = gekozen.dataset.emoji; label = gekozen.dataset.label; }
+  else { const m = GEVOEL_WOORDEN.find(w => w[0].test(tekst.toLowerCase())); if (m) { emoji = m[1]; label = m[2]; } }
+  slaStemmingOp(emoji, label, tekst);
+  const reacties = STEMMING_REACTIES[emoji] || ['Dank je dat je het deelt 💚 Het is fijn dat je laat weten hoe het met je gaat.'];
+  reactie.textContent = reacties[Math.floor(Math.random() * reacties.length)];
+  veld.value = '';
+  document.querySelectorAll('#gevoel-woorden .gw').forEach(x => x.classList.remove('gekozen'));
+  updateSterren();
+}
 function kiesStemming(e, emoji, label) {
   document.querySelectorAll('.hw-btn').forEach(b => b.classList.remove('gekozen'));
   if (e && e.currentTarget) e.currentTarget.classList.add('gekozen');
@@ -2470,7 +2521,7 @@ function updateSterren() {
   for (let i = 0; i < 7; i++) {
     const s = document.createElement('span');
     s.style.cssText = `font-size:1.6rem;filter:${i < sterren ? 'none' : 'grayscale(1) opacity(0.3)'}`;
-    s.textContent = i < sterren ? '⭐' : '☆';
+    s.textContent = i < sterren ? '💚' : '🤍';
     el.appendChild(s);
   }
 }
@@ -2624,7 +2675,25 @@ function uitloggenOuder() {
   document.getElementById('ouder-dashboard').style.display = 'none';
   if (document.getElementById('ouder-pin')) document.getElementById('ouder-pin').value = '';
 }
+function laadGevoelTeksten() {
+  const el = document.getElementById('gevoel-teksten'); if (!el) return;
+  let data = {}; try { data = JSON.parse(localStorage.getItem('milou_stemmingen') || '{}'); } catch (e) {}
+  const regels = [];
+  Object.keys(data).sort().reverse().slice(0, 14).forEach(k => (data[k] || []).slice().reverse().forEach(x => { if (x.tekst) regels.push({ k, x }); }));
+  if (!regels.length) { el.innerHTML = ''; return; }
+  el.innerHTML = '<div style="font-weight:800;font-size:0.85rem;margin-bottom:6px">💬 Wat Milou zelf schreef</div>';
+  regels.slice(0, 8).forEach(r => {
+    const d = document.createElement('div');
+    d.style.cssText = 'background:var(--bg);border-radius:12px;padding:8px 12px;margin-bottom:6px;font-size:0.85rem;line-height:1.45';
+    const datum = new Date(r.x.timestamp).toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' });
+    d.innerHTML = '<div style="font-size:0.72rem;color:var(--muted);font-weight:800"></div><div></div>';
+    d.children[0].textContent = r.x.emoji + ' ' + datum + ' · ' + r.x.tijd;
+    d.children[1].textContent = r.x.tekst;
+    el.appendChild(d);
+  });
+}
 function laadOuderDashboard() {
+  laadGevoelTeksten();
   tekenStemmingGrafiek();
   laadDagboekStats();
   laadLeerDashboard();
@@ -2640,7 +2709,13 @@ function laadLeerDashboard() {
   const v = MB.voortgang(), log = MB.oefenlog();
   // Overzicht per onderdeel
   let h = '<div style="display:grid;gap:8px">';
-  h += '<div style="font-weight:800">⭐ ' + MB.sterren() + ' sterren · 📅 ' + MB.oefendagen() + ' oefendagen</div>';
+  const tk = MB.taken();
+  h += '<div style="font-weight:800">📅 ' + MB.oefendagen() + ' oefendagen · ⭐ ' + MB.sterren() + ' sterren</div>';
+  h += '<div style="font-size:0.8rem;color:var(--muted);font-weight:700">Totaal gedaan: ' + MB.VOLGORDE.map(k => MB.TAKEN[k].emoji + ' ' + tk[k] + ' ' + MB.TAKEN[k].meer).join(' · ') + '</div>';
+  h += '<label style="display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:0.82rem;font-weight:700;background:var(--bg);border-radius:12px;padding:8px 12px">'
+    + '<span>🎯 Dagdoel: sterren per dag voor een oefendag</span>'
+    + '<select id="ld-dagdoel" style="border:2px solid var(--pink2);border-radius:10px;padding:6px;font-family:Nunito,sans-serif;background:var(--card);color:var(--text)">'
+    + [5, 8, 10, 12, 15, 20].map(n => '<option value="' + n + '"' + (n === MB.dagdoel() ? ' selected' : '') + '>' + n + ' ⭐</option>').join('') + '</select></label>';
   Object.keys(MB.ONDERDELEN).forEach(o => {
     const x = v[o], hoog = MB.hoogsteNiveau(o), pct = x.totaal ? Math.round(x.goed / x.totaal * 100) : 0, n = AANTAL_NIVEAUS[o];
     const laatst = x.laatst ? new Date(x.laatst).toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }) : 'nog niet';
@@ -2656,15 +2731,17 @@ function laadLeerDashboard() {
     + '<div style="font-size:0.78rem;color:var(--muted)">Een niveau is gehaald bij 5 keer op een rij goed</div></div>';
   h += '</div>';
   document.getElementById('ld-overzicht').innerHTML = h;
-  // Oefendagen
+  document.getElementById('ld-dagdoel').addEventListener('change', function () { MB.zetDagdoel(parseInt(this.value, 10)); laadLeerDashboard(); });
+  // Sterren per dag
   const dg = document.getElementById('ld-dagen'); dg.innerHTML = '';
   for (let i = 13; i >= 0; i--) {
     const d = new Date(); d.setDate(d.getDate() - i);
     const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     const e = log[key], s = document.createElement('div');
-    s.title = d.toLocaleDateString('nl-NL') + (e ? ': ' + e.vragen + ' vragen' : '');
-    s.style.cssText = 'width:30px;height:38px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:0.62rem;font-weight:800;' + (e ? 'background:#a8e6cf;color:#1f5a3f' : 'background:var(--bg);color:var(--muted)');
-    s.innerHTML = '<span>' + ['zo','ma','di','wo','do','vr','za'][d.getDay()] + '</span><span>' + (e ? (e.vragen || '✓') : '·') + '</span>';
+    const st = e ? (e.sterren || 0) : 0, stempel = e && e.stempel;
+    s.title = d.toLocaleDateString('nl-NL') + (e ? ': ' + st + ' sterren, ' + e.vragen + ' vragen' : '');
+    s.style.cssText = 'width:30px;height:38px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:0.62rem;font-weight:800;' + (stempel ? 'background:#ffc4e1;color:#8a1f55' : e ? 'background:#fff1de;color:#7a4a00' : 'background:var(--bg);color:var(--muted)');
+    s.innerHTML = '<span>' + ['zo','ma','di','wo','do','vr','za'][d.getDay()] + '</span><span>' + (stempel ? '✅' : e ? st : '·') + '</span>';
     dg.appendChild(s);
   }
   // Fouten
@@ -2693,11 +2770,12 @@ function laadBeloningBeheer() {
   const l = MB.ladder(), el = document.getElementById('bl-lijst');
   el.innerHTML = l.length ? '' : '<div style="font-size:0.85rem;color:var(--muted)">Nog geen beloningen. Voeg er hieronder een toe.</div>';
   l.forEach((b, i) => {
-    const st = Math.min(MB.stand(b), b.drempel), pct = Math.round(st / b.drempel * 100);
+    const isPakket = b.type === 'pakket';
+    const st = isPakket ? MB.stand(b) : Math.min(MB.stand(b), b.drempel), pct = isPakket ? st : Math.round(st / b.drempel * 100);
     const r = document.createElement('div');
     r.style.cssText = 'background:var(--bg);border-radius:12px;padding:10px 12px;display:flex;gap:10px;align-items:center';
     r.innerHTML = '<div style="flex:1;min-width:0"><div class="bl-naam" style="font-weight:800;font-size:0.9rem"></div>'
-      + '<div style="font-size:0.75rem;color:var(--muted)">' + htmlVeilig(MB.omschrijf(b)) + (b.bereikt ? ' · ✅ behaald op ' + new Date(b.datum).toLocaleDateString('nl-NL') : ' · ' + (b.type === 'niveau' ? 'nu niveau ' + st : st + ' van ' + b.drempel)) + '</div>'
+      + '<div style="font-size:0.75rem;color:var(--muted)">' + (isPakket ? '🎁 ' : b.type === 'dagen' ? '📅 Extra · ' : '🏅 Extra · ') + htmlVeilig(MB.omschrijf(b)) + (b.bereikt ? ' · ✅ behaald op ' + new Date(b.datum).toLocaleDateString('nl-NL') : ' · ' + (isPakket ? pct + '% af' : b.type === 'niveau' ? 'nu niveau ' + st : st + ' van ' + b.drempel)) + '</div>'
       + (b.bereikt ? '' : '<div style="height:6px;background:var(--pink2);border-radius:6px;overflow:hidden;margin-top:6px"><div style="height:100%;width:' + pct + '%;background:#ffb347"></div></div>')
       + '</div><button aria-label="Verwijder" style="background:none;border:none;cursor:pointer;font-size:1.1rem">🗑️</button>';
     r.querySelector('.bl-naam').textContent = b.beloning;
@@ -2726,39 +2804,36 @@ function laadBeloningBeheer() {
 function blTypeWissel() {
   const t = document.getElementById('bl-type').value;
   document.getElementById('bl-onderdeel').style.display = t === 'niveau' ? '' : 'none';
-  document.getElementById('bl-hint').textContent = t === 'sterren' ? 'Telt vanaf nu. Ze heeft er nu ' + MB.sterren() + ', die tellen niet mee.'
-    : t === 'oefendagen' ? 'Telt alle dagen waarop ze in het leer- of taalboek oefent (nu ' + MB.oefendagen() + ').'
+  const maat = document.getElementById('bl-maat');
+  if (!maat.options.length) maat.innerHTML = Object.keys(MB.MATEN).map(k => '<option value="' + k + '">' + MB.MATEN[k].naam + '</option>').join('');
+  maat.style.display = t === 'pakket' ? '' : 'none';
+  document.getElementById('bl-drempel').style.display = t === 'pakket' ? 'none' : '';
+  document.getElementById('bl-hint').textContent = t === 'pakket' ? 'Pakket: ' + MB.pakketTekst(MB.MATEN[maat.value].pakket) + '. Komt achteraan in de rij.'
+    : t === 'dagen' ? 'Ze heeft nu ' + MB.oefendagen() + ' oefendagen. Een oefendag = ' + MB.dagdoel() + ' ⭐ op één dag.'
     : 'Spelling heeft 10 niveaus, grammatica 8, lezen 5 en klokkijken 5.';
 }
 function blToevoegen() {
   const t = document.getElementById('bl-type').value, d = parseInt(document.getElementById('bl-drempel').value, 10);
   const bel = document.getElementById('bl-beloning').value.trim(), o = document.getElementById('bl-onderdeel').value;
-  if (!d || d < 1) { alert('Vul een aantal in.'); return; }
+  if (t !== 'pakket' && (!d || d < 1)) { alert('Vul een aantal in.'); return; }
   if (!bel) { alert('Vul in wat de beloning is.'); return; }
   if (t === 'niveau' && d > AANTAL_NIVEAUS[o]) { alert(MB.NAMEN[o] + ' heeft ' + AANTAL_NIVEAUS[o] + ' niveaus.'); return; }
-  const b = { id: 'b' + Date.now(), type: t, drempel: d, beloning: bel, bereikt: false };
+  const b = { id: 'b' + Date.now(), type: t, beloning: bel, bereikt: false };
+  if (t === 'pakket') b.pakket = JSON.parse(JSON.stringify(MB.MATEN[document.getElementById('bl-maat').value].pakket));
+  else b.drempel = d;
   if (t === 'niveau') b.onderdeel = o;
-  if (t === 'sterren') b.basis = MB.sterren();
   const l = MB.ladder(); l.push(b); MB.bewaarLadder(l);
   document.getElementById('bl-drempel').value = ''; document.getElementById('bl-beloning').value = '';
   laadBeloningBeheer();
 }
 function laadHomeBeloning() {
-  const kaart = document.getElementById('home-beloning');
-  if (!kaart || typeof MB === 'undefined') return;
-  const nv = MB.volgende();
-  if (!nv) { kaart.style.display = 'none'; return; }
-  kaart.style.display = 'block';
-  document.getElementById('hb-naam').textContent = nv.b.beloning;
-  document.getElementById('hb-balk').style.width = nv.pct + '%';
-  const rest = nv.b.drempel - nv.stand;
-  document.getElementById('hb-stand').textContent = nv.b.type === 'niveau'
-    ? MB.NAMEN[nv.b.onderdeel] + ': niveau ' + nv.stand + ' van ' + nv.b.drempel
-    : 'Nog ' + rest + (nv.b.type === 'sterren' ? ' ⭐' : (rest === 1 ? ' oefendag' : ' oefendagen')) + ' te gaan!';
+  if (typeof MB === 'undefined') return;
+  MB.widget(document.getElementById('home-dagdoel'), { link: 'spaarkaart.html' });
+  MB.check(); // nog niet getoonde bonnen alsnog laten zien
 }
 window.addEventListener('load', laadHomeBeloning);
 function blPapaLadder() {
-  if (!confirm('De huidige beloningsladder wordt vervangen door de 10 beloningen van papa. Verdiende bonnen blijven bewaard. Doorgaan?')) return;
+  if (!confirm('De beloningsladder wordt vervangen door de beloningen van papa (7 pakketten + extra beloningen). Al verdiende beloningen en bonnen blijven bewaard, en het tellen van taken begint opnieuw. Doorgaan?')) return;
   MB.laadPapaLadder();
   laadBeloningBeheer();
 }
@@ -2773,7 +2848,7 @@ function tekenStemmingGrafiek() {
   const ctx = canvas.getContext('2d');
   let weekData = {}; try { weekData = JSON.parse(localStorage.getItem('milou_stemmingen') || '{}'); } catch(e) {}
   const nu = new Date();
-  const SCORE = { '😊':5,'🥰':5,'😐':3,'😴':2,'😢':1 };
+  const SCORE = { '😊':5,'🥰':5,'🤩':5,'😌':4,'😐':3,'💬':3,'😴':2,'😟':2,'😢':1,'😠':1 };
   const DN = ['Zo','Ma','Di','Wo','Do','Vr','Za'];
   const labels=[], scores=[], kleuren=[];
   for (let i = 6; i >= 0; i--) {

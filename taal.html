@@ -41,10 +41,7 @@ h1.titel { font-family: 'Pacifico', cursive; font-weight: 400; color: var(--roze
 .sub { text-align: center; color: var(--muted); font-size: 0.9rem; margin-top: 2px; }
 
 /* Beloningsstrook: het kaartje bovenaan dat laat zien waar ze naartoe werkt */
-.beloning-strook {
-  margin: 18px 0 20px; background: var(--wit); border-radius: 22px; box-shadow: var(--shadow);
-  display: flex; gap: 14px; align-items: center; padding: 14px 16px; border: 2px dashed var(--roze2);
-}
+.beloning-strook { margin: 18px 0 20px; }
 .bs-trofee { font-size: 2.2rem; }
 .bs-midden { flex: 1; min-width: 0; }
 .bs-label { font-size: 0.75rem; font-weight: 800; color: var(--muted); }
@@ -438,6 +435,7 @@ function sterren() { return MB.sterren(); }
 function updateSterren() { $('sterren').textContent = sterren(); }
 function voegSterToe(n) {
   try { localStorage.setItem('milou_leer_sterren', sterren() + n); } catch (e) {}
+  MB.logSterren(n); // telt mee voor de oefendag van vandaag
   updateSterren();
   for (let i = 0; i < n; i++) setTimeout(() => {
     const s = document.createElement('div'); s.className = 'ster-pop'; s.textContent = '⭐';
@@ -514,15 +512,7 @@ function renderMenu() {
   });
   renderStrook();
 }
-function renderStrook() {
-  const el = $('beloning-strook'), nv = MB.volgende(), nb = MB.bonnen().filter(b => !b.ingewisseld).length;
-  const knop = `<button class="bs-bonnen" onclick="openBonnen()">🎁<br>Alle beloningen${nb ? '<br>🎟️ ' + nb : ''}</button>`;
-  if (!nv) { el.innerHTML = `<div class="bs-trofee">🏆</div><div class="bs-midden"><div class="bs-label">Beloningen</div><div class="bs-naam">Alles verdiend! Papa bedenkt vast iets nieuws.</div></div>${knop}`; return; }
-  const eenh = nv.b.type === 'sterren' ? '⭐' : nv.b.type === 'oefendagen' ? 'dagen' : '';
-  const standTxt = nv.b.type === 'niveau' ? MB.NAMEN[nv.b.onderdeel] + ': niveau ' + nv.stand + ' van ' + nv.b.drempel : nv.stand + ' van ' + nv.b.drempel + ' ' + eenh;
-  el.innerHTML = `<div class="bs-trofee">🎁</div><div class="bs-midden"><div class="bs-label">Hier werk je naartoe</div><div class="bs-naam"></div><div class="balk"><div style="width:${nv.pct}%"></div></div><div class="bs-stand">${esc(standTxt)}</div></div>${knop}`;
-  el.querySelector('.bs-naam').textContent = nv.b.beloning;
-}
+function renderStrook() { MB.widget($('beloning-strook'), { link: 'spaarkaart.html' }); }
 
 // ════════════════════════════════════════════════════════════
 //  NIVEAUS
@@ -796,6 +786,9 @@ function eindeRonde() {
   const pct = ronde.score / ronde.telt, gehaald = pct >= DOEL;
   const v = MB.voortgang(), alGehaald = v[ronde.vak].behaald.indexOf(nr) >= 0;
   MB.logOefening(ronde.vak, ronde.score, ronde.telt);
+  // Een ronde telt mee voor het pakket als ze minstens de helft goed had
+  const teltMee = ronde.score >= Math.ceil(ronde.telt / 2);
+  if (teltMee) MB.telTaak(ronde.vak);
   if (gehaald && !alGehaald) {
     v[ronde.vak].behaald.push(nr); MB.bewaarVoortgang(v);
     ronde.verdiend += 5; voegSterToe(5);
@@ -807,7 +800,8 @@ function eindeRonde() {
   $('res-tekst').textContent = gehaald
     ? (alGehaald ? 'Weer gehaald! Dit niveau ken je echt goed.' : 'Niveau ' + nr + ' gehaald! ' + (nr < d.niveaus.length ? 'Niveau ' + (nr + 1) + ' is nu open.' : 'Je hebt alle niveaus gehaald, wauw!'))
     : 'Goed geoefend! Je hebt ' + Math.ceil(ronde.telt * DOEL) + ' goed nodig om het niveau te halen. Probeer het nog een keer.';
-  $('res-sterren').textContent = ronde.verdiend ? '+' + ronde.verdiend + ' ⭐ verdiend' + (gehaald && !alGehaald ? ' (met 5 bonussterren)' : '') : '';
+  $('res-sterren').textContent = (ronde.verdiend ? '+' + ronde.verdiend + ' ⭐ verdiend' + (gehaald && !alGehaald ? ' (met 5 bonussterren)' : '') + ' · ' : '')
+    + (teltMee ? '🎁 Deze ronde telt mee voor je pakket!' : '🎁 Haal minstens de helft goed, dan telt de ronde mee voor je pakket.');
   const kn = $('res-knoppen'); kn.innerHTML = '';
   function knop(tekst, licht, fn) { const b = document.createElement('button'); b.className = 'knop' + (licht ? ' licht' : ''); b.textContent = tekst; b.addEventListener('click', fn); kn.appendChild(b); }
   knop('Nog een keer', !gehaald ? false : true, function () { openUitleg(ronde.ni); startOefenen(); });
@@ -825,6 +819,7 @@ function stopOefenen() {
 //  BONNEN
 // ════════════════════════════════════════════════════════════
 function openBonnen() {
+  location.href = 'spaarkaart.html'; return;
   zetKleur('spelling');
   const lijst = $('bon-lijst'), bn = MB.bonnen();
   lijst.innerHTML = bn.length ? '' : '<div class="leeg">🎟️ Hier komen je beloningsbonnen.<br>Oefen in je taalboek en leerboek om ze te verdienen!</div>';
@@ -853,6 +848,7 @@ function openBonnen() {
 }
 
 renderMenu();
+(function () { const o = new URLSearchParams(location.search).get('open'); if (DATA[o]) openVak(o); })();
 if (location.hash === '#beloningen') openBonnen();
 window.addEventListener('hashchange', function () { if (location.hash === '#beloningen') openBonnen(); });
 </script>

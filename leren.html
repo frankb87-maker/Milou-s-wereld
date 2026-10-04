@@ -414,11 +414,7 @@ canvas.overtrek-canvas {
       <h1 style="font-family:'Pacifico',cursive;font-size:1.5rem;color:var(--roze);margin-top:6px">Milou's Leerboek</h1>
       <p style="color:var(--muted);font-size:0.88rem;margin-top:4px">Kies wat je wilt leren vandaag!</p>
     </div>
-    <a href="taal.html#beloningen" class="leer-strook" id="leer-strook" style="display:none">
-      <div class="ls-em">🎁</div>
-      <div class="ls-mid"><div class="ls-label">Hier werk je naartoe</div><div class="ls-naam" id="ls-naam"></div><div class="ls-balk"><div id="ls-balk"></div></div><div class="ls-stand" id="ls-stand"></div></div>
-      <div class="ls-pijl">Alle<br>beloningen</div>
-    </a>
+    <div id="leer-strook" style="margin:0 0 18px"></div>
     <div class="module-grid">
       <div class="module-kaart" onclick="startRekenboek('plus')">
         <div class="mk-emoji">➕</div>
@@ -604,6 +600,7 @@ function voegSterToe(aantal, x, y) {
   // Telt mee voor oefendagen en de beloningsladder (zie beloningen.js)
   if (typeof MB !== 'undefined') {
     MB.logOefening(null, 1, 1);
+    MB.logSterren(aantal); // telt mee voor de oefendag van vandaag
     clearTimeout(beloningTimer);
     beloningTimer = setTimeout(function () { MB.check(); renderLeerStrook(); }, 1500);
   }
@@ -781,6 +778,7 @@ function verwerkAntwoord(juist, el, goed) {
     fb.textContent = '✅ Super goed! Knap hoor! 🌟';
     fb.className = 'feedback-vak goed';
     rekenState.aantalGoed++;
+    if (typeof MB !== 'undefined') MB.telTaak('rekenen');
     speelGeluid('goed');
     voegSterToe(1, window.innerWidth/2, window.innerHeight/2);
     maakConfetti();
@@ -1493,6 +1491,7 @@ function klokResultaat(juist, antwoord, extra) {
     fb.className = 'feedback-vak goed';
     speelGeluid('goed');
     voegSterToe(sterren, window.innerWidth / 2, window.innerHeight / 2);
+    if (typeof MB !== 'undefined') MB.telTaak('klok');
     if (klokReeks === 5) {
       const nieuwNiveau = klokLaadKlaar().indexOf(klokNiv) === -1 && klokNiv > 0;
       klokBewaarKlaar(klokNiv); renderKlokNiveaus(); maakConfetti();
@@ -1579,19 +1578,16 @@ function updateKlokLive() {
 // ══════════════════════════════════════════════════
 laadSterren();
 function renderLeerStrook() {
-  const el = document.getElementById('leer-strook');
-  if (!el || typeof MB === 'undefined') return;
-  const nv = MB.volgende();
-  if (!nv) { el.style.display = 'none'; return; }
-  el.style.display = 'flex';
-  document.getElementById('ls-naam').textContent = nv.b.beloning;
-  document.getElementById('ls-balk').style.width = nv.pct + '%';
-  const rest = nv.b.drempel - nv.stand;
-  document.getElementById('ls-stand').textContent = nv.b.type === 'niveau'
-    ? MB.NAMEN[nv.b.onderdeel] + ': niveau ' + nv.stand + ' van ' + nv.b.drempel
-    : 'Nog ' + rest + (nv.b.type === 'sterren' ? ' ⭐' : (rest === 1 ? ' oefendag' : ' oefendagen')) + ' te gaan!';
+  if (typeof MB === 'undefined') return;
+  MB.widget(document.getElementById('leer-strook'), { link: 'spaarkaart.html' });
 }
 renderLeerStrook();
+// Directe links vanuit het pakket, bijv. leren.html?open=klok
+(function () {
+  const o = new URLSearchParams(location.search).get('open');
+  if (o === 'klok') startKlok();
+  else if (['plus', 'min', 'keer'].indexOf(o) >= 0) startRekenboek(o);
+})();
 maakBloemenBg();
 </script>
 </body>
