@@ -101,6 +101,8 @@ h1.titel { font-family: 'Pacifico', cursive; font-weight: 400; color: var(--roze
 .lees-tekst { background: var(--wit); border-radius: 20px; padding: 18px 18px 14px; box-shadow: var(--shadow); margin-bottom: 14px; }
 .lees-tekst h3 { font-size: 1.1rem; font-weight: 900; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .lees-tekst p { font-size: 1.05rem; line-height: 1.75; max-width: 62ch; }
+.stem-info { margin-top: 22px; text-align: center; font-size: 0.78rem; font-weight: 700; color: var(--muted); line-height: 1.5; }
+.stem-info button { border: 2px solid #f0e3ec; background: var(--wit); border-radius: 999px; padding: 5px 12px; font-weight: 900; font-size: 0.78rem; cursor: pointer; margin-left: 6px; }
 .lees-hulp { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 10px; }
 .tempo-knop { border: 2px solid #f0e3ec; background: var(--wit); border-radius: 999px; padding: 6px 12px; font-weight: 900; font-size: 0.8rem; cursor: pointer; }
 .lees-tip { font-size: 0.78rem; font-weight: 800; color: var(--muted); }
@@ -190,6 +192,7 @@ h1.titel { font-family: 'Pacifico', cursive; font-weight: 400; color: var(--roze
     <p class="sub">Elke dag een beetje, en je wordt steeds sterker!</p>
     <div class="beloning-strook" id="beloning-strook"></div>
     <div class="vak-lijst" id="vak-lijst"></div>
+    <div class="stem-info" id="stem-info"></div>
   </div>
 
   <!-- NIVEAUS -->
@@ -476,7 +479,7 @@ function confetti() {
 }
 
 // ── Voorlezen (Nederlandse stem van de iPad) ──
-let nlStem = null;
+let nlStem = null, nlStemKwaliteit = 0;
 // Voorkeur voor een lieve vrouwenstem. Claire (iPad/iPhone), Ellen (Vlaams), en de vrouwenstemmen van Google/Microsoft.
 const VROUWENSTEMMEN = ['claire', 'ellen', 'fleur', 'google nederlands', 'colette', 'fenna', 'hanna', 'maartje'];
 const MANNENSTEMMEN = ['xander', 'frank', 'maarten', 'arnaud'];
@@ -485,17 +488,20 @@ function zoekStem() {
   const nl = speechSynthesis.getVoices().filter(v => (v.lang || '').replace('_', '-').toLowerCase().indexOf('nl') === 0);
   const naam = v => (v.name || '').toLowerCase();
   const isVrouw = v => VROUWENSTEMMEN.some(n => naam(v).indexOf(n) >= 0);
-  const kwaliteit = v => /premium|enhanced|verbeterd|natural/.test(naam(v)) ? 2 : 1;
+  const kwaliteit = v => { const t = naam(v) + ' ' + (v.voiceURI || '').toLowerCase(); return /premium/.test(t) ? 3 : /enhanced|verbeterd|natural/.test(t) ? 2 : 1; };
   const vrouwen = nl.filter(isVrouw).sort((a, b) => kwaliteit(b) - kwaliteit(a) || (b.lang === 'nl-NL') - (a.lang === 'nl-NL'));
+  const rest = nl.slice().sort((a, b) => kwaliteit(b) - kwaliteit(a));
   nlStem = vrouwen[0]
-    || nl.find(v => v.lang === 'nl-NL' && !MANNENSTEMMEN.some(n => naam(v).indexOf(n) >= 0))
-    || nl.find(v => v.lang === 'nl-NL') || nl[0] || null;
+    || rest.find(v => v.lang === 'nl-NL' && !MANNENSTEMMEN.some(n => naam(v).indexOf(n) >= 0))
+    || rest.find(v => v.lang === 'nl-NL') || rest[0] || null;
+  nlStemKwaliteit = nlStem ? kwaliteit(nlStem) : 0;
 }
 if ('speechSynthesis' in window) { zoekStem(); speechSynthesis.onvoiceschanged = zoekStem; }
 function kanSpreken() { return 'speechSynthesis' in window; }
 // Voorleestempo: Milou kan kiezen tussen rustig en heel langzaam
-let leesTempo = 0.85;
-try { leesTempo = parseFloat(localStorage.getItem('milou_leestempo')) || 0.85; } catch (e) {}
+const TEMPO_RUSTIG = 0.92, TEMPO_LANGZAAM = 0.78;
+let leesTempo = TEMPO_RUSTIG;
+try { leesTempo = (parseFloat(localStorage.getItem('milou_leestempo')) || 1) < 0.85 ? TEMPO_LANGZAAM : TEMPO_RUSTIG; } catch (e) {}
 let spreekToken = 0;
 function maakUitspraak(tekst, tempo) {
   if (!nlStem) zoekStem(); // op de iPad komen de stemmen soms pas later binnen
@@ -529,6 +535,19 @@ function spreekReeks(stukken, bijStuk, klaar, tempo) {
   setTimeout(volgende, 120);
 }
 function stopSpreken() { spreekToken++; if (kanSpreken()) speechSynthesis.cancel(); }
+function spreekWoord(woord, metOpdracht) {
+  const w = String(woord).trim();
+  spreekReeks([(metOpdracht ? 'Schrijf op: ' : 'Het woord is: ') + w + '.', w + '.'], null, null, TEMPO_LANGZAAM);
+}
+// iPad: de eerste keer dat de stem praat valt het begin soms weg. Bij de eerste tik "warmen" we de stem stilletjes op.
+(function () {
+  if (!kanSpreken()) return;
+  function wakker() {
+    try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; u.lang = 'nl-NL'; speechSynthesis.speak(u); } catch (e) {}
+    document.removeEventListener('pointerdown', wakker, true);
+  }
+  document.addEventListener('pointerdown', wakker, true);
+})();
 function zonderHtml(h) { const d = document.createElement('div'); d.innerHTML = h.replace(/<br>/g, '. '); return d.textContent; }
 
 // ════════════════════════════════════════════════════════════
@@ -589,7 +608,10 @@ function openUitleg(i) {
   $('uitleg-spreek').style.display = kanSpreken() ? '' : 'none';
   toonScherm('uitleg');
 }
-function spreekUitleg() { const n = DATA[huidigVak].niveaus[huidigNiv]; spreek(zonderHtml(n.regel)); }
+function spreekUitleg() {
+  const n = DATA[huidigVak].niveaus[huidigNiv], t = zonderHtml(n.regel);
+  spreekReeks((t.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [t]).map(z => z.trim()).filter(Boolean));
+}
 
 // ════════════════════════════════════════════════════════════
 //  VRAGEN MAKEN
@@ -694,11 +716,11 @@ function toonVraag() {
     renderOpties(q, q.goed.length <= 4);
   } else if (q.type === 'dictee') {
     k.innerHTML = herh + `<div class="vraag-label">🎧 Luister en schrijf het woord op.${q.vraag ? ' Hint: ' + esc(q.vraag.replace(/…/g, '').trim()) : ''}</div><button class="luister-knop" id="luister" aria-label="Luister naar het woord">🔊</button><input class="dictee-veld" id="dictee" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="typ hier"><div class="feedback" id="fb"></div>`;
-    $('luister').addEventListener('click', function () { spreek(q.woord, 0.7); });
+    $('luister').addEventListener('click', function () { spreekWoord(q.woord, true); });
     $('dictee').addEventListener('keydown', function (e) { if (e.key === 'Enter') controleerDictee(); });
     $('volgende-rij').innerHTML = '<button class="knop" id="check-knop">Controleer</button>';
     $('check-knop').addEventListener('click', controleerDictee);
-    setTimeout(function () { spreek(q.woord, 0.7); }, 350);
+    setTimeout(function () { spreekWoord(q.woord, true); }, 350);
   } else if (q.type === 'tik') {
     k.innerHTML = herh + `<div class="vraag-tekst">${esc(q.opdracht)}</div><div class="zin-woorden" id="woorden"></div><div class="feedback" id="fb"></div>`;
     const w = $('woorden');
@@ -725,7 +747,7 @@ function toonLeestekst(plek, t) {
     <h3><span>${esc(t.titel)}</span></h3>
     ${kanSpreken() ? `<div class="lees-hulp">
       <button class="spreek-knop" id="lees-voor">🔊 Lees voor</button>
-      <button class="tempo-knop" id="lees-tempo">${leesTempo < 0.8 ? '🐢 Heel langzaam' : '🙂 Rustig'}</button>
+      <button class="tempo-knop" id="lees-tempo">${leesTempo < 0.85 ? '🐢 Langzaam' : '🙂 Rustig'}</button>
       <span class="lees-tip">💡 Tik op een woord om het te horen</span>
     </div>` : ''}
     <p class="lees-zinnen">${zinnen.map((z, i) => `<span class="zin" data-i="${i}">${woordHTML(z)}</span>`).join(' ')}</p>
@@ -742,9 +764,9 @@ function toonLeestekst(plek, t) {
     spreekReeks([t.titel + '.'].concat(zinnen), i => markeer(i - 1), stop);
   });
   $('lees-tempo').addEventListener('click', function () {
-    leesTempo = leesTempo < 0.8 ? 0.85 : 0.65;
+    leesTempo = leesTempo < 0.85 ? TEMPO_RUSTIG : TEMPO_LANGZAAM;
     try { localStorage.setItem('milou_leestempo', leesTempo); } catch (e) {}
-    this.textContent = leesTempo < 0.8 ? '🐢 Heel langzaam' : '🙂 Rustig';
+    this.textContent = leesTempo < 0.85 ? '🐢 Langzaam' : '🙂 Rustig';
   });
   plek.querySelectorAll('.wrd').forEach(w => w.addEventListener('click', function () {
     if (bezig) stop();
@@ -755,8 +777,8 @@ function toonLeestekst(plek, t) {
     h.hidden = false;
     h.innerHTML = '<b></b><button class="mini-spreek" aria-label="Nog een keer">🔊</button>';
     h.querySelector('b').textContent = woord;
-    h.querySelector('button').addEventListener('click', () => spreek(woord, 0.55));
-    spreek(woord, 0.6);
+    h.querySelector('button').addEventListener('click', () => spreekWoord(woord));
+    spreekWoord(woord);
   }));
 }
 function renderOpties(q, groot) {
@@ -928,7 +950,18 @@ function openBonnen() {
   toonScherm('bonnen');
 }
 
+function renderStemInfo() {
+  const el = $('stem-info'); if (!el || !kanSpreken()) return;
+  zoekStem();
+  const naam = nlStem ? nlStem.name : 'standaardstem';
+  const goed = nlStemKwaliteit >= 2;
+  el.innerHTML = '🔊 Voorleesstem: <b></b>' + (goed ? ' ✓' : '<br>Tip voor papa: download op de iPad de stem <b>Claire (verbeterd)</b>, die is veel duidelijker.') + ' <button id="stem-test">Test</button>';
+  el.querySelector('b').textContent = naam + (goed ? ' (verbeterd)' : '');
+  $('stem-test').addEventListener('click', () => spreekReeks(['Hoi Milou!', 'Zo klink ik als ik voorlees.', 'Het woord is: trein.']));
+}
 renderMenu();
+renderStemInfo();
+if (kanSpreken()) setTimeout(renderStemInfo, 1500); // op de iPad komen de stemmen soms iets later binnen
 (function () { const o = new URLSearchParams(location.search).get('open'); if (DATA[o]) openVak(o); })();
 if (location.hash === '#beloningen') openBonnen();
 window.addEventListener('hashchange', function () { if (location.hash === '#beloningen') openBonnen(); });
