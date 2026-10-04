@@ -472,6 +472,7 @@
     gap: 10px; margin-top: 16px;
   }
   .hero-widget {
+    min-width: 0;
     background: rgba(255,255,255,0.15);
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
@@ -495,7 +496,38 @@
   }
   .hw-btn:hover { transform: scale(1.2); background: rgba(255,255,255,0.35); }
   .hw-btn.gekozen { background: rgba(255,255,255,0.5); transform: scale(1.15); }
+  .kh-zoek { display: flex; gap: 8px; }
+  .kh-zoek input { flex: 1; min-width: 0; border: 2px solid var(--pink2); border-radius: 14px; padding: 12px 14px; font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 700; color: var(--text); background: var(--card); }
+  .kh-zoek input:focus { outline: none; border-color: #ff6eb4; }
+  .kh-zoek button { border: none; cursor: pointer; background: #ff6eb4; color: white; font-size: 1.2rem; border-radius: 14px; padding: 0 16px; }
+  .kh-voorbeelden { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 4px; }
+  .kh-voorbeelden button { border: 2px solid var(--pink2); background: var(--card); color: var(--text); cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.8rem; padding: 6px 10px; border-radius: 999px; }
+  .kh-bubbel { margin-top: 12px; border-radius: 16px; padding: 12px 14px; font-size: 0.9rem; line-height: 1.5; }
+  .kh-bubbel.vraag { background: var(--pink2); margin-left: 15%; font-weight: 800; text-align: right; }
+  .kh-bubbel.antwoord { background: var(--bg); border: 2px solid var(--pink2); }
+  .kh-bubbel h3 { font-size: 1.05rem; margin: 2px 0 4px; }
+  .kh-tips { margin-top: 10px; background: #fff8d6; color: #7a5a00; border-radius: 12px; padding: 8px 12px; font-size: 0.82rem; font-weight: 800; line-height: 1.5; }
+  .kh-knoppen { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .kh-knoppen a, .kh-knoppen button { border: none; cursor: pointer; text-decoration: none; background: #ff6eb4; color: white; font-family: 'Nunito', sans-serif; font-weight: 900; font-size: 0.82rem; padding: 9px 14px; border-radius: 999px; }
+  .kh-knoppen .licht { background: var(--card); color: var(--text); border: 2px solid var(--pink2); }
   .gevoel-woorden { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .gevoel-acties { display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap; }
+  .gevoel-schrijf { margin-top: 8px; border: 1px solid rgba(255,255,255,0.6); cursor: pointer; background: transparent; color: white; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.85rem; padding: 8px 14px; border-radius: 999px; }
+  .gevoel-klaar-rij { color: white; font-weight: 800; font-size: 0.92rem; display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
+  .gevoel-klaar-rij button { border: 1px solid rgba(255,255,255,0.6); background: transparent; color: white; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.78rem; padding: 5px 12px; border-radius: 999px; cursor: pointer; }
+  .stemming-dicht .gevoel-woorden, .stemming-dicht .gevoel-acties, .stemming-dicht #gevoel-schrijfvak { display: none !important; }
+  @media (max-width: 600px) {
+    .home-hero { padding: 22px 14px; margin-bottom: 16px; }
+    .home-hero h1 { font-size: 1.9rem; margin-bottom: 2px; }
+    .home-hero p { font-size: 0.9rem; }
+    .hero-widgets { grid-template-columns: minmax(0, 1fr); gap: 8px; margin-top: 12px; }
+    .hero-widget { padding: 10px 12px; min-width: 0; }
+    .hw-label { margin-bottom: 4px; }
+    .gevoel-woorden { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; justify-content: flex-start; padding-bottom: 2px; margin-top: 4px; }
+    .gevoel-woorden::-webkit-scrollbar { display: none; }
+    .gw { flex-shrink: 0; }
+    #dagquote { font-size: 0.8rem !important; line-height: 1.4 !important; }
+  }
   .gw { border: none; cursor: pointer; background: rgba(255,255,255,0.25); color: white; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.82rem; padding: 6px 10px; border-radius: 999px; }
   .gw.gekozen { background: white; color: #c2407e; }
   .gevoel-tekst { width: 100%; margin-top: 10px; border: none; border-radius: 12px; padding: 10px 12px; font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 700; color: #3a2a3a; background: rgba(255,255,255,0.9); resize: none; }
@@ -538,6 +570,10 @@
   .quiz-antwoord-btn.fout  { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
 
   /* ─── DAGBOEK ─── */
+  .dagboek-slot { border: 2px solid var(--lavender); background: var(--card); color: var(--text); cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.8rem; padding: 8px 12px; border-radius: 50px; white-space: nowrap; }
+  .dagboek-slot.op-slot { background: #5a4a9a; color: white; border-color: #5a4a9a; }
+  .de-kop { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .de-deel { border: none; background: var(--card); cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.72rem; padding: 4px 10px; border-radius: 50px; color: var(--muted); white-space: nowrap; }
   .dagboek-entry {
     background: var(--bg); border-radius: 14px; padding: 14px 16px;
     border-left: 4px solid var(--lavender);
@@ -588,9 +624,15 @@
           <button class="gw" data-emoji="😢" data-label="Verdrietig">😢 Verdrietig</button>
           <button class="gw" data-emoji="😠" data-label="Boos">😠 Boos</button>
         </div>
-        <textarea id="gevoel-tekst" class="gevoel-tekst" rows="2" maxlength="300" placeholder="Of schrijf zelf hoe je je voelt… ✍️"></textarea>
-        <button class="gevoel-klaar" onclick="slaGevoelOp()">Klaar 💚</button>
-        <div class="gevoel-noot">Papa en mama kunnen lezen wat je hier schrijft. Iets geheims? Dat kan in je dagboek 📓</div>
+        <div class="gevoel-acties">
+          <button class="gevoel-schrijf" id="gevoel-schrijf" onclick="gevoelSchrijfOpen()">✍️ Zelf schrijven</button>
+          <button class="gevoel-klaar" onclick="slaGevoelOp()">Klaar 💚</button>
+        </div>
+        <div id="gevoel-schrijfvak" hidden>
+          <textarea id="gevoel-tekst" class="gevoel-tekst" rows="2" maxlength="300" placeholder="Schrijf hier hoe je je voelt…"></textarea>
+          <div class="gevoel-noot">Papa en mama kunnen lezen wat je hier schrijft. Iets alleen voor jezelf? Zet in je dagboek het slotje aan 🔒</div>
+        </div>
+        <div class="gevoel-klaar-rij" id="gevoel-gedaan" hidden></div>
         <div id="stemming-reactie" style="min-height:20px;font-size:0.85rem;font-weight:700;color:rgba(255,255,255,0.9);margin-top:6px"></div>
       </div>
       <!-- Dagelijkse quote -->
@@ -636,7 +678,7 @@
     <button class="home-tile" onclick="toon('dagboek', navBtn('dagboek'))" style="position:relative">
       <div class="tile-emoji">📓</div>
       <div class="tile-label">Mijn Dagboek</div>
-      <div class="tile-sub">Privé voor jou alleen</div>
+      <div class="tile-sub">Papa mag meelezen 💌</div>
       <span style="position:absolute;top:8px;right:8px;background:var(--pink);color:white;font-size:0.6rem;font-weight:900;padding:2px 6px;border-radius:10px">NIEUW</span>
     </button>
     <button class="home-tile" onclick="toon('quiz', navBtn('quiz'))" style="position:relative">
@@ -829,6 +871,24 @@
     <p>Milou's favoriete gerechten</p>
   </div>
 
+  <!-- 👩‍🍳 Kookhulp: typ wat je wilt maken -->
+  <div class="card accent-pink kookhulp">
+    <h2>👩‍🍳 Kookhulp</h2>
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px">Typ wat je wilt maken, en je krijgt meteen een recept!</p>
+    <div class="kh-zoek">
+      <input id="kh-vraag" type="text" enterkeyhint="search" autocomplete="off" placeholder="Bijv. hoe moet ik koekjes bakken?">
+      <button onclick="kookhulpZoek()" aria-label="Zoeken">🔎</button>
+    </div>
+    <div class="kh-voorbeelden">
+      <button onclick="kookhulpZoek('Ik wil koekjes bakken')">🍪 Koekjes</button>
+      <button onclick="kookhulpZoek('Ik wil spaghetti maken')">🍝 Spaghetti</button>
+      <button onclick="kookhulpZoek('Ik wil komkommersalade maken')">🥒 Komkommersalade</button>
+      <button onclick="kookhulpZoek('Hoe maak ik een smoothie?')">🥤 Smoothie</button>
+      <button onclick="kookhulpZoek('Ik wil muffins bakken')">🧁 Muffins</button>
+    </div>
+    <div id="kh-antwoord"></div>
+  </div>
+
   <div class="card accent-yellow">
     <h2>🌟 Mijn favoriete gerechten</h2>
     <div class="recipe-grid" id="receptGrid">
@@ -836,41 +896,6 @@
     </div>
   </div>
 
-  <div class="card accent-pink">
-    <h2>🍪 Koekjes bakken — Basisrecept</h2>
-    <p style="font-size:0.85rem; color:var(--muted); margin-bottom:12px">Knapperig van buiten, zacht van binnen</p>
-    <ul style="padding-left:18px; font-size:0.88rem; line-height:1.9; color:var(--text)">
-      <li>125g zachte boter</li>
-      <li>150g suiker</li>
-      <li>1 ei</li>
-      <li>1 tl vanille-extract</li>
-      <li>200g bloem</li>
-      <li>½ tl bakpoeder</li>
-      <li>Snufje zout</li>
-    </ul>
-    <div class="stappen" style="margin-top:14px; font-size:0.88rem; line-height:2; color:var(--text); border-top:1px solid #f0e0f0; padding-top:12px">
-      <strong>Zo maak je ze:</strong><br>
-      1️⃣ Verwarm de oven op 180°C<br>
-      2️⃣ Mix boter en suiker tot het luchtig is<br>
-      3️⃣ Voeg het ei en vanille toe<br>
-      4️⃣ Meng er de bloem, bakpoeder en zout door<br>
-      5️⃣ Vorm balletjes en leg op bakpapier<br>
-      6️⃣ Bak 10-12 minuten tot lichtgoud 🍪
-    </div>
-  </div>
-
-  <div class="card accent-mint">
-    <h2>🥒 Milou's Komkommersalade</h2>
-    <p style="font-size:0.85rem; color:var(--muted); margin-bottom:12px">Jouw eigen recept!</p>
-    <ul style="padding-left:18px; font-size:0.88rem; line-height:1.9;">
-      <li>1 komkommer</li>
-      <li>Scheut olijfolie</li>
-      <li>Beetje azijn of citroensap</li>
-      <li>Zout en peper</li>
-      <li>Optioneel: verse dille of munt</li>
-    </ul>
-    <p style="margin-top:10px; font-size:0.82rem; color:var(--muted)">✏️ <em>Pas dit recept aan naar jouw eigen smaak!</em></p>
-  </div>
 </section>
 
 <!-- ══════════ BLACKPINK ══════════ -->
@@ -1375,7 +1400,7 @@
   <div class="page-header">
     <div class="emoji">📓</div>
     <h1>Mijn Dagboek</h1>
-    <p>Privé — alleen voor jou 🔒</p>
+    <p>Papa mag meelezen 💌 · Iets alleen voor jou? Zet het slotje aan 🔒</p>
   </div>
   <div class="card accent-lav">
     <h2>✍️ Schrijf vandaag</h2>
@@ -1384,8 +1409,8 @@
       style="width:100%;min-height:160px;border:2px solid var(--lavender);border-radius:14px;
       padding:14px;font-family:'Nunito',sans-serif;font-size:0.92rem;resize:vertical;
       background:var(--bg);color:var(--text);outline:none;line-height:1.6"></textarea>
-    <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
-      <div style="display:flex;gap:6px" id="dagboek-stickers">
+    <div style="display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap">
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="dagboek-stickers">
         <button onclick="voegStickerToe('🌸')" class="sticker-btn">🌸</button>
         <button onclick="voegStickerToe('⭐')" class="sticker-btn">⭐</button>
         <button onclick="voegStickerToe('💕')" class="sticker-btn">💕</button>
@@ -1393,6 +1418,7 @@
         <button onclick="voegStickerToe('🎵')" class="sticker-btn">🎵</button>
         <button onclick="voegStickerToe('🎮')" class="sticker-btn">🎮</button>
       </div>
+      <button id="dagboek-slot" onclick="dagboekSlot()" class="dagboek-slot" aria-pressed="false">💌 Papa mag lezen</button>
       <button onclick="slaanDagboekOp()" style="margin-left:auto;background:var(--lavender);border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:10px 20px;border-radius:50px;color:#5a4a9a;font-size:0.88rem">
         💾 Opslaan
       </button>
@@ -1544,8 +1570,10 @@
 
     <!-- Dagboek inzien (optioneel) -->
     <div class="card accent-mint">
-      <h2>📓 Dagboek statistieken</h2>
-      <div id="dagboek-stats" style="font-size:0.88rem;color:var(--muted);line-height:2"></div>
+      <h2>📓 Milou's dagboek</h2>
+      <p style="font-size:0.78rem;color:var(--muted);margin-bottom:8px">Hier zie je de pagina's die Milou met je deelt. Pagina's met een slotje houdt ze voor zichzelf.</p>
+      <div id="dagboek-stats" style="font-size:0.85rem;color:var(--muted);line-height:1.8"></div>
+      <div id="dagboek-ouder" style="display:grid;gap:8px;margin-top:10px"></div>
     </div>
 
     <button onclick="uitloggenOuder()" style="width:100%;background:#fee2e2;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:12px;border-radius:14px;color:#e63946;font-size:0.88rem;margin-top:8px">
@@ -1746,8 +1774,30 @@ function slaGevoelOp() {
   reactie.textContent = reacties[Math.floor(Math.random() * reacties.length)];
   veld.value = '';
   document.querySelectorAll('#gevoel-woorden .gw').forEach(x => x.classList.remove('gekozen'));
+  document.getElementById('gevoel-schrijfvak').hidden = true;
   updateSterren();
+  setTimeout(gevoelStatus, 2500); // na de reactie klapt het blok netjes in
 }
+function gevoelSchrijfOpen() {
+  const v = document.getElementById('gevoel-schrijfvak');
+  v.hidden = !v.hidden;
+  if (!v.hidden) document.getElementById('gevoel-tekst').focus();
+}
+// Heeft ze vandaag al ingevuld? Dan alleen een klein regeltje laten zien.
+function gevoelStatus() {
+  const w = document.getElementById('stemming-widget'), g = document.getElementById('gevoel-gedaan');
+  if (!w || !g) return;
+  let data = {}; try { data = JSON.parse(localStorage.getItem('milou_stemmingen') || '{}'); } catch (e) {}
+  const nu = new Date(), k = nu.getFullYear() + '-' + String(nu.getMonth() + 1).padStart(2, '0') + '-' + String(nu.getDate()).padStart(2, '0');
+  const laatste = (data[k] || []).slice(-1)[0];
+  if (!laatste) { w.classList.remove('stemming-dicht'); g.hidden = true; return; }
+  w.classList.add('stemming-dicht'); g.hidden = false;
+  g.innerHTML = '<span></span><button>✏️ Nog iets delen</button>';
+  g.querySelector('span').textContent = 'Vandaag: ' + laatste.emoji + ' ' + laatste.label + ' ✓';
+  g.querySelector('button').addEventListener('click', function () { w.classList.remove('stemming-dicht'); g.hidden = true; document.getElementById('stemming-reactie').textContent = ''; });
+  document.getElementById('stemming-reactie').textContent = '';
+}
+gevoelStatus();
 function kiesStemming(e, emoji, label) {
   document.querySelectorAll('.hw-btn').forEach(b => b.classList.remove('gekozen'));
   if (e && e.currentTarget) e.currentTarget.classList.add('gekozen');
@@ -2414,6 +2464,150 @@ RECEPTEN.forEach((r) => {
   receptGrid.appendChild(detail);
 });
 
+// ════════════════════════════════════════════════════
+//  👩‍🍳 KOOKHULP — idee van Milou: typ wat je wilt maken
+//  Zoekt slim in Milou's receptenboek (ook met typfoutjes).
+//  Niet gevonden? Dan kan ze verder zoeken op Allerhande of Google.
+// ════════════════════════════════════════════════════
+const EXTRA_RECEPTEN = {
+  'Koekjes': { emoji: '🍪', tijd: '30 min', land: '🏠 Basisrecept',
+    intro: 'Knapperig van buiten, zacht van binnen. Je maakt er ongeveer 20.',
+    ingredienten: ['125 g zachte boter', '150 g suiker', '1 ei', '1 tl vanille-extract', '200 g bloem', '½ tl bakpoeder', 'Snufje zout', 'Optioneel: 100 g chocoladestukjes'],
+    stappen: ['Verwarm de oven voor op 180 °C en leg bakpapier op de bakplaat.', 'Mix de boter en de suiker tot het luchtig is.', 'Voeg het ei en de vanille toe en mix goed.', 'Meng de bloem, het bakpoeder en het zout erdoor. Wil je chocola? Roer die er nu door.', 'Maak balletjes zo groot als een walnoot en leg ze ver uit elkaar op de bakplaat. Druk ze een beetje plat.', 'Bak ze 10 tot 12 minuten, tot de randjes lichtbruin zijn.', 'Laat ze afkoelen op de bakplaat: warme koekjes breken snel. 🍪'] },
+  'Muffins': { emoji: '🧁', tijd: '35 min', land: '🏠 Basisrecept',
+    intro: 'Makkelijke muffins voor 12 stuks. Met chocola of met blauwe bessen!',
+    ingredienten: ['250 g bloem', '2 tl bakpoeder', '100 g suiker', 'Snufje zout', '2 eieren', '200 ml melk', '100 ml zonnebloemolie', '100 g chocoladestukjes of blauwe bessen', '12 papieren muffinvormpjes'],
+    stappen: ['Verwarm de oven voor op 190 °C. Zet de papieren vormpjes in een muffinplaat.', 'Meng in een kom de bloem, het bakpoeder, de suiker en het zout.', 'Klop in een andere kom de eieren met de melk en de olie.', 'Giet het natte mengsel bij het droge en roer kort tot alles net gemengd is. Een paar klontjes is goed!', 'Schep de chocola of de bessen erdoor.', 'Vul de vormpjes voor twee derde.', 'Bak ze 18 tot 22 minuten. Prik met een satéprikker in een muffin: komt hij er schoon uit, dan zijn ze klaar.'] },
+  'Brownies': { emoji: '🍫', tijd: '40 min', land: '🏠 Basisrecept',
+    intro: 'Smeuïge chocoladebrownies uit een vierkante vorm van 20 bij 20 cm.',
+    ingredienten: ['150 g pure chocolade', '125 g boter', '150 g suiker', '2 eieren', '75 g bloem', 'Snufje zout'],
+    stappen: ['Verwarm de oven voor op 175 °C. Bekleed de vorm met bakpapier.', 'Smelt de chocolade en de boter samen in een pannetje op laag vuur. Roer steeds. Haal het van het vuur.', 'Roer de suiker erdoor en laat het even afkoelen.', 'Klop de eieren er een voor een door.', 'Zeef de bloem en het zout erboven en roer tot het net gemengd is.', 'Giet het beslag in de vorm en bak 20 tot 25 minuten. Het midden mag nog een beetje zacht zijn.', 'Laat helemaal afkoelen en snijd in vierkantjes. 🍫'] },
+  'Smoothie': { emoji: '🥤', tijd: '5 min', land: '🏠 Snel & gezond',
+    intro: 'Een romige fruitsmoothie voor 2 glazen.',
+    ingredienten: ['1 banaan', 'Een handje aardbeien of bevroren fruit', '150 ml melk of yoghurt', 'Optioneel: 1 tl honing'],
+    stappen: ['Pel de banaan en breek hem in stukjes.', 'Was de aardbeien en haal de groene blaadjes eraf.', 'Doe al het fruit met de melk of yoghurt in de blender. Doe het deksel er goed op!', 'Mix ongeveer een minuut tot alles glad is.', 'Proef. Wil je hem zoeter? Doe er een beetje honing bij en mix nog even.', 'Schenk in een glas en drink meteen op. 🥤'] },
+  'Tosti': { emoji: '🥪', tijd: '10 min', land: '🏠 Snel',
+    intro: 'Een warme, knapperige tosti met gesmolten kaas.',
+    ingredienten: ['2 sneetjes brood', '1 of 2 plakjes kaas', 'Optioneel: 1 plakje ham', 'Een beetje boter'],
+    stappen: ['Besmeer de buitenkant van beide sneetjes dun met boter.', 'Leg de kaas (en ham) tussen de sneetjes, met de boterkant naar buiten.', 'Leg de tosti in het tosti-ijzer of in een koekenpan op middelhoog vuur.', 'Tosti-ijzer: 3 tot 4 minuten. Koekenpan: 2 tot 3 minuten per kant, druk hem zacht aan met een spatel.', 'Klaar als het brood goudbruin is en de kaas gesmolten. Pas op, de kaas is heet!'] },
+  'Omelet': { emoji: '🍳', tijd: '10 min', land: '🏠 Snel',
+    intro: 'Een luchtige omelet voor 1 persoon. Vul hem met wat jij lekker vindt!',
+    ingredienten: ['2 eieren', 'Scheutje melk', 'Zout en peper', 'Klontje boter', 'Optioneel: geraspte kaas, ham, paprika of champignons'],
+    stappen: ['Klop de eieren met de melk, een snufje zout en een beetje peper in een kom.', 'Smelt de boter in een koekenpan op middelhoog vuur.', 'Giet de eieren in de pan en laat ze rustig stollen.', 'Strooi de vulling over één helft.', 'Is de bovenkant bijna droog? Vouw de omelet dubbel met een spatel.', 'Schuif hem op een bord en eet smakelijk! 🍳'] },
+  'Wentelteefjes': { emoji: '🍞', tijd: '15 min', land: '🇳🇱 Oud-Hollands',
+    intro: 'Zoete gebakken broodjes met kaneel. Lekker met oud brood!',
+    ingredienten: ['4 sneetjes (oud) brood', '2 eieren', '150 ml melk', '1 el suiker', '1 tl kaneel', 'Boter om te bakken', 'Poedersuiker of stroop'],
+    stappen: ['Klop in een diep bord de eieren met de melk, de suiker en de kaneel.', 'Leg een sneetje brood in het mengsel en draai het om, zodat het aan beide kanten nat is.', 'Smelt een klontje boter in een koekenpan op middelhoog vuur.', 'Bak de sneetjes 2 tot 3 minuten per kant, tot ze goudbruin zijn.', 'Strooi er poedersuiker over of doe er een beetje stroop op. 🍞'] },
+  'Fruitsalade': { emoji: '🍓', tijd: '10 min', land: '🏠 Fris & gezond',
+    intro: 'Een kleurrijke fruitsalade. Gebruik het fruit dat je thuis hebt!',
+    ingredienten: ['1 banaan', '1 appel', 'Een handje druiven', '1 mandarijn', 'Een handje aardbeien', 'Scheutje sinaasappelsap'],
+    stappen: ['Was het fruit.', 'Snijd de appel in vieren, haal het klokhuis eruit en snijd hem in blokjes.', 'Snijd de banaan in plakjes en de aardbeien en druiven doormidden.', 'Pel de mandarijn en haal de partjes los.', 'Doe alles in een schaal en giet er een scheutje sinaasappelsap over. Dan wordt de appel niet bruin.', 'Even roeren en klaar! 🍓'] },
+  'Pasta pesto': { emoji: '🌿', tijd: '15 min', land: '🇮🇹 Italië',
+    intro: 'Snelle groene pasta voor 2 personen.',
+    ingredienten: ['200 g pasta', '3 el groene pesto', 'Een handje cherrytomaatjes', 'Geraspte kaas', 'Optioneel: gebakken kipblokjes'],
+    stappen: ['Breng een grote pan water met een snufje zout aan de kook.', 'Kook de pasta zo lang als op de verpakking staat.', 'Snijd intussen de tomaatjes doormidden.', 'Giet de pasta af boven de gootsteen. Vraag hulp: het water is heel heet!', 'Doe de pasta terug in de pan en roer de pesto erdoor.', 'Schep op een bord met de tomaatjes en strooi er kaas over. 🌿'] },
+  'Yoghurtcake': { emoji: '🍰', tijd: '50 min', land: '🇫🇷 Frans',
+    intro: 'De makkelijkste cake: je meet alles af met het lege yoghurtbekertje!',
+    ingredienten: ['1 bekertje yoghurt (125 g)', '2 bekertjes suiker', '3 bekertjes zelfrijzend bakmeel', '3 eieren', '½ bekertje zonnebloemolie', 'Optioneel: rasp van een citroen'],
+    stappen: ['Verwarm de oven voor op 180 °C en vet een cakevorm in.', 'Doe de yoghurt in een kom. Spoel het bekertje om en droog het af: dit is je maatbeker.', 'Voeg de suiker en de eieren toe en klop goed.', 'Roer het bakmeel erdoor, en daarna de olie (en de citroenrasp).', 'Giet het beslag in de vorm.', 'Bak de cake 35 tot 40 minuten. Klaar als een satéprikker er schoon uitkomt.', 'Laat hem eerst afkoelen voor je hem uit de vorm haalt. 🍰'] }
+};
+const KOOK_WOORDEN = {
+  'Spaghetti': ['spaghetti', 'spagetti', 'spageti', 'bolognese', 'pasta bolognese'],
+  'Komkommersalade': ['komkommersalade', 'komkommer salade', 'salade'],
+  'Komkommer sushi': ['sushi', 'komkommer sushi'],
+  'Pannenkoeken': ['pannenkoek', 'pannenkoeken', 'pannekoek', 'pancake'],
+  'Pizza': ['pizza'], 'Lasagne': ['lasagne', 'lasagna'], 'Taco': ['taco', 'tacos'],
+  'Broodje hamburger': ['hamburger', 'burger'], 'Kipwraps': ['wrap', 'wraps'],
+  'Uiensoep': ['uiensoep', 'soep'], 'Köfte': ['kofte', 'köfte', 'gehaktballetjes'],
+  'Koekjes': ['koekje', 'koekjes', 'cookie', 'cookies', 'koek'],
+  'Muffins': ['muffin', 'muffins', 'cupcake', 'cupcakes'],
+  'Brownies': ['brownie', 'brownies', 'chocoladecake'],
+  'Smoothie': ['smoothie', 'smoothies', 'milkshake', 'shake'],
+  'Tosti': ['tosti', 'tostie', 'tostis', 'toastie', 'tosti ijzer'],
+  'Omelet': ['omelet', 'omelette', 'ei bakken', 'eitje bakken', 'eieren bakken', 'gebakken ei'],
+  'Wentelteefjes': ['wentelteefje', 'wentelteefjes', 'wentelteef', 'french toast'],
+  'Fruitsalade': ['fruitsalade', 'fruit salade', 'fruit'],
+  'Pasta pesto': ['pesto', 'pasta pesto', 'pasta'],
+  'Yoghurtcake': ['cake', 'yoghurtcake', 'taart', 'baktaart']
+};
+function khNorm(t) { return t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim(); }
+function khAfstand(a, b) {
+  if (Math.abs(a.length - b.length) > 2) return 9;
+  const d = []; for (let i = 0; i <= a.length; i++) { d[i] = [i]; }
+  for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++)
+    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  return d[a.length][b.length];
+}
+function khAlleRecepten() { return Object.assign({}, RECEPTEN_DATA, EXTRA_RECEPTEN); }
+function khZoek(vraag) {
+  const tekst = ' ' + khNorm(vraag) + ' ', woorden = tekst.trim().split(' ');
+  const alle = khAlleRecepten(), scores = [];
+  Object.keys(alle).forEach(naam => {
+    const lijst = (KOOK_WOORDEN[naam] || []).concat([naam]).map(khNorm);
+    let score = 0;
+    lijst.forEach(k => {
+      if (tekst.indexOf(' ' + k + ' ') >= 0 || (k.length >= 5 && tekst.indexOf(k) >= 0)) score = Math.max(score, k.length * 2);
+      else if (k.indexOf(' ') < 0 && k.length >= 5) woorden.forEach(w => { if (w.length >= 4 && khAfstand(w, k) <= (k.length >= 8 ? 2 : 1)) score = Math.max(score, k.length); });
+    });
+    if (score) scores.push({ naam, score });
+  });
+  return scores.sort((a, b) => b.score - a.score).map(x => x.naam);
+}
+function khVeilig(d) {
+  const t = (d.stappen || []).join(' ').toLowerCase(), tips = [];
+  if (/oven/.test(t)) tips.push('🔥 Vraag papa of mama om te helpen met de oven, en gebruik ovenwanten.');
+  if (/snijd|snij|mes/.test(t)) tips.push('🔪 Snijd altijd van je vingers af, op een snijplank.');
+  if (/kook|heet|pan|vuur|bak /.test(t)) tips.push('♨️ Pannen en water worden heel heet. Draai de stelen naar binnen.');
+  return tips;
+}
+function khSpreek(tekst) {
+  if (!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(tekst), st = speechSynthesis.getVoices();
+  u.lang = 'nl-NL'; u.rate = 0.9; u.pitch = 1.1;
+  const v = st.find(x => /claire|ellen|fleur|google nederlands|colette|fenna/i.test(x.name) && /^nl/i.test(x.lang)) || st.find(x => /^nl/i.test(x.lang));
+  if (v) u.voice = v;
+  speechSynthesis.speak(u);
+}
+function kookhulpZoek(vraag) {
+  const veld = document.getElementById('kh-vraag');
+  vraag = (vraag || veld.value || '').trim();
+  if (!vraag) { veld.focus(); return; }
+  veld.value = '';
+  const plek = document.getElementById('kh-antwoord'), alle = khAlleRecepten(), gevonden = khZoek(vraag);
+  plek.innerHTML = '';
+  const v = document.createElement('div'); v.className = 'kh-bubbel vraag'; v.textContent = vraag; plek.appendChild(v);
+  const a = document.createElement('div'); a.className = 'kh-bubbel antwoord'; plek.appendChild(a);
+  if (gevonden.length) {
+    const naam = gevonden[0], d = alle[naam];
+    a.innerHTML = `<div style="font-weight:800;margin-bottom:6px">Leuk! Zo maak je ${naam.toLowerCase()} ${d.emoji}</div>
+      <h3>${d.emoji} ${naam}</h3>
+      <div style="font-size:0.8rem;color:var(--muted);margin-bottom:8px">⏱️ ${d.tijd} · ${d.land}</div>
+      <p style="font-size:0.87rem;font-style:italic;margin-bottom:10px">${d.intro}</p>
+      <strong style="font-size:0.85rem">🛒 Dit heb je nodig:</strong>
+      <ul style="padding-left:18px;font-size:0.86rem;line-height:1.9;margin:6px 0 12px">${d.ingredienten.map(i => `<li>${i}</li>`).join('')}</ul>
+      <strong style="font-size:0.85rem">👩‍🍳 Zo maak je het:</strong>
+      <ol style="padding-left:18px;font-size:0.86rem;line-height:1.9;margin-top:6px">${d.stappen.map(s => `<li>${s}</li>`).join('')}</ol>
+      ${khVeilig(d).length ? '<div class="kh-tips">' + khVeilig(d).join('<br>') + '</div>' : ''}
+      <div class="kh-knoppen"><button class="kh-lees">🔊 Lees voor</button>${gevonden.length > 1 ? gevonden.slice(1, 3).map(n => `<button class="licht kh-ander" data-naam="${n}">${alle[n].emoji} ${n}</button>`).join('') : ''}</div>`;
+    a.querySelector('.kh-lees').addEventListener('click', () => khSpreek(naam + '. Dit heb je nodig: ' + d.ingredienten.join(', ') + '. Zo maak je het. ' + d.stappen.map((s, i) => 'Stap ' + (i + 1) + '. ' + s).join(' ')));
+    a.querySelectorAll('.kh-ander').forEach(b => b.addEventListener('click', () => kookhulpZoek(b.dataset.naam)));
+  } else {
+    // Misschien vraagt ze naar een beloning?
+    let beloning = null;
+    if (typeof MB !== 'undefined' && MB.zoekBeloning) beloning = MB.zoekBeloning(vraag);
+    const q = encodeURIComponent(vraag.replace(/^(hoe (moet|maak|kan) ik|ik wil( graag)?|kun je)\s+/i, '').replace(/[?!.]/g, '').trim());
+    a.innerHTML = beloning
+      ? `Dat klinkt als een beloning! 🎁 Kijk bij <b>Beloningen</b> wat je daarvoor moet doen.<div class="kh-knoppen"><a href="spaarkaart.html?vraag=${encodeURIComponent(vraag)}">🎁 Naar mijn beloningen</a></div>`
+      : `Dat recept staat nog niet in jouw kookboek 🤔. Zullen we het samen opzoeken?
+        <div class="kh-knoppen"><a href="https://www.ah.nl/allerhande/recepten-zoeken?query=${q}" target="_blank" rel="noopener">🔎 Zoek op Allerhande</a><a class="licht" href="https://www.google.com/search?safe=active&q=${encodeURIComponent('makkelijk recept ')}${q}" target="_blank" rel="noopener">🔎 Zoek op Google</a></div>
+        <div style="font-size:0.78rem;color:var(--muted);margin-top:8px">Tip: vraag papa om je lievelingsrecept toe te voegen aan je kookboek!</div>`;
+  }
+  setTimeout(() => plek.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+}
+document.getElementById('kh-vraag').addEventListener('keydown', e => { if (e.key === 'Enter') kookhulpZoek(); });
+
 // ── ADEMHALING ──
 let ademBezig = false, ademTimer = null;
 function startAdem() {
@@ -2567,7 +2761,7 @@ function slaanDagboekOp() {
   const nu = new Date();
   const key = nu.toLocaleDateString('nl-NL', { weekday:'long', day:'numeric', month:'long' });
   let e = []; try { e = JSON.parse(localStorage.getItem('milou_dagboek') || '[]'); } catch(ex) {}
-  e.unshift({ datum: key, tekst, timestamp: nu.toISOString() });
+  e.unshift({ datum: key, tekst, timestamp: nu.toISOString(), prive: dagboekPrive });
   if (e.length > 50) e = e.slice(0, 50);
   localStorage.setItem('milou_dagboek', JSON.stringify(e));
   document.getElementById('dagboek-input').value = '';
@@ -2580,7 +2774,24 @@ function laadDagboekEntries() {
   if (!c) return;
   let e = []; try { e = JSON.parse(localStorage.getItem('milou_dagboek') || '[]'); } catch(ex) {}
   if (!e.length) { c.innerHTML = '<p style="font-size:0.85rem;color:var(--muted)">Nog niets geschreven. Begin vandaag! ✍️</p>'; return; }
-  c.innerHTML = e.slice(0,10).map(i => `<div class="dagboek-entry"><div class="de-datum">📅 ${i.datum}</div><div class="de-tekst">${i.tekst.replace(/</g,'&lt;')}</div></div>`).join('');
+  c.innerHTML = e.slice(0,10).map((i, n) => `<div class="dagboek-entry"><div class="de-kop"><div class="de-datum">📅 ${i.datum}</div><button class="de-deel" data-n="${n}">${isPrive(i) ? '🔒 Alleen voor mij' : '💌 Papa mag lezen'}</button></div><div class="de-tekst">${i.tekst.replace(/</g,'&lt;')}</div></div>`).join('');
+  c.querySelectorAll('.de-deel').forEach(b => b.addEventListener('click', function () {
+    let lijst = []; try { lijst = JSON.parse(localStorage.getItem('milou_dagboek') || '[]'); } catch (ex) {}
+    const it = lijst[+this.dataset.n]; if (!it) return;
+    it.prive = !isPrive(it);
+    localStorage.setItem('milou_dagboek', JSON.stringify(lijst));
+    laadDagboekEntries();
+  }));
+}
+// Pagina's van vóór deze update schreef ze toen het dagboek nog privé was: die blijven op slot tot zij ze zelf deelt.
+function isPrive(i) { return i.prive !== false; }
+let dagboekPrive = false;
+function dagboekSlot() {
+  dagboekPrive = !dagboekPrive;
+  const b = document.getElementById('dagboek-slot');
+  b.classList.toggle('op-slot', dagboekPrive);
+  b.setAttribute('aria-pressed', dagboekPrive ? 'true' : 'false');
+  b.textContent = dagboekPrive ? '🔒 Alleen voor mij' : '💌 Papa mag lezen';
 }
 
 // ════════════════════════════════════════════════════
@@ -2893,8 +3104,19 @@ function laadDagboekStats() {
   const el = document.getElementById('dagboek-stats');
   if (!el) return;
   let e=[]; try{e=JSON.parse(localStorage.getItem('milou_dagboek')||'[]');}catch(ex){}
+  const gedeeld = e.filter(i => !isPrive(i));
   el.innerHTML = !e.length ? 'Milou heeft nog niets in haar dagboek geschreven.' :
-    `📝 <strong>${e.length}</strong> pagina's geschreven<br>📅 Laatste: <strong>${e[0]?.datum}</strong><br>✍️ Gem. lengte: <strong>${Math.round(e.reduce((s,i)=>s+i.tekst.length,0)/e.length)} tekens</strong>`;
+    `📝 <strong>${e.length}</strong> pagina's geschreven · 📅 laatste: <strong>${e[0]?.datum}</strong>`;
+  const lijst = document.getElementById('dagboek-ouder'); if (!lijst) return;
+  lijst.innerHTML = e.length && !gedeeld.length ? '<div style="font-size:0.85rem;color:var(--muted)">Nog geen gedeelde pagina\'s.</div>' : '';
+  gedeeld.slice(0, 15).forEach(i => {
+    const d = document.createElement('div');
+    d.style.cssText = 'background:var(--bg);border-radius:12px;padding:10px 12px;border-left:4px solid var(--lavender)';
+    d.innerHTML = '<div style="font-size:0.75rem;font-weight:800;color:var(--muted)"></div><div style="font-size:0.88rem;line-height:1.6;white-space:pre-wrap;margin-top:2px"></div>';
+    d.children[0].textContent = '📅 ' + i.datum;
+    d.children[1].textContent = i.tekst;
+    lijst.appendChild(d);
+  });
 }
 
 // ════════════════════════════════════════════════════
