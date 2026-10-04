@@ -509,7 +509,7 @@ function renderStrook() {
   const knop = `<button class="bs-bonnen" onclick="openBonnen()">🎁<br>Alle beloningen${nb ? '<br>🎟️ ' + nb : ''}</button>`;
   if (!nv) { el.innerHTML = `<div class="bs-trofee">🏆</div><div class="bs-midden"><div class="bs-label">Beloningen</div><div class="bs-naam">Alles verdiend! Papa bedenkt vast iets nieuws.</div></div>${knop}`; return; }
   const eenh = nv.b.type === 'sterren' ? '⭐' : nv.b.type === 'oefendagen' ? 'dagen' : '';
-  const standTxt = nv.b.type === 'niveau' ? MB.ONDERDELEN[nv.b.onderdeel] + ': niveau ' + nv.stand + ' van ' + nv.b.drempel : nv.stand + ' van ' + nv.b.drempel + ' ' + eenh;
+  const standTxt = nv.b.type === 'niveau' ? MB.NAMEN[nv.b.onderdeel] + ': niveau ' + nv.stand + ' van ' + nv.b.drempel : nv.stand + ' van ' + nv.b.drempel + ' ' + eenh;
   el.innerHTML = `<div class="bs-trofee">🎁</div><div class="bs-midden"><div class="bs-label">Hier werk je naartoe</div><div class="bs-naam"></div><div class="balk"><div style="width:${nv.pct}%"></div></div><div class="bs-stand">${esc(standTxt)}</div></div>${knop}`;
   el.querySelector('.bs-naam').textContent = nv.b.beloning;
 }
@@ -790,7 +790,7 @@ function eindeRonde() {
     v[ronde.vak].behaald.push(nr); MB.bewaarVoortgang(v);
     ronde.verdiend += 5; voegSterToe(5);
     confetti();
-    MB.niveauGehaald(ronde.vak, nr, niv.titel, ronde.score + ' van de ' + ronde.telt);
+    MB.niveauGehaald(ronde.vak, nr, niv.titel, ronde.score + ' van de ' + ronde.telt + ' goed');
   } else { MB.check(); }
   $('res-emoji').textContent = gehaald ? '🏅' : pct >= 0.5 ? '💪' : '🌱';
   $('res-score').textContent = ronde.score + ' / ' + ronde.telt;

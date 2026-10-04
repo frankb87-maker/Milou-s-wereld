@@ -384,6 +384,15 @@ canvas.overtrek-canvas {
 }
 .klok-hulp-knop.aan { background: var(--paars); color: white; }
 .klok-reeks { font-weight: 800; font-size: 0.82rem; color: var(--muted); }
+.leer-strook { display: flex; align-items: center; gap: 12px; background: var(--wit); border: 2px dashed var(--roze2); border-radius: 20px; padding: 12px 14px; margin: 0 0 18px; text-decoration: none; color: inherit; box-shadow: var(--shadow); }
+.ls-em { font-size: 2rem; }
+.ls-mid { flex: 1; min-width: 0; }
+.ls-label { font-size: 0.72rem; font-weight: 800; color: var(--muted); }
+.ls-naam { font-weight: 900; font-size: 0.95rem; line-height: 1.25; margin: 1px 0 6px; }
+.ls-balk { height: 9px; background: #fff0f7; border-radius: 9px; overflow: hidden; }
+.ls-balk > div { height: 100%; width: 0; background: linear-gradient(90deg, #ff6eb4, #ffb347); border-radius: 9px; transition: width .6s ease; }
+.ls-stand { font-size: 0.72rem; font-weight: 800; color: var(--muted); margin-top: 4px; }
+.ls-pijl { font-size: 0.72rem; font-weight: 900; color: var(--roze); text-align: center; background: #fff4fa; border-radius: 12px; padding: 8px; }
 </style>
 </head>
 <body>
@@ -405,6 +414,11 @@ canvas.overtrek-canvas {
       <h1 style="font-family:'Pacifico',cursive;font-size:1.5rem;color:var(--roze);margin-top:6px">Milou's Leerboek</h1>
       <p style="color:var(--muted);font-size:0.88rem;margin-top:4px">Kies wat je wilt leren vandaag!</p>
     </div>
+    <a href="taal.html#beloningen" class="leer-strook" id="leer-strook" style="display:none">
+      <div class="ls-em">🎁</div>
+      <div class="ls-mid"><div class="ls-label">Hier werk je naartoe</div><div class="ls-naam" id="ls-naam"></div><div class="ls-balk"><div id="ls-balk"></div></div><div class="ls-stand" id="ls-stand"></div></div>
+      <div class="ls-pijl">Alle<br>beloningen</div>
+    </a>
     <div class="module-grid">
       <div class="module-kaart" onclick="startRekenboek('plus')">
         <div class="mk-emoji">➕</div>
@@ -591,7 +605,7 @@ function voegSterToe(aantal, x, y) {
   if (typeof MB !== 'undefined') {
     MB.logOefening(null, 1, 1);
     clearTimeout(beloningTimer);
-    beloningTimer = setTimeout(function () { MB.check(); }, 1500);
+    beloningTimer = setTimeout(function () { MB.check(); renderLeerStrook(); }, 1500);
   }
   for (let i = 0; i < aantal; i++) {
     setTimeout(() => {
@@ -1480,7 +1494,12 @@ function klokResultaat(juist, antwoord, extra) {
     speelGeluid('goed');
     voegSterToe(sterren, window.innerWidth / 2, window.innerHeight / 2);
     if (klokReeks === 5) {
+      const nieuwNiveau = klokLaadKlaar().indexOf(klokNiv) === -1 && klokNiv > 0;
       klokBewaarKlaar(klokNiv); renderKlokNiveaus(); maakConfetti();
+      if (nieuwNiveau && typeof MB !== 'undefined') {
+        const nv = KLOK_NIVEAUS.find(n => n.id === klokNiv);
+        MB.niveauGehaald('klokkijken', klokNiv, nv ? nv.naam : '', '5 keer op een rij goed');
+      }
       const volgende = KLOK_NIVEAUS.find(n => n.id === klokNiv + 1);
       fb.textContent += volgende ? ` 🏆 5 op een rij! Klaar voor niveau ${volgende.id}: ${volgende.naam}?` : ' 🏆 5 op een rij! Jij bent een echte klokkenkenner!';
     }
@@ -1559,6 +1578,20 @@ function updateKlokLive() {
 //  INIT
 // ══════════════════════════════════════════════════
 laadSterren();
+function renderLeerStrook() {
+  const el = document.getElementById('leer-strook');
+  if (!el || typeof MB === 'undefined') return;
+  const nv = MB.volgende();
+  if (!nv) { el.style.display = 'none'; return; }
+  el.style.display = 'flex';
+  document.getElementById('ls-naam').textContent = nv.b.beloning;
+  document.getElementById('ls-balk').style.width = nv.pct + '%';
+  const rest = nv.b.drempel - nv.stand;
+  document.getElementById('ls-stand').textContent = nv.b.type === 'niveau'
+    ? MB.NAMEN[nv.b.onderdeel] + ': niveau ' + nv.stand + ' van ' + nv.b.drempel
+    : 'Nog ' + rest + (nv.b.type === 'sterren' ? ' ⭐' : (rest === 1 ? ' oefendag' : ' oefendagen')) + ' te gaan!';
+}
+renderLeerStrook();
 maakBloemenBg();
 </script>
 </body>

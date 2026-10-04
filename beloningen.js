@@ -20,6 +20,9 @@
     wachtrij: 'milou_mail_wachtrij'
   };
   const ONDERDELEN = { spelling: 'Spelling', lezen: 'Lezen', grammatica: 'Grammatica' };
+  // Alles waarvoor een niveau-beloning kan gelden (klokkijken zit in het Leerboek)
+  const NAMEN = Object.assign({}, ONDERDELEN, { klokkijken: 'Klokkijken' });
+  const AANTAL = { spelling: 10, lezen: 5, grammatica: 8, klokkijken: 5 };
 
   function lees(k, std) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : std; } catch (e) { return std; } }
   function schrijf(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
@@ -38,7 +41,11 @@
     return v;
   }
   function bewaarVoortgang(v) { schrijf(K.voortgang, v); }
-  function hoogsteNiveau(o) { const b = voortgang()[o].behaald; return b.length ? Math.max.apply(null, b) : 0; }
+  function hoogsteNiveau(o) {
+    if (o === 'klokkijken') { const k = lees('milou_klok_niveaus', []).filter(n => n > 0); return k.length ? Math.max.apply(null, k) : 0; }
+    const v = voortgang()[o]; if (!v) return 0;
+    return v.behaald.length ? Math.max.apply(null, v.behaald) : 0;
+  }
 
   // ── Oefenlog (per dag) ──
   function logOefening(onderdeel, goed, totaal) {
@@ -78,6 +85,9 @@
     if (!l) {
       // Sterren die ze al had tellen niet mee voor de eerste beloning
       l = laadPapaLadder();
+    } else if (l.length === 3 && l.every(b => ['b1', 'b2', 'b3'].indexOf(b.id) >= 0 && !b.bereikt)) {
+      // De drie oude voorbeeldbeloningen staan er nog: vervang ze door de ladder van papa
+      l = laadPapaLadder();
     }
     return l;
   }
@@ -93,7 +103,7 @@
   function omschrijf(b) {
     if (b.type === 'sterren') return b.drempel + ' sterren verdienen';
     if (b.type === 'oefendagen') return b.drempel + ' dagen geoefend';
-    if (b.type === 'niveau') return (ONDERDELEN[b.onderdeel] || b.onderdeel) + ' niveau ' + b.drempel + ' halen';
+    if (b.type === 'niveau') return (NAMEN[b.onderdeel] || b.onderdeel) + ' niveau ' + b.drempel + ' halen';
     return '';
   }
   function eenheid(b) { return b.type === 'sterren' ? '⭐' : b.type === 'oefendagen' ? 'dagen' : 'niveau'; }
@@ -145,13 +155,14 @@
       const pct = v[o].totaal ? Math.round(v[o].goed / v[o].totaal * 100) : 0;
       r.push('• ' + ONDERDELEN[o] + ': niveau ' + (hoogsteNiveau(o) || '–') + ' behaald (' + pct + '% goed van ' + v[o].totaal + ' vragen)');
     });
+    r.push('• Klokkijken: niveau ' + (hoogsteNiveau('klokkijken') || '–') + ' van 5 behaald');
     return r.join('\n');
   }
 
   function niveauGehaald(onderdeel, niveau, titel, score) {
     if (MAIL_BIJ_NIVEAU) {
-      mail('⭐ Milou haalde ' + ONDERDELEN[onderdeel] + ' niveau ' + niveau,
-        'Milou heeft ' + ONDERDELEN[onderdeel] + ' niveau ' + niveau + ' (' + titel + ') gehaald met ' + score + ' van de 10 goed.\n\n' + samenvatting());
+      mail('⭐ Milou haalde ' + NAMEN[onderdeel] + ' niveau ' + niveau,
+        'Milou heeft ' + NAMEN[onderdeel] + ' niveau ' + niveau + ' (' + titel + ') gehaald: ' + score + '.\n\n' + samenvatting());
     }
     check();
   }
@@ -269,7 +280,7 @@
   }
 
   window.MB = {
-    ONDERDELEN, sterren, voortgang, bewaarVoortgang, hoogsteNiveau, logOefening, oefendagen,
+    ONDERDELEN, NAMEN, AANTAL, sterren, voortgang, bewaarVoortgang, hoogsteNiveau, logOefening, oefendagen,
     ladder, bewaarLadder, laadPapaLadder, bonnen, bewaarBonnen: b => schrijf(K.bonnen, b), stand, omschrijf, eenheid, volgende,
     check, niveauGehaald, mail, testMail, verwerkWachtrij, toonBon, samenvatting, datumNL,
     oefenlog: () => lees(K.log, {}), wachtrij: () => lees(K.wachtrij, [])

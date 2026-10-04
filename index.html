@@ -1508,7 +1508,7 @@
             <option value="niveau">🎯 Niveau halen</option>
           </select>
           <select id="bl-onderdeel" style="display:none;flex:1;min-width:120px;border:2px solid var(--pink2);border-radius:12px;padding:8px;font-family:'Nunito',sans-serif;font-size:0.85rem;background:var(--card);color:var(--text)">
-            <option value="spelling">Spelling</option><option value="lezen">Lezen</option><option value="grammatica">Grammatica</option>
+            <option value="spelling">Spelling</option><option value="lezen">Lezen</option><option value="grammatica">Grammatica</option><option value="klokkijken">Klokkijken</option>
           </select>
           <input id="bl-drempel" type="number" min="1" inputmode="numeric" placeholder="Aantal" style="width:90px;border:2px solid var(--pink2);border-radius:12px;padding:8px;font-family:'Nunito',sans-serif;font-size:0.85rem;background:var(--card);color:var(--text)">
         </div>
@@ -2633,7 +2633,7 @@ function laadOuderDashboard() {
 // ════════════════════════════════════════════════════
 //  📚 LEERVOORTGANG & 🏆 BELONINGEN (ouderdashboard)
 // ════════════════════════════════════════════════════
-const AANTAL_NIVEAUS = { spelling: 10, lezen: 5, grammatica: 8 };
+const AANTAL_NIVEAUS = { spelling: 10, lezen: 5, grammatica: 8, klokkijken: 5 };
 function htmlVeilig(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
 function laadLeerDashboard() {
   if (typeof MB === 'undefined') return;
@@ -2649,6 +2649,11 @@ function laadLeerDashboard() {
       + '<div style="height:8px;background:var(--pink2);border-radius:8px;overflow:hidden;margin:6px 0"><div style="height:100%;width:' + Math.round(hoog / n * 100) + '%;background:linear-gradient(90deg,#ff6eb4,#ffb347)"></div></div>'
       + '<div style="font-size:0.78rem;color:var(--muted)">' + pct + '% goed bij de eerste poging · ' + x.totaal + ' vragen · laatst: ' + laatst + (x.start > 1 ? ' · start bij niveau ' + x.start : '') + '</div></div>';
   });
+  const klok = MB.hoogsteNiveau('klokkijken');
+  h += '<div style="background:var(--bg);border-radius:12px;padding:10px 12px">'
+    + '<div style="display:flex;justify-content:space-between;font-weight:800"><span>🕐 Klokkijken (Leerboek)</span><span>niveau ' + (klok || '–') + ' / 5</span></div>'
+    + '<div style="height:8px;background:var(--pink2);border-radius:8px;overflow:hidden;margin:6px 0"><div style="height:100%;width:' + Math.round(klok / 5 * 100) + '%;background:linear-gradient(90deg,#ff6eb4,#ffb347)"></div></div>'
+    + '<div style="font-size:0.78rem;color:var(--muted)">Een niveau is gehaald bij 5 keer op een rij goed</div></div>';
   h += '</div>';
   document.getElementById('ld-overzicht').innerHTML = h;
   // Oefendagen
@@ -2723,14 +2728,14 @@ function blTypeWissel() {
   document.getElementById('bl-onderdeel').style.display = t === 'niveau' ? '' : 'none';
   document.getElementById('bl-hint').textContent = t === 'sterren' ? 'Telt vanaf nu. Ze heeft er nu ' + MB.sterren() + ', die tellen niet mee.'
     : t === 'oefendagen' ? 'Telt alle dagen waarop ze in het leer- of taalboek oefent (nu ' + MB.oefendagen() + ').'
-    : 'Spelling heeft 10 niveaus, grammatica 8 en lezen 5.';
+    : 'Spelling heeft 10 niveaus, grammatica 8, lezen 5 en klokkijken 5.';
 }
 function blToevoegen() {
   const t = document.getElementById('bl-type').value, d = parseInt(document.getElementById('bl-drempel').value, 10);
   const bel = document.getElementById('bl-beloning').value.trim(), o = document.getElementById('bl-onderdeel').value;
   if (!d || d < 1) { alert('Vul een aantal in.'); return; }
   if (!bel) { alert('Vul in wat de beloning is.'); return; }
-  if (t === 'niveau' && d > AANTAL_NIVEAUS[o]) { alert(MB.ONDERDELEN[o] + ' heeft ' + AANTAL_NIVEAUS[o] + ' niveaus.'); return; }
+  if (t === 'niveau' && d > AANTAL_NIVEAUS[o]) { alert(MB.NAMEN[o] + ' heeft ' + AANTAL_NIVEAUS[o] + ' niveaus.'); return; }
   const b = { id: 'b' + Date.now(), type: t, drempel: d, beloning: bel, bereikt: false };
   if (t === 'niveau') b.onderdeel = o;
   if (t === 'sterren') b.basis = MB.sterren();
@@ -2748,7 +2753,7 @@ function laadHomeBeloning() {
   document.getElementById('hb-balk').style.width = nv.pct + '%';
   const rest = nv.b.drempel - nv.stand;
   document.getElementById('hb-stand').textContent = nv.b.type === 'niveau'
-    ? MB.ONDERDELEN[nv.b.onderdeel] + ': niveau ' + nv.stand + ' van ' + nv.b.drempel
+    ? MB.NAMEN[nv.b.onderdeel] + ': niveau ' + nv.stand + ' van ' + nv.b.drempel
     : 'Nog ' + rest + (nv.b.type === 'sterren' ? ' ⭐' : (rest === 1 ? ' oefendag' : ' oefendagen')) + ' te gaan!';
 }
 window.addEventListener('load', laadHomeBeloning);
