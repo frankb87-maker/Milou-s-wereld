@@ -336,17 +336,32 @@
   }
 
   function samenvatting() {
-    const v = voortgang();
-    const t = taken();
-    const r = ['Stand van zaken:', '📅 ' + oefendagen() + ' oefendagen', '⭐ ' + sterren() + ' sterren in totaal',
-      '✏️ ' + t.spelling + ' spellingrondes · 🧩 ' + t.grammatica + ' grammaticarondes · 📖 ' + t.lezen + ' leesrondes',
-      '➕ ' + t.rekenen + ' sommen goed · 🕐 ' + t.klok + ' klokvragen goed'];
-    const nv = volgende(); if (nv) r.push('🎁 Ze werkt nu aan: ' + nv.b.beloning + ' (' + nv.pct + '%)');
+    const v = voortgang(), t = taken(), nu = new Date();
+    const tijd = nu.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+    const datum = nu.toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
+    function nw(aantal, enkel, meer) { return aantal + ' ' + (aantal === 1 ? enkel : meer); }
+    const r = ['Stand van zaken (' + datum + ', ' + tijd + '):',
+      '📅 ' + nw(oefendagen(), 'oefendag', 'oefendagen') + ' · ⭐ ' + sterren() + ' sterren in totaal',
+      '',
+      'Wat ze in totaal gedaan heeft:',
+      '✏️ ' + nw(t.spelling, 'spellingronde', 'spellingrondes') + ' · 🧩 ' + nw(t.grammatica, 'grammaticaronde', 'grammaticarondes') + ' · 📖 ' + nw(t.lezen, 'leesronde', 'leesrondes'),
+      '➕ ' + nw(t.rekenen, 'som goed', 'sommen goed') + ' · 🕐 ' + nw(t.klok, 'klokvraag goed', 'klokvragen goed'),
+      ''];
+    const nv = volgende();
+    if (nv) {
+      r.push('🎁 Ze werkt nu aan: ' + nv.b.beloning + ' (' + nv.pct + '% af)');
+      const rest = nogTeDoen(nv.b);
+      if (rest.length) r.push('   Nog te doen: ' + nogTekst(rest));
+      r.push('');
+    }
+    r.push('Niveaus:');
     Object.keys(ONDERDELEN).forEach(o => {
-      const pct = v[o].totaal ? Math.round(v[o].goed / v[o].totaal * 100) : 0;
-      r.push('• ' + ONDERDELEN[o] + ': niveau ' + (hoogsteNiveau(o) || '–') + ' behaald (' + pct + '% goed van ' + v[o].totaal + ' vragen)');
+      const h = hoogsteNiveau(o), pct = v[o].totaal ? Math.round(v[o].goed / v[o].totaal * 100) : 0;
+      r.push('• ' + ONDERDELEN[o] + ': ' + (h ? 'niveau ' + h + ' van ' + AANTAL[o] + ' gehaald' : 'nog geen niveau gehaald')
+        + (v[o].totaal ? ' (' + pct + '% goed van ' + v[o].totaal + ' vragen)' : ''));
     });
-    r.push('• Klokkijken: niveau ' + (hoogsteNiveau('klokkijken') || '–') + ' van 5 behaald');
+    const hk = hoogsteNiveau('klokkijken');
+    r.push('• Klokkijken: ' + (hk ? 'niveau ' + hk + ' van 5 gehaald' : 'nog geen niveau gehaald'));
     return r.join('\n');
   }
 

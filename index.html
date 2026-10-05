@@ -134,6 +134,26 @@
     display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
   }
+  .st-blokken { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
+  .st-blok { background: var(--bg); border-radius: 14px; padding: 10px; text-align: center; border: 2px solid transparent; }
+  .st-blok.goed { background: #e7f7ea; border-color: #bfe6c3; }
+  .st-blok.laag { background: #fff3e0; border-color: #ffd9a8; }
+  .st-blok-em { font-size: 1.4rem; line-height: 1.2; }
+  .st-blok-gr { font-weight: 900; font-size: 1.25rem; line-height: 1.2; }
+  .st-blok-kl { font-size: 0.72rem; font-weight: 800; color: var(--muted); }
+  .st-regel { font-size: 0.82rem; font-weight: 700; color: var(--muted); margin-top: 10px; text-align: center; }
+  .st-kop2 { font-weight: 900; font-size: 0.88rem; margin: 16px 0 8px; }
+  .st-lijst { display: grid; gap: 8px; }
+  .st-rij { display: flex; gap: 10px; align-items: center; background: var(--bg); border-radius: 12px; padding: 9px 11px; }
+  .st-em { font-size: 1.4rem; width: 28px; text-align: center; }
+  .st-mid { flex: 1; min-width: 0; }
+  .st-naam { font-weight: 900; font-size: 0.88rem; display: flex; justify-content: space-between; gap: 8px; }
+  .st-naam span { font-weight: 800; color: var(--muted); font-size: 0.78rem; white-space: nowrap; }
+  .st-balk { height: 7px; background: var(--pink2); border-radius: 7px; overflow: hidden; margin: 5px 0 3px; }
+  .st-balk > div { height: 100%; background: linear-gradient(90deg,#ff6eb4,#ffb347); border-radius: 7px; }
+  .st-sub { font-size: 0.74rem; font-weight: 700; color: var(--muted); }
+  .st-doel { background: var(--bg); border-radius: 14px; padding: 12px; margin-top: 14px; }
+  .st-doel-naam { font-weight: 900; font-size: 0.95rem; line-height: 1.3; }
   .groep-kop {
     font-weight: 900; font-size: 0.95rem; color: var(--text);
     margin: 22px 2px 10px; display: flex; align-items: center; gap: 8px;
@@ -1546,6 +1566,12 @@
       <div id="geheim-bevestiging" style="font-size:0.8rem;color:var(--mint);margin-top:8px;min-height:18px;font-weight:700"></div>
     </div>
 
+    <!-- 📊 Statusoverzicht -->
+    <div class="card accent-mint">
+      <h2>📊 Waar staat Milou?</h2>
+      <div id="status-overzicht"></div>
+    </div>
+
     <!-- 📚 Leervoortgang -->
     <div class="card accent-sky">
       <h2>📚 Leervoortgang</h2>
@@ -1609,7 +1635,7 @@
     </div>
 
     <div style="text-align:center;font-size:0.75rem;color:var(--muted);font-weight:700;margin:14px 0 6px">
-      Milou's Wereld · versie <b>2026.10.04-a</b>
+      Milou's Wereld · versie <b>2026.10.05-a</b>
     </div>
     <button onclick="uitloggenOuder()" style="width:100%;background:#fee2e2;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:800;padding:12px;border-radius:14px;color:#e63946;font-size:0.88rem;margin-top:8px">
       🔒 Uitloggen
@@ -2939,6 +2965,7 @@ function laadGevoelTeksten() {
   });
 }
 function laadOuderDashboard() {
+  laadStatusOverzicht();
   laadGevoelTeksten();
   tekenStemmingGrafiek();
   laadDagboekStats();
@@ -2950,6 +2977,73 @@ function laadOuderDashboard() {
 // ════════════════════════════════════════════════════
 const AANTAL_NIVEAUS = { spelling: 10, lezen: 5, grammatica: 8, klokkijken: 5 };
 function htmlVeilig(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+// ── 📊 Statusoverzicht: in één oogopslag zien waar ze staat ──
+function laadStatusOverzicht() {
+  const box = document.getElementById('status-overzicht');
+  if (!box || typeof MB === 'undefined') return;
+  const v = MB.voortgang(), tk = MB.taken(), nv = MB.volgende(), log = MB.oefenlog();
+  const vandaag = MB.vandaagStatus();
+
+  // Deze week: hoeveel dagen geoefend en hoeveel vragen
+  let weekVragen = 0, weekDagen = 0;
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const k = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    if (log[k]) { weekVragen += log[k].vragen || 0; if (log[k].stempel) weekDagen++; }
+  }
+  const laatsteDagen = Object.keys(log).filter(k => log[k].stempel).sort();
+  const laatste = laatsteDagen.length ? laatsteDagen[laatsteDagen.length-1] : null;
+  let sinds = '';
+  if (laatste) {
+    const d = Math.round((new Date().setHours(0,0,0,0) - new Date(laatste).setHours(0,0,0,0)) / 86400000);
+    sinds = d === 0 ? 'vandaag' : d === 1 ? 'gisteren' : d + ' dagen geleden';
+  }
+
+  let h = '<div class="st-blokken">';
+  h += stBlok('📅', weekDagen + ' / 7', 'dagen deze week', weekDagen >= 5 ? 'goed' : weekDagen >= 3 ? 'ok' : 'laag');
+  h += stBlok('✍️', weekVragen, 'vragen deze week', weekVragen >= 100 ? 'goed' : weekVragen >= 40 ? 'ok' : 'laag');
+  h += stBlok('🔥', MB.oefendagen(), 'oefendagen totaal', 'ok');
+  h += stBlok('⭐', MB.sterren(), 'sterren totaal', 'ok');
+  h += '</div>';
+  h += '<div class="st-regel">Laatst geoefend: <b>' + (sinds || 'nog niet') + '</b>' + (vandaag.gehaald ? ' · ✅ dagdoel van vandaag gehaald' : ' · vandaag ' + vandaag.sterren + '/' + vandaag.doel + ' ⭐') + '</div>';
+
+  // Per onderdeel: niveau, hoeveel procent goed en hoeveel ze deed
+  function mv(n, enkel, meer) { return n + ' ' + (n === 1 ? enkel : meer); }
+  const rijen = [
+    ['spelling', '✏️', 'Spelling', mv(tk.spelling, 'ronde', 'rondes')],
+    ['grammatica', '🧩', 'Grammatica', mv(tk.grammatica, 'ronde', 'rondes')],
+    ['lezen', '📖', 'Lezen', mv(tk.lezen, 'ronde', 'rondes')],
+    ['klokkijken', '🕐', 'Klokkijken', mv(tk.klok, 'vraag goed', 'vragen goed')],
+    ['rekenen', '➕', 'Rekenen', mv(tk.rekenen, 'som goed', 'sommen goed')]
+  ];
+  h += '<div class="st-kop2">Per onderdeel</div><div class="st-lijst">';
+  rijen.forEach(function (r) {
+    const sleutel = r[0], max = MB.AANTAL[sleutel] || 0, niv = max ? MB.hoogsteNiveau(sleutel) : 0;
+    const vo = v[sleutel], pct = vo && vo.totaal ? Math.round(vo.goed / vo.totaal * 100) : null;
+    const aantal = parseInt(r[3], 10) || 0;
+    const balk = max ? Math.round(niv / max * 100) : Math.min(100, aantal);
+    h += '<div class="st-rij"><div class="st-em">' + r[1] + '</div><div class="st-mid">'
+      + '<div class="st-naam">' + r[2] + (max ? ' <span>niveau ' + (niv || '–') + ' / ' + max + '</span>' : '') + '</div>'
+      + '<div class="st-balk"><div style="width:' + balk + '%"></div></div>'
+      + '<div class="st-sub">' + r[3] + (pct !== null ? ' · ' + pct + '% goed bij de eerste poging' : '') + '</div>'
+      + '</div></div>';
+  });
+  h += '</div>';
+
+  if (nv) {
+    const rest = MB.nogTeDoen(nv.b);
+    h += '<div class="st-doel"><div class="st-kop2" style="margin-top:0">🎁 Werkt nu aan</div>'
+      + '<div class="st-doel-naam"></div>'
+      + '<div class="st-balk" style="margin:6px 0"><div style="width:' + nv.pct + '%"></div></div>'
+      + '<div class="st-sub">' + nv.pct + '% af' + (rest.length ? ' · nog ' + htmlVeilig(MB.nogTekst(rest)) : ' · helemaal af!') + '</div></div>';
+  }
+  box.innerHTML = h;
+  if (nv) box.querySelector('.st-doel-naam').textContent = nv.b.beloning;
+}
+function stBlok(em, groot, klein, kleur) {
+  return '<div class="st-blok ' + kleur + '"><div class="st-blok-em">' + em + '</div><div class="st-blok-gr">' + groot + '</div><div class="st-blok-kl">' + klein + '</div></div>';
+}
+
 function laadLeerDashboard() {
   if (typeof MB === 'undefined') return;
   const v = MB.voortgang(), log = MB.oefenlog();
