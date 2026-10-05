@@ -347,6 +347,9 @@ canvas.overtrek-canvas {
 
 /* ── KLOKKIJKEN ── */
 .klok-niveaus { display: flex; gap: 6px; overflow-x: auto; padding: 2px 2px 8px; margin: -6px 0 10px; }
+.klok-modus { display: flex; justify-content: center; gap: 6px; margin: 2px 0 10px; flex-wrap: wrap; }
+.klok-modus button { border: 2px solid #e8dcf0; background: var(--wit); border-radius: 999px; padding: 6px 12px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.78rem; cursor: pointer; color: var(--tekst); }
+.klok-modus button.actief { background: var(--paars); color: #fff; border-color: var(--paars); }
 .klok-niv {
   flex: none; border: 2px solid var(--roze2); background: var(--bg); color: var(--tekst);
   border-radius: 999px; padding: 7px 12px; font-family: 'Nunito', sans-serif; font-weight: 800;
@@ -577,6 +580,7 @@ canvas.overtrek-canvas {
       <div class="boek-bloemen">🌸🌷🌼🌺🌸🌷🌼🌺🌸</div>
       <div class="bladzijde-titel" style="color:var(--paars)">🕐 Klokkijken</div>
       <div class="klok-niveaus" id="klok-niveaus"></div>
+      <div class="klok-modus" id="klok-modus"></div>
       <details class="klok-uitleg" id="klok-uitleg"><summary>💡 Uitleg</summary><p id="klok-uitleg-tekst"></p></details>
       <div class="klok-vraag" id="klok-vraag"></div>
       <div class="klok-digi" id="klok-digi"></div>
@@ -1355,6 +1359,8 @@ const KLOK_CONTEXT = [
   { h: 12, m: 30, t: 'De lunch op school begint om <span class="doel">half één</span>. Zet de klok!' },
 ];
 
+let klokModus = 'mix';
+try { klokModus = localStorage.getItem('milou_klok_modus') || 'mix'; } catch (e) {}
 let klokNiv = 1, klokType = 'lees', klokDoel = { h: 3, m: 0, h24: 15 }, klokZet = { h: 12, m: 0 };
 let klokHulp = true, klokReeks = 0, klokBeantwoord = false, klokSleep = null, klokVorige = '';
 
@@ -1431,8 +1437,24 @@ function startKlok() {
   const eerste = KLOK_NIVEAUS.find(n => n.id > 0 && klaar.indexOf(n.id) === -1);
   kiesKlokNiveau(eerste ? eerste.id : 1);
 }
+function renderKlokModus() {
+  const box = document.getElementById('klok-modus');
+  if (!box) return;
+  if (klokNiv === 5 || klokNiv === 0) { box.innerHTML = ''; return; }
+  const opties = [['kies', '🔢 Kiezen'], ['mix', '🔀 Door elkaar'], ['zet', '🕐 Zelf zetten']];
+  box.innerHTML = opties.map(function (o) {
+    return '<button class="' + (klokModus === o[0] ? 'actief' : '') + '" onclick="zetKlokModus(\'' + o[0] + '\')">' + o[1] + '</button>';
+  }).join('');
+}
+function zetKlokModus(m) {
+  klokModus = m;
+  try { localStorage.setItem('milou_klok_modus', m); } catch (e) {}
+  renderKlokModus();
+  nieuweKlokVraag();
+}
 function renderKlokNiveaus() {
   const klaar = klokLaadKlaar();
+  renderKlokModus();
   document.getElementById('klok-niveaus').innerHTML = KLOK_NIVEAUS.map(n =>
     `<button class="klok-niv${n.id === klokNiv ? ' actief' : ''}" onclick="kiesKlokNiveau(${n.id})">${n.id ? n.id + '. ' : ''}${n.naam}${klaar.indexOf(n.id) > -1 ? '<span class="vink">✓</span>' : ''}</button>`
   ).join('');
@@ -1483,7 +1505,9 @@ function nieuweKlokVraag() {
   klokVorige = sleutel;
 
   if (klokNiv === 5) klokType = Math.random() < 0.5 ? 'digi-tekst' : 'analoog-digi';
-  else klokType = Math.random() < 0.5 ? 'lees' : 'zet';
+  else if (klokModus === 'kies') klokType = 'lees';                       // alleen kiezen
+  else if (klokModus === 'zet') klokType = 'zet';                         // alleen zelf zetten
+  else klokType = Math.random() < 0.75 ? 'lees' : 'zet';                  // mix: meestal kiezen
 
   let context = null;
   if (klokType === 'zet' && Math.random() < 0.4) {
