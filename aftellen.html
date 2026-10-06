@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>🗓️ Milou's Aftelkalender</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+:root { --roze: #ff6eb4; --roze2: #ffd6ec; --roze3: #fff4fa; --bg: #fff9fc; --wit: #fff; --tekst: #3a2a3a; --muted: #8a7a8a; --shadow: 0 4px 20px rgba(200,100,160,0.12); }
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { -webkit-text-size-adjust: 100%; }
+body { font-family: 'Nunito', system-ui, sans-serif; background: var(--bg); color: var(--tekst); min-height: 100vh; padding-bottom: env(safe-area-inset-bottom, 0px); }
+button { font-family: inherit; color: inherit; }
+header { position: sticky; top: 0; z-index: 20; background: linear-gradient(135deg, #ff6eb4, #ffb347); padding: calc(10px + env(safe-area-inset-top, 0px)) 14px 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; box-shadow: 0 4px 16px rgba(255,110,180,0.3); }
+.logo { font-family: 'Pacifico', cursive; font-size: 1.1rem; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.18); }
+.kop-knop { background: rgba(255,255,255,0.3); border: none; border-radius: 50px; padding: 7px 14px; color: #fff; font-weight: 800; font-size: 0.82rem; text-decoration: none; }
+.container { max-width: 560px; margin: 0 auto; padding: 20px 14px 40px; }
+h1 { font-family: 'Pacifico', cursive; font-weight: 400; color: var(--roze); font-size: 1.7rem; text-align: center; }
+.sub { text-align: center; color: var(--muted); font-size: 0.9rem; font-weight: 800; margin: 2px 0 18px; }
+
+/* Aftelkaart */
+.kaart { background: var(--wit); border-radius: 24px; box-shadow: var(--shadow); padding: 18px 16px; margin-bottom: 20px; border-top: 6px solid var(--kl, var(--roze)); }
+.kop { display: flex; align-items: center; gap: 12px; }
+.kop .em { font-size: 2.6rem; line-height: 1; }
+.kop .tk { flex: 1; min-width: 0; }
+.kop h2 { font-size: 1.15rem; font-weight: 900; line-height: 1.25; }
+.kop .dat { font-size: 0.82rem; font-weight: 800; color: var(--muted); }
+.groot { text-align: center; margin: 14px 0 10px; }
+.groot .n { font-size: 3.4rem; font-weight: 900; line-height: 1; color: var(--kl, var(--roze)); }
+.groot .w { font-size: 0.95rem; font-weight: 900; color: var(--muted); }
+.balk { height: 12px; background: var(--roze3); border-radius: 12px; overflow: hidden; }
+.balk > div { height: 100%; background: linear-gradient(90deg, var(--kl, var(--roze)), #ffb347); border-radius: 12px; transition: width .5s; }
+.balk-tekst { text-align: center; font-size: 0.78rem; font-weight: 800; color: var(--muted); margin-top: 6px; }
+
+/* Vakjes om af te kruisen */
+.vakjes { display: grid; grid-template-columns: repeat(auto-fill, minmax(38px, 1fr)); gap: 6px; margin-top: 14px; }
+.vak { aspect-ratio: 1; border-radius: 11px; border: 2px solid var(--roze2); background: var(--wit); font-weight: 900; font-size: 0.78rem; color: var(--muted); display: grid; place-items: center; cursor: pointer; position: relative; padding: 0; }
+.vak.af { background: var(--kl, var(--roze)); border-color: var(--kl, var(--roze)); color: #fff; }
+.vak.af::after { content: '✕'; position: absolute; font-size: 1rem; }
+.vak.af span { opacity: .35; }
+.vak.vandaag { box-shadow: 0 0 0 3px #ffe066; border-color: #ffc400; }
+.vak.doel { background: #fff4c2; border-color: #ffc400; font-size: 1.1rem; }
+.vak.voorbij { opacity: .55; }
+.vak:disabled { cursor: default; }
+.knoprij { display: flex; gap: 8px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
+.knoprij button { border: 2px solid var(--roze2); background: var(--wit); border-radius: 999px; padding: 8px 14px; font-weight: 800; font-size: 0.82rem; cursor: pointer; }
+.knoprij button.vol { background: var(--kl, var(--roze)); color: #fff; border-color: transparent; }
+.klaar-tekst { text-align: center; font-weight: 900; font-size: 1.05rem; margin-top: 12px; line-height: 1.4; }
+
+/* Verjaardagen */
+h3 { font-size: 1.05rem; font-weight: 900; margin: 26px 0 10px; }
+.jarig { display: flex; align-items: center; gap: 12px; background: var(--wit); border-radius: 18px; padding: 12px 14px; box-shadow: var(--shadow); margin-bottom: 9px; }
+.jarig .em { font-size: 2rem; }
+.jarig .tk { flex: 1; min-width: 0; }
+.jarig .nm { font-weight: 900; font-size: 1rem; }
+.jarig .ds { font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+.jarig .nog { font-weight: 900; font-size: 0.85rem; color: var(--roze); text-align: right; white-space: nowrap; }
+.jarig.vandaag { background: #fff8d6; border: 2px solid #ffc400; }
+.confetti-stuk { position: fixed; width: 9px; height: 14px; border-radius: 2px; z-index: 998; top: -20px; pointer-events: none; animation: val linear forwards; }
+@keyframes val { to { transform: translateY(110vh) rotate(720deg); } }
+@media (prefers-reduced-motion: reduce) { .confetti-stuk { display: none; } .balk > div { transition: none; } }
+</style>
+</head>
+<body>
+<header>
+  <a href="index.html" class="kop-knop">← Terug</a>
+  <span class="logo">🗓️ Aftellen</span>
+  <span style="width:62px"></span>
+</header>
+
+<div class="container">
+  <h1>Aftelkalender</h1>
+  <p class="sub">Kruis elke dag een vakje af!</p>
+  <div id="kalenders"></div>
+  <h3>🎂 Verjaardagen</h3>
+  <div id="jarig"></div>
+</div>
+
+<script>
+// ✏️ Hier staan de aftelmomenten en verjaardagen
+const AFTELLEN = [
+  { id: 'verjaardag', emoji: '🎂', titel: 'Milou wordt 12!', datum: '2026-11-11', kleur: '#ff6eb4',
+    klaar: '🎉 Hiep hiep hoera! Je bent 12 geworden! 🎂' },
+  { id: 'sleutel', emoji: '🔑', titel: 'Sleutel nieuwe huis', datum: '2026-12-10', kleur: '#4f9fe8',
+    klaar: '🔑 We hebben de sleutel! Welkom in ons nieuwe huis! 🏡' }
+];
+const JARIG = [
+  { naam: 'Milou', emoji: '🌸', datum: '2014-11-11' },
+  { naam: 'Papa', emoji: '👨', datum: '1987-10-31' },
+  { naam: 'Mama', emoji: '👩', datum: '1984-01-08' },
+  { naam: 'Demi', emoji: '💜', datum: '2008-01-12' }
+];
+const MAANDEN = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+const DAGEN = ['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'];
+
+function datum0(d) { const x = new Date(d); x.setHours(0,0,0,0); return x; }
+function vandaag() { return datum0(new Date()); }
+function dagenTussen(a, b) { return Math.round((datum0(b) - datum0(a)) / 86400000); }
+function sleutelVan(d) { return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+function lees(k, std) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : std; } catch (e) { return std; } }
+function schrijf(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+function confetti() {
+  const kl = ['#ff6eb4','#ffe066','#64b5f6','#4caf50','#b39ddb','#ffb347'];
+  for (let i = 0; i < 50; i++) {
+    const c = document.createElement('div'); c.className = 'confetti-stuk';
+    c.style.left = Math.random()*100 + 'vw'; c.style.background = kl[i % kl.length];
+    c.style.animationDuration = (1.4 + Math.random()) + 's'; c.style.animationDelay = Math.random()*.6 + 's';
+    document.body.appendChild(c); setTimeout(() => c.remove(), 3200);
+  }
+}
+
+function render() {
+  const box = document.getElementById('kalenders');
+  box.innerHTML = '';
+  AFTELLEN.forEach(function (a) {
+    const doel = datum0(a.datum), nu = vandaag(), nog = dagenTussen(nu, doel);
+    const afgekruist = lees('milou_aftel_' + a.id, []);
+    // De kalender begint op de dag dat Milou voor het eerst keek, zodat elk vakje een dag is die ze aftelt
+    let startS = lees('milou_aftelstart_' + a.id, null);
+    if (!startS || datum0(startS) > nu) { startS = sleutelVan(nu); schrijf('milou_aftelstart_' + a.id, startS); }
+    const start = datum0(startS);
+    const totaal = Math.max(1, dagenTussen(start, doel) + 1);
+    const k = document.createElement('div');
+    k.className = 'kaart'; k.style.setProperty('--kl', a.kleur);
+    const dw = DAGEN[doel.getDay()], ds = dw + ' ' + doel.getDate() + ' ' + MAANDEN[doel.getMonth()] + ' ' + doel.getFullYear();
+    const pct = Math.max(0, Math.min(100, Math.round(afgekruist.length / totaal * 100)));
+    k.innerHTML = '<div class="kop"><div class="em">' + a.emoji + '</div><div class="tk"><h2></h2><div class="dat">' + ds + '</div></div></div>'
+      + (nog > 0
+        ? '<div class="groot"><div class="n">' + nog + '</div><div class="w">' + (nog === 1 ? 'nachtje slapen!' : 'nachtjes slapen') + '</div></div>'
+        : nog === 0 ? '<div class="klaar-tekst">' + a.klaar + '</div>'
+        : '<div class="klaar-tekst">🎉 Geweest op ' + doel.getDate() + ' ' + MAANDEN[doel.getMonth()] + '!</div>')
+      + '<div class="balk"><div style="width:' + pct + '%"></div></div>'
+      + '<div class="balk-tekst">' + afgekruist.length + ' van de ' + totaal + ' dagen afgekruist</div>'
+      + '<div class="vakjes"></div>'
+      + '<div class="knoprij"><button class="vol" data-a="vandaag">✕ Kruis vandaag af</button><button data-a="wis">↩️ Begin opnieuw</button></div>';
+    k.querySelector('h2').textContent = a.titel;
+
+    const vakjes = k.querySelector('.vakjes');
+    for (let i = 0; i < totaal; i++) {
+      const d = new Date(start); d.setDate(start.getDate() + i);
+      const s = sleutelVan(d), isDoel = i === totaal - 1, af = afgekruist.indexOf(s) >= 0;
+      const b = document.createElement('button');
+      b.className = 'vak' + (af ? ' af' : '') + (isDoel ? ' doel' : '') + (s === sleutelVan(nu) ? ' vandaag' : '') + (!af && d < nu ? ' voorbij' : '');
+      b.innerHTML = isDoel ? a.emoji : '<span>' + d.getDate() + '</span>';
+      b.title = d.getDate() + ' ' + MAANDEN[d.getMonth()];
+      if (d > nu) { b.disabled = true; b.style.opacity = '.45'; }
+      else b.addEventListener('click', function () { wissel(a, s); });
+      vakjes.appendChild(b);
+    }
+    k.querySelector('[data-a="vandaag"]').addEventListener('click', function () { wissel(a, sleutelVan(nu), true); });
+    k.querySelector('[data-a="wis"]').addEventListener('click', function () {
+      if (confirm('Alle kruisjes van "' + a.titel + '" weghalen?')) { schrijf('milou_aftel_' + a.id, []); schrijf('milou_aftelstart_' + a.id, sleutelVan(vandaag())); render(); }
+    });
+    box.appendChild(k);
+  });
+  renderJarig();
+}
+
+function wissel(a, s, alleenAan) {
+  const key = 'milou_aftel_' + a.id, lijst = lees(key, []), i = lijst.indexOf(s);
+  if (i >= 0) { if (alleenAan) return; lijst.splice(i, 1); }
+  else { lijst.push(s); confetti(); }
+  schrijf(key, lijst);
+  render();
+}
+
+function renderJarig() {
+  const box = document.getElementById('jarig'), nu = vandaag();
+  const lijst = JARIG.map(function (j) {
+    const geb = datum0(j.datum);
+    let volgend = new Date(nu.getFullYear(), geb.getMonth(), geb.getDate());
+    if (dagenTussen(nu, volgend) < 0) volgend = new Date(nu.getFullYear() + 1, geb.getMonth(), geb.getDate());
+    const nog = dagenTussen(nu, volgend);
+    return { j: j, nog: nog, wordt: volgend.getFullYear() - geb.getFullYear(), geb: geb };
+  }).sort(function (a, b) { return a.nog - b.nog; });
+  box.innerHTML = '';
+  lijst.forEach(function (x) {
+    const d = document.createElement('div');
+    d.className = 'jarig' + (x.nog === 0 ? ' vandaag' : '');
+    d.innerHTML = '<div class="em">' + (x.nog === 0 ? '🎉' : x.j.emoji) + '</div><div class="tk"><div class="nm"></div>'
+      + '<div class="ds">' + x.geb.getDate() + ' ' + MAANDEN[x.geb.getMonth()] + ' · wordt ' + x.wordt + '</div></div>'
+      + '<div class="nog">' + (x.nog === 0 ? 'vandaag!' : x.nog === 1 ? 'morgen!' : 'nog ' + x.nog + ' dagen') + '</div>';
+    d.querySelector('.nm').textContent = x.j.naam + (x.nog === 0 ? ' is jarig!' : '');
+    box.appendChild(d);
+  });
+}
+render();
+</script>
+</body>
+</html>
